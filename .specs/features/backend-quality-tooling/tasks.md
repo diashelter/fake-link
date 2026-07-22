@@ -469,9 +469,9 @@ T14 → T15
 
 **Done when**:
 
-- [ ] Teste passa em `make test-backend`
-- [ ] Assert exit code 0 para os três comandos
-- [ ] Gate check passes: `make test-backend`
+- [x] Teste passa em `make test-backend`
+- [x] Assert exit code 0 para os três comandos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature  
 **Gate**: full
