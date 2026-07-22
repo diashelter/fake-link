@@ -1,5 +1,32 @@
 name: ${COMPOSE_PROJECT_NAME:-fake_link}
 
+x-backend-image: &backend-image
+  build:
+    context: docker/php
+    dockerfile: Dockerfile
+    target: dev
+    args:
+      PHP_VERSION: ${PHP_VERSION:-8.4.23}
+      COMPOSER_VERSION: ${COMPOSER_VERSION:-2.10.2}
+  volumes:
+    - ./backend:/var/www/html
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    DB_CONNECTION: pgsql
+    DB_HOST: postgres
+    DB_PORT: 5432
+    DB_DATABASE: ${POSTGRES_DB:-fake_link}
+    DB_USERNAME: ${POSTGRES_USER:-fake_link}
+    DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    REDIS_HOST: redis-ephemeral
+    REDIS_PORT: 6379
+    REDIS_QUEUE_HOST: redis-queue
+    REDIS_QUEUE_PORT: 6379
+  stop_grace_period: 30s
+  stop_signal: SIGTERM
+
 services:
   postgres:
     image: postgres:${POSTGRES_VERSION:-18.4}-bookworm
@@ -50,6 +77,101 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+
+  backend:
+    <<: *backend-image
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-ephemeral:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "SCRIPT_NAME=/ping SCRIPT_FILENAME=/ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 || exit 1",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  scheduler:
+    <<: *backend-image
+    command: ["php", "artisan", "schedule:work"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pgrep -f 'artisan schedule:work' >/dev/null || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  analytics-worker:
+    <<: *backend-image
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --queue=analytics
+      - --sleep=1
+      - --timeout=120
+      - --max-jobs=1000
+      - --max-time=3600
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pgrep -f 'artisan queue:work' >/dev/null || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  notification-worker:
+    <<: *backend-image
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --queue=notifications
+      - --sleep=1
+      - --timeout=60
+      - --max-jobs=1000
+      - --max-time=3600
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pgrep -f 'artisan queue:work' >/dev/null || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   postgres_data:
