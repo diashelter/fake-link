@@ -442,10 +442,10 @@ T14 → T15
 
 **Done when**:
 
-- [ ] AD-009 presente no Decisions log
-- [ ] README referencia `make lint`, `make test-backend-coverage`, workflow CI
-- [ ] `docs/testing.md` consistente (sem PHPCS; Larastan nível 6 explícito)
-- [ ] Handoff `.specs/STATE.md` atualizado
+- [x] AD-009 presente no Decisions log
+- [x] README referencia `make lint`, `make test-backend-coverage`, workflow CI
+- [x] `docs/testing.md` consistente (sem PHPCS; Larastan nível 6 explícito)
+- [x] Handoff `.specs/STATE.md` atualizado
 
 **Tests**: none  
 **Gate**: full
