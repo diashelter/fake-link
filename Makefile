@@ -41,8 +41,9 @@ shell-frontend: ## Open an interactive shell in the frontend container
 migrate: ## Run Laravel database migrations
 	$(COMPOSE) exec backend php artisan migrate --force
 
-smoke: ## Run HTTPS health smoke checks against both local hosts
+smoke: ## Run HTTPS health and nginx routing smoke checks
 	bash tests/smoke/health.sh
+	bash tests/smoke/nginx-routes.sh
 
 test-backend: ## Run Pest tests in the backend container
 	@test -f .env || cp .env.example .env
