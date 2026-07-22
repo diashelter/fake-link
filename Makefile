@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-frontend lint lint-backend analyse-backend md-backend format-backend
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend lint lint-backend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -65,6 +65,16 @@ test-backend: ## Run Pest tests in the backend container
 		-e SESSION_DRIVER=array \
 		-e QUEUE_CONNECTION=sync \
 		backend php artisan test
+
+test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend container
+	@test -f .env || cp .env.example .env
+	$(COMPOSE) run --rm --no-deps \
+		-e DB_CONNECTION=sqlite \
+		-e DB_DATABASE=:memory: \
+		-e CACHE_STORE=array \
+		-e SESSION_DRIVER=array \
+		-e QUEUE_CONNECTION=sync \
+		backend composer run test:coverage
 
 test-frontend: ## Run Vitest tests in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend pnpm test
