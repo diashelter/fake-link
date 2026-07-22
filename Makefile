@@ -73,6 +73,8 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-backend
 	$(MAKE) test-frontend
 	bash tests/compose/config.sh
+	bash tests/compose/env-example.sh
+	bash tests/compose/depends-on.sh
 	bash tests/compose/test-profile.sh
 	bash tests/compose/docs-profile.sh
 	bash tests/compose/benchmark-profile.sh
