@@ -1,0 +1,13 @@
+# Local development publish ports (AD-004). Merged by Makefile for `make up`.
+services:
+  postgres:
+    ports:
+      - "${POSTGRES_PUBLISH_PORT:-5432}:5432"
+
+  redis-ephemeral:
+    ports:
+      - "${REDIS_EPHEMERAL_PUBLISH_PORT:-6379}:6379"
+
+  redis-queue:
+    ports:
+      - "${REDIS_QUEUE_PUBLISH_PORT:-6380}:6379"

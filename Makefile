@@ -1,4 +1,5 @@
-COMPOSE := docker compose --env-file docker/versions.env
+COMPOSE := docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.dev.yml
+COMPOSE_TEST := COMPOSE_PROJECT_NAME=fake_link_test docker compose --env-file docker/versions.env -f docker-compose.yml --profile test
 REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
@@ -62,6 +63,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-backend
 	$(MAKE) test-frontend
 	bash tests/compose/config.sh
+	bash tests/compose/test-profile.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
 	$(COMPOSE) up -d --wait
