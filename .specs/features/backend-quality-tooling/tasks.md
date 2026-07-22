@@ -389,10 +389,10 @@ T14 → T15
 
 **Done when**:
 
-- [ ] `vendor/bin/pest tests/Architecture` exit 0 no baseline
-- [ ] Regras cobrem: Controller sem Eloquent direto; cross-module Models proibido; Shared não depende de domínio (namespace-aware)
-- [ ] Discriminação documentada: mutante Controller+Eloquent falharia (verifier/sensor na Execute)
-- [ ] Gate check passes: `docker compose ... run --rm --no-deps backend vendor/bin/pest tests/Architecture`
+- [x] `vendor/bin/pest tests/Architecture` exit 0 no baseline
+- [x] Regras cobrem: Controller sem Eloquent direto; cross-module Models proibido; Shared não depende de domínio (namespace-aware)
+- [x] Discriminação documentada: mutante Controller+Eloquent falharia (verifier/sensor na Execute)
+- [x] Gate check passes: `docker compose ... run --rm --no-deps backend vendor/bin/pest tests/Architecture`
 
 **Tests**: architecture  
 **Gate**: full
