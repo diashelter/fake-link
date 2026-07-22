@@ -15,6 +15,7 @@ docker/nginx/certs/go.localhost.*
 # Dependencies (scaffolded later)
 backend/vendor/
 frontend/node_modules/
+frontend/.pnpm-store/
 frontend/.next/
 
 # OS / editor
