@@ -174,6 +174,36 @@ services:
       retries: 3
       start_period: 30s
 
+  # Second analytics worker for load tests (AD-002 / DOCKER-21).
+  analytics-worker-2:
+    profiles: ["benchmark"]
+    <<: *backend-image
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --queue=analytics
+      - --sleep=1
+      - --timeout=120
+      - --max-jobs=1000
+      - --max-time=3600
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pgrep -f 'artisan queue:work' >/dev/null || exit 1",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
   frontend:
     build:
       context: .
