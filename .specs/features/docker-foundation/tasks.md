@@ -100,9 +100,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `docker/versions.env` contém todas as variáveis da spec (PHP, Laravel, Composer, Node, pnpm, Next, Postgres, Redis, Nginx, Swagger UI)
-- [ ] Estrutura de diretórios conforme `design.md` §Layout
-- [ ] Gate check passes: `test -f docker/versions.env && grep -q PHP_VERSION docker/versions.env`
+- [x] `docker/versions.env` contém todas as variáveis da spec (PHP, Laravel, Composer, Node, pnpm, Next, Postgres, Redis, Nginx, Swagger UI)
+- [x] Estrutura de diretórios conforme `design.md` §Layout
+- [x] Gate check passes: `test -f docker/versions.env && grep -q PHP_VERSION docker/versions.env`
 
 **Tests**: none  
 **Gate**: build
@@ -124,9 +124,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `ephemeral.conf`: `save ""`, `appendonly no`, `maxmemory-policy allkeys-lru`
-- [ ] `queue.conf`: `appendonly yes`, `appendfsync everysec`, `maxmemory-policy noeviction`
-- [ ] Gate check passes: `grep -q noeviction docker/redis/queue.conf && grep -q allkeys-lru docker/redis/ephemeral.conf`
+- [x] `ephemeral.conf`: `save ""`, `appendonly no`, `maxmemory-policy allkeys-lru`
+- [x] `queue.conf`: `appendonly yes`, `appendfsync everysec`, `maxmemory-policy noeviction`
+- [x] Gate check passes: `grep -q noeviction docker/redis/queue.conf && grep -q allkeys-lru docker/redis/ephemeral.conf`
 
 **Tests**: none  
 **Gate**: build
@@ -148,11 +148,11 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `generate-dev-certs.sh` gera CA + certs para `app.localhost` e `go.localhost` em `docker/nginx/certs/`
-- [ ] `validate-env.sh` falha com lista clara se variável obrigatória ausente
-- [ ] `trust-ca.sh` documenta import da CA (macOS/Linux)
-- [ ] Scripts são executáveis e idempotentes
-- [ ] Gate check passes: `bash -n docker/scripts/*.sh`
+- [x] `generate-dev-certs.sh` gera CA + certs para `app.localhost` e `go.localhost` em `docker/nginx/certs/`
+- [x] `validate-env.sh` falha com lista clara se variável obrigatória ausente
+- [x] `trust-ca.sh` documenta import da CA (macOS/Linux)
+- [x] Scripts são executáveis e idempotentes
+- [x] Gate check passes: `bash -n docker/scripts/*.sh`
 
 **Tests**: none  
 **Gate**: build
@@ -174,10 +174,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Dockerfile consome `PHP_VERSION` de `versions.env`
-- [ ] Targets `dev` (bind-mount friendly) e `prod` (sem dev deps)
-- [ ] `www.conf`: `ping.path = /ping`, `ping.response = pong`
-- [ ] Gate check passes: `docker compose --env-file docker/versions.env build backend` (após T13 wiring mínimo ou build isolado `docker build -f docker/php/Dockerfile`)
+- [x] Dockerfile consome `PHP_VERSION` de `versions.env`
+- [x] Targets `dev` (bind-mount friendly) e `prod` (sem dev deps)
+- [x] `www.conf`: `ping.path = /ping`, `ping.response = pong`
+- [x] Gate check passes: `docker compose --env-file docker/versions.env build backend` (após T13 wiring mínimo ou build isolado `docker build -f docker/php/Dockerfile`)
 
 **Tests**: none  
 **Gate**: build
@@ -199,9 +199,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Consome `NODE_VERSION`, `PNPM_VERSION`, `NEXT_VERSION`
-- [ ] Target dev: `pnpm dev`; target prod: `pnpm build && pnpm start`
-- [ ] Gate check passes: build de imagem frontend bem-sucedido
+- [x] Consome `NODE_VERSION`, `PNPM_VERSION`, `NEXT_VERSION`
+- [x] Target dev: `pnpm dev`; target prod: `pnpm build && pnpm start`
+- [x] Gate check passes: build de imagem frontend bem-sucedido
 
 **Tests**: none  
 **Gate**: build
@@ -223,9 +223,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Imagem estende `nginx:${NGINX_VERSION}`
-- [ ] `00-global.conf` não contém `Strict-Transport-Security`
-- [ ] Gate check passes: `! grep -ri strict-transport-security docker/nginx/`
+- [x] Imagem estende `nginx:${NGINX_VERSION}`
+- [x] `00-global.conf` não contém `Strict-Transport-Security`
+- [x] Gate check passes: `! grep -ri strict-transport-security docker/nginx/`
 
 **Tests**: none  
 **Gate**: build
@@ -247,11 +247,11 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] TLS 443 + redirect 80→443
-- [ ] `/health` → `frontend:3000/health`
-- [ ] `/api/v1/*` → FastCGI backend
-- [ ] `/*` → frontend
-- [ ] Gate check passes: `nginx -t` via container build ou lint de sintaxe documentado
+- [x] TLS 443 + redirect 80→443
+- [x] `/health` → `frontend:3000/health`
+- [x] `/api/v1/*` → FastCGI backend
+- [x] `/*` → frontend
+- [x] Gate check passes: `nginx -t` via container build ou lint de sintaxe documentado
 
 **Tests**: none  
 **Gate**: build
@@ -273,10 +273,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `/health` → backend FastCGI
-- [ ] Allowlist: `/`, `/robots.txt`, slug regex `^[a-z0-9-]+$`
-- [ ] Métodos mutáveis rejeitados no Nginx
-- [ ] Gate check passes: revisão estática + `nginx -t` quando imagem disponível
+- [x] `/health` → backend FastCGI
+- [x] Allowlist: `/`, `/robots.txt`, slug regex `^[a-z0-9-]+$`
+- [x] Métodos mutáveis rejeitados no Nginx
+- [x] Gate check passes: revisão estática + `nginx -t` quando imagem disponível
 
 **Tests**: none  
 **Gate**: build
