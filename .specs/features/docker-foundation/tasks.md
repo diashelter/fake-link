@@ -552,10 +552,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Volumes de teste separados do dev
-- [ ] Postgres/Redis sem `ports:` no profile test
-- [ ] Test script confirma isolamento
-- [ ] Gate check passes: `docker compose --profile test config`
+- [x] Volumes de teste separados do dev
+- [x] Postgres/Redis sem `ports:` no profile test
+- [x] Test script confirma isolamento
+- [x] Gate check passes: `docker compose --profile test config`
 
 **Tests**: integration (estendido em `tests/compose/test-profile.sh`)  
 **Gate**: full
@@ -577,10 +577,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Swagger monta `docs/openapi.yaml`
-- [ ] Acessível via `https://app.localhost/docs` com profile ativo
-- [ ] Healthcheck swagger-ui
-- [ ] Gate check passes: smoke docs em `make test` ou target `make up-docs` documentado
+- [x] Swagger monta `docs/openapi.yaml`
+- [x] Acessível via `https://app.localhost/docs` com profile ativo
+- [x] Healthcheck swagger-ui
+- [x] Gate check passes: smoke docs em `make test` ou target `make up-docs` documentado
 
 **Tests**: integration  
 **Gate**: full

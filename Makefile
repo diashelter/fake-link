@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up down ps logs shell-backend shell-frontend migrate smoke test test-backend test-frontend lint
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-frontend lint
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -24,8 +24,15 @@ up: ## Validate environment, ensure dev certs, and start the stack
 	$(COMPOSE) up -d --wait
 	$(COMPOSE) exec -T backend php artisan migrate --force
 
+up-docs: ## Start the stack with Swagger UI (profile docs)
+	@test -f .env || cp .env.example .env
+	@ENV_FILE=$(REPO_ROOT)/.env bash docker/scripts/validate-env.sh
+	@$(MAKE) trust-ca
+	$(COMPOSE) --profile docs up -d --wait
+	$(COMPOSE) exec -T backend php artisan migrate --force
+
 down: ## Stop and remove containers
-	$(COMPOSE) down
+	$(COMPOSE) --profile docs down
 
 ps: ## Show compose service status
 	$(COMPOSE) ps
@@ -46,6 +53,9 @@ smoke: ## Run HTTPS health and nginx routing smoke checks
 	bash tests/smoke/health.sh
 	bash tests/smoke/nginx-routes.sh
 
+smoke-docs: ## Run Swagger UI smoke check via app.localhost/docs
+	bash tests/smoke/docs.sh
+
 test-backend: ## Run Pest tests in the backend container
 	@test -f .env || cp .env.example .env
 	$(COMPOSE) run --rm --no-deps \
@@ -64,13 +74,15 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-frontend
 	bash tests/compose/config.sh
 	bash tests/compose/test-profile.sh
+	bash tests/compose/docs-profile.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
-	$(COMPOSE) up -d --wait
+	$(COMPOSE) --profile docs up -d --wait
 	$(COMPOSE) exec -T backend php artisan migrate --force
 	bash tests/compose/redis-policies.sh
 	bash tests/smoke/services-healthy.sh
 	$(MAKE) smoke
+	$(MAKE) smoke-docs
 
 lint: ## Placeholder for future container lint targets
 	@echo "lint targets will be added in a later phase"

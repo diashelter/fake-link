@@ -235,6 +235,21 @@ services:
     command: ["true"]
     restart: "no"
 
+  swagger-ui:
+    profiles: ["docs"]
+    image: swaggerapi/swagger-ui:${SWAGGER_UI_VERSION:-v5.18.2}
+    environment:
+      SWAGGER_JSON: /openapi.yaml
+      BASE_URL: /docs
+    volumes:
+      - ./docs/openapi.yaml:/openapi.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/docs/ >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
 volumes:
   postgres_data:
     name: ${COMPOSE_PROJECT_NAME:-fake_link}_postgres_data
