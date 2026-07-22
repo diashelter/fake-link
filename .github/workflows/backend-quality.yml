@@ -33,5 +33,8 @@ jobs:
       - name: PHPMD complexity check
         run: make md-backend
 
+      - name: Pest Architecture suite
+        run: make test-architecture
+
       - name: Pest tests with PCOV coverage
         run: make test-backend-coverage

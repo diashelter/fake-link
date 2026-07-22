@@ -66,6 +66,16 @@ test-backend: ## Run Pest tests in the backend container
 		-e QUEUE_CONNECTION=sync \
 		backend php artisan test
 
+test-architecture: ## Run Pest Architecture suite in the backend container
+	@test -f .env || cp .env.example .env
+	$(COMPOSE) run --rm --no-deps \
+		-e DB_CONNECTION=sqlite \
+		-e DB_DATABASE=:memory: \
+		-e CACHE_STORE=array \
+		-e SESSION_DRIVER=array \
+		-e QUEUE_CONNECTION=sync \
+		backend vendor/bin/pest tests/Architecture
+
 test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend container
 	@test -f .env || cp .env.example .env
 	$(COMPOSE) run --rm --no-deps \
@@ -115,6 +125,7 @@ md-backend: ## Run PHPMD in the backend container
 format-backend: ## Run Pint style check in the backend container
 	$(COMPOSE) run --rm --no-deps backend composer run lint
 
-lint: ## Run backend static analysis then Pest tests (fail-fast)
+lint: ## Run backend static analysis, Architecture suite, then Pest tests (fail-fast)
 	$(MAKE) lint-backend
+	$(MAKE) test-architecture
 	$(MAKE) test-backend

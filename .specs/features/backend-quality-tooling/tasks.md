@@ -416,9 +416,9 @@ T14 → T15
 
 **Done when**:
 
-- [ ] `make lint` executa Architecture suite
-- [ ] CI workflow inclui step Pest Arch ou herda via `make lint` atualizado
-- [ ] Gate check passes: `make lint && bash tests/compose/backend-quality-gates.sh`
+- [x] `make lint` executa Architecture suite
+- [x] CI workflow inclui step Pest Arch ou herda via `make lint` atualizado
+- [x] Gate check passes: `make lint && bash tests/compose/backend-quality-gates.sh`
 
 **Tests**: none (coberto por T12)  
 **Gate**: full
