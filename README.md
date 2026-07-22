@@ -41,6 +41,72 @@ Em caso de divergência durante essa fase, [decisions.md](docs/decisions.md) reg
 - Analytics privados com minimização de dados e retenção limitada.
 - Interface em pt-BR, responsiva e acessível.
 
+## Ambiente Docker
+
+A interface operacional do ambiente local é o `Makefile` na raiz (`make help` lista os targets).
+
+### Pré-requisitos
+
+- Docker Engine e Docker Compose v2
+- Portas livres `80` e `443` (ou ajuste `NGINX_HTTPS_PORT` no `.env`)
+- Em desenvolvimento, confiança na CA local (ver `make trust-ca`)
+
+### Bootstrap
+
+```bash
+cp .env.example .env
+make up
+```
+
+`make up` valida variáveis, gera certificados de desenvolvimento, sobe a stack e aplica migrations.
+
+### URLs locais
+
+| Host | Uso |
+| --- | --- |
+| `https://app.localhost` | App / BFF / API (`/api/v1`) |
+| `https://app.localhost/health` | Readiness do frontend |
+| `https://app.localhost/docs` | Swagger UI (`make up-docs`, profile `docs`) |
+| `https://go.localhost` | Short host (redirect) |
+| `https://go.localhost/health` | Readiness do backend via Nginx |
+
+### Confiança na CA de desenvolvimento
+
+```bash
+make trust-ca
+```
+
+O script gera os certificados em `docker/nginx/certs/` e imprime o comando de importação por SO. Em CI, os smokes usam `curl -k`.
+
+### Targets úteis
+
+| Target | Ação |
+| --- | --- |
+| `make help` | Lista targets |
+| `make up` / `make down` | Sobe / derruba a stack |
+| `make up-docs` | Stack + Swagger UI |
+| `make smoke` | Health + rotas Nginx |
+| `make test` | Pest, Vitest, compose gates e smoke |
+| `make test-backend` / `make test-frontend` | Suites isoladas |
+| `make logs` / `make ps` | Observabilidade operacional |
+
+Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
+
+### Seeds determinísticos
+
+Seeds e fixtures determinísticos ficam restritos a **local** e **CI**. Não rodar seed de demo em produção; dados de produção vêm de fluxos reais ou jobs controlados.
+
+### Troubleshooting
+
+| Sintoma | O que verificar |
+| --- | --- |
+| `curl` rejeita HTTPS | Importar a CA (`make trust-ca`) ou usar `-k` só em CI |
+| Porta 443 em uso | Alterar `NGINX_HTTPS_PORT` ou liberar a porta |
+| `.env` incompleto | `cp .env.example .env` e rodar `docker/scripts/validate-env.sh` |
+| Serviço `unhealthy` | `make ps` e `make logs`; Postgres/Redis precisam ficar healthy antes do backend |
+| `/docs` 502 | Subir com `make up-docs` (profile `docs`) |
+| Conflito com stack de teste | Profile `test` usa `COMPOSE_PROJECT_NAME=fake_link_test` e não publica portas de datastore |
+
 ## Licença
 
 Repositório público distribuído sob a [licença MIT](LICENSE).

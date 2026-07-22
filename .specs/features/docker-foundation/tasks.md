@@ -602,9 +602,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `docker compose --profile benchmark config` mostra 2 analytics workers
-- [ ] README stub em `tests/load/` referencia variáveis
-- [ ] Gate check passes: `docker compose --profile benchmark config`
+- [x] `docker compose --profile benchmark config` mostra 2 analytics workers
+- [x] README stub em `tests/load/` referencia variáveis
+- [x] Gate check passes: `docker compose --profile benchmark config`
 
 **Tests**: none  
 **Gate**: build
@@ -626,9 +626,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Collector stub sobe com healthcheck `:13133`
-- [ ] Portas OTLP não publicadas no host
-- [ ] Gate check passes: `docker compose --profile observability config`
+- [x] Collector stub sobe com healthcheck `:13133`
+- [x] Portas OTLP não publicadas no host
+- [x] Gate check passes: `docker compose --profile observability config`
 
 **Tests**: none  
 **Gate**: build
@@ -650,12 +650,12 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `restart: unless-stopped` nos serviços app
-- [ ] CPU/RAM limits documentados
-- [ ] Sem bind mounts de código
-- [ ] Datastores sem `ports:`
-- [ ] Workers 2 analytics + 1 notification
-- [ ] Gate check passes: `tests/compose/prod-config.sh`
+- [x] `restart: unless-stopped` nos serviços app
+- [x] CPU/RAM limits documentados
+- [x] Sem bind mounts de código
+- [x] Datastores sem `ports:`
+- [x] Workers 2 analytics + 1 notification
+- [x] Gate check passes: `tests/compose/prod-config.sh`
 
 **Tests**: integration  
 **Gate**: full
@@ -677,9 +677,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Script buildx documentado para backend e frontend
-- [ ] Sem alteração manual de Dockerfile entre arquiteturas
-- [ ] Gate check passes: `bash -n docker/scripts/build-multiarch.sh`
+- [x] Script buildx documentado para backend e frontend
+- [x] Sem alteração manual de Dockerfile entre arquiteturas
+- [x] Gate check passes: `bash -n docker/scripts/build-multiarch.sh`
 
 **Tests**: none  
 **Gate**: build
@@ -701,10 +701,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Seção "Ambiente Docker" em português
-- [ ] Pré-requisitos, `make up`, URLs locais, trust-ca, troubleshooting
-- [ ] Seeds determinísticos restritos a local/CI documentados
-- [ ] Gate check passes: revisão manual + link para Makefile targets
+- [x] Seção "Ambiente Docker" em português
+- [x] Pré-requisitos, `make up`, URLs locais, trust-ca, troubleshooting
+- [x] Seeds determinísticos restritos a local/CI documentados
+- [x] Gate check passes: revisão manual + link para Makefile targets
 
 **Tests**: none  
 **Gate**: build
