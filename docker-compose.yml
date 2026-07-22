@@ -14,12 +14,19 @@ x-backend-image: &backend-image
     - path: .env
       required: false
   environment:
+    APP_NAME: Fake Link
+    APP_URL: ${APP_URL:-https://app.localhost}
+    SHORT_HOST: ${SHORT_HOST:-go.localhost}
     DB_CONNECTION: pgsql
     DB_HOST: postgres
     DB_PORT: 5432
     DB_DATABASE: ${POSTGRES_DB:-fake_link}
     DB_USERNAME: ${POSTGRES_USER:-fake_link}
     DB_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    CACHE_STORE: redis
+    SESSION_DRIVER: redis
+    QUEUE_CONNECTION: redis
+    REDIS_CLIENT: phpredis
     REDIS_HOST: redis-ephemeral
     REDIS_PORT: 6379
     REDIS_QUEUE_HOST: redis-queue
@@ -50,7 +57,7 @@ services:
       start_period: 30s
 
   redis-ephemeral:
-    image: redis:${REDIS_VERSION:-8.8.0}-bookworm
+    image: redis:${REDIS_VERSION:-8.8.0}
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     volumes:
       - ./docker/redis/ephemeral.conf:/usr/local/etc/redis/redis.conf:ro
@@ -64,7 +71,7 @@ services:
       start_period: 10s
 
   redis-queue:
-    image: redis:${REDIS_VERSION:-8.8.0}-bookworm
+    image: redis:${REDIS_VERSION:-8.8.0}
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     volumes:
       - ./docker/redis/queue.conf:/usr/local/etc/redis/redis.conf:ro
@@ -175,8 +182,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ./docker/node/Dockerfile
+      context: .
+      dockerfile: docker/node/Dockerfile
       target: dev
       args:
         NODE_VERSION: ${NODE_VERSION:-24.18.0}

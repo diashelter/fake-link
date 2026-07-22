@@ -20,7 +20,8 @@ up: ## Validate environment, ensure dev certs, and start the stack
 	@test -f .env || cp .env.example .env
 	@ENV_FILE=$(REPO_ROOT)/.env bash docker/scripts/validate-env.sh
 	@$(MAKE) trust-ca
-	$(COMPOSE) up -d
+	$(COMPOSE) up -d --wait
+	$(COMPOSE) exec -T backend php artisan migrate --force
 
 down: ## Stop and remove containers
 	$(COMPOSE) down
@@ -45,7 +46,13 @@ smoke: ## Run HTTPS health smoke checks against both local hosts
 
 test-backend: ## Run Pest tests in the backend container
 	@test -f .env || cp .env.example .env
-	$(COMPOSE) run --rm --no-deps backend php artisan test
+	$(COMPOSE) run --rm --no-deps \
+		-e DB_CONNECTION=sqlite \
+		-e DB_DATABASE=:memory: \
+		-e CACHE_STORE=array \
+		-e SESSION_DRIVER=array \
+		-e QUEUE_CONNECTION=sync \
+		backend php artisan test
 
 test-frontend: ## Run Vitest tests in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend pnpm test
@@ -54,6 +61,10 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-backend
 	$(MAKE) test-frontend
 	bash tests/compose/config.sh
+	@test -f .env || cp .env.example .env
+	@$(MAKE) trust-ca
+	$(COMPOSE) up -d --wait
+	$(COMPOSE) exec -T backend php artisan migrate --force
 	bash tests/compose/redis-policies.sh
 	bash tests/smoke/services-healthy.sh
 	$(MAKE) smoke

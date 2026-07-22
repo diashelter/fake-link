@@ -349,10 +349,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `GET /health` → `200 {"status":"ok"}`
-- [ ] `pnpm-lock.yaml` presente; Corepack/pnpm pin
-- [ ] Cookie defaults não relaxam `Secure`/`HttpOnly`/`SameSite`
-- [ ] Gate check passes: `make build` (frontend image)
+- [x] `GET /health` → `200 {"status":"ok"}`
+- [x] `pnpm-lock.yaml` presente; Corepack/pnpm pin
+- [x] Cookie defaults não relaxam `Secure`/`HttpOnly`/`SameSite`
+- [x] Gate check passes: `make build` (frontend image)
 
 **Tests**: none (testes em T12)  
 **Gate**: build
@@ -374,9 +374,9 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Vitest asserta status 200 e body `{"status":"ok"}`
-- [ ] Gate check passes: `make test-frontend`
-- [ ] Test count: ≥1 test pass
+- [x] Vitest asserta status 200 e body `{"status":"ok"}`
+- [x] Gate check passes: `make test-frontend`
+- [x] Test count: ≥1 test pass
 
 **Tests**: unit (Vitest)  
 **Gate**: quick
@@ -398,10 +398,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Volumes nomeados PG e redis-queue; ephemeral sem persistência
-- [ ] Healthchecks conforme matriz do design
-- [ ] Dev: ports 5432, 6379, 6380 mapeados via `.env`
-- [ ] Gate check passes: `docker compose --env-file docker/versions.env config`
+- [x] Volumes nomeados PG e redis-queue; ephemeral sem persistência
+- [x] Healthchecks conforme matriz do design
+- [x] Dev: ports 5432, 6379, 6380 mapeados via `.env`
+- [x] Gate check passes: `docker compose --env-file docker/versions.env config`
 
 **Tests**: none  
 **Gate**: build
@@ -423,11 +423,11 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Variáveis Redis separadas (ephemeral vs queue)
-- [ ] Commands artisan conforme design
-- [ ] `depends_on` + `service_healthy` para PG e redis-queue
-- [ ] `stop_grace_period: 30s` nos workers
-- [ ] Gate check passes: `docker compose config`
+- [x] Variáveis Redis separadas (ephemeral vs queue)
+- [x] Commands artisan conforme design
+- [x] `depends_on` + `service_healthy` para PG e redis-queue
+- [x] `stop_grace_period: 30s` nos workers
+- [x] Gate check passes: `docker compose config`
 
 **Tests**: none  
 **Gate**: build
@@ -449,10 +449,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Nginx healthcheck curl em ambos vhosts
-- [ ] Frontend depends_on backend healthy
-- [ ] Nginx depends_on backend + frontend healthy
-- [ ] Gate check passes: `docker compose config`
+- [x] Nginx healthcheck curl em ambos vhosts
+- [x] Frontend depends_on backend healthy
+- [x] Nginx depends_on backend + frontend healthy
+- [x] Gate check passes: `docker compose config`
 
 **Tests**: none  
 **Gate**: build
@@ -474,10 +474,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Grupos Compose, Postgres, App, URLs, Redis, Ports dev presentes
-- [ ] Sem segredos reais; placeholders seguros
-- [ ] `validate-env.sh` passa com `.env.example` copiado
-- [ ] Gate check passes: `cp .env.example .env.test && docker/scripts/validate-env.sh`
+- [x] Grupos Compose, Postgres, App, URLs, Redis, Ports dev presentes
+- [x] Sem segredos reais; placeholders seguros
+- [x] `validate-env.sh` passa com `.env.example` copiado
+- [x] Gate check passes: `cp .env.example .env.test && docker/scripts/validate-env.sh`
 
 **Tests**: none  
 **Gate**: build
@@ -499,10 +499,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `make help` lista todos os targets
-- [ ] Compose sempre via `--env-file docker/versions.env`
-- [ ] `make up` invoca validate-env + trust-ca quando necessário
-- [ ] Gate check passes: `make help`
+- [x] `make help` lista todos os targets
+- [x] Compose sempre via `--env-file docker/versions.env`
+- [x] `make up` invoca validate-env + trust-ca quando necessário
+- [x] Gate check passes: `make help`
 
 **Tests**: none  
 **Gate**: build
@@ -524,13 +524,13 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Script smoke: `curl` HTTPS `app.localhost` e `go.localhost` `/health` → 200
-- [ ] Script valida `docker compose ps` all healthy
-- [ ] Script valida CONFIG GET Redis (policies distintas)
-- [ ] Script valida `docker compose config` base válido
-- [ ] `make test` orquestra profile smoke efêmero
-- [ ] Gate check passes: `make test`
-- [ ] Test count: ≥4 smoke assertions pass
+- [x] Script smoke: `curl` HTTPS `app.localhost` e `go.localhost` `/health` → 200
+- [x] Script valida `docker compose ps` all healthy
+- [x] Script valida CONFIG GET Redis (policies distintas)
+- [x] Script valida `docker compose config` base válido
+- [x] `make test` orquestra profile smoke efêmero
+- [x] Gate check passes: `make test`
+- [x] Test count: ≥4 smoke assertions pass
 
 **Tests**: integration  
 **Gate**: full

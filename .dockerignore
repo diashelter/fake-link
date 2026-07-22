@@ -1,0 +1,6 @@
+.git
+backend/vendor
+frontend/node_modules
+frontend/.next
+frontend/.pnpm-store
+**/.DS_Store

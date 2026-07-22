@@ -27,12 +27,12 @@ CMD ["pnpm", "dev"]
 
 FROM base AS deps
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 
-COPY . .
+COPY frontend/ .
 RUN pnpm build
 
 FROM base AS prod
