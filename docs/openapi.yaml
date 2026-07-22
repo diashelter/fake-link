@@ -1,0 +1,1976 @@
+openapi: 3.1.0
+info:
+  title: Fake Link API
+  version: 1.0.0
+  summary: Contrato design-first do MVP do Fake Link
+  description: |
+    API Laravel pública para usuários convidados. A API versionada e o Swagger UI
+    usam o host da aplicação; o Swagger fica em `/docs` e não persiste credenciais
+    do try-it-out. O BFF do navegador não faz parte deste contrato.
+
+    O host curto é separado e aparece como servidor apenas nas operações de
+    redirect. Não há CORS cross-origin. Datas e horas são UTC estrito com sufixo
+    `Z`. Métodos não documentados retornam `405 METHOD_NOT_ALLOWED`. A API pode
+    retornar `503 SERVICE_UNAVAILABLE` ou `504 GATEWAY_TIMEOUT` em falhas temporárias.
+    Requests JSON aceitam no máximo 64 KiB; o host curto não aceita body.
+
+    A depreciação pública tem antecedência mínima de 90 dias. Limites iniciais:
+    registro 5/h por IP; login 5/min por e-mail+IP e 30/min por IP; solicitação de
+    reset 3/h por e-mail+IP; conclusão de reset 5/h por IP e token; reenvio de
+    verificação 3/h por conta; verificação 5/h por conta; criação de links 60/min
+    por conta; demais escritas 120/min por conta; leituras 300/min por token;
+    analytics 60/min por conta; redirect 120/min
+    por IP+slug na aplicação, além da proteção do Nginx.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://{appHost}
+    description: Host configurável da aplicação e da API
+    variables:
+      appHost:
+        default: app.localhost
+        description: Usa app.localhost em desenvolvimento e o domínio registrável escolhido em produção
+tags:
+  - name: Auth
+    description: Registro, verificação, sessão e recuperação da conta
+  - name: Links
+    description: Gerenciamento privado de links e histórico de destinos
+  - name: Analytics
+    description: Analytics privados dos links do proprietário
+  - name: Redirect
+    description: Resolução pública no host curto, sem autenticação
+paths:
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      summary: Criar uma conta pendente
+      description: |
+        Aceita somente os campos declarados. Cria um usuário `pending_verification` e emite um
+        token `verification`. Convite não autorizado e e-mail duplicado produzem a
+        mesma resposta genérica para impedir enumeração.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/AuthIssued'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/RegistrationNotAllowed'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Autenticar uma conta
+      description: |
+        Emite `session` para usuário ativo. Credenciais corretas de usuário `pending_verification`
+        emitem apenas `verification`; após verificar o e-mail é necessário novo login.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthIssued'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '403':
+          $ref: '#/components/responses/AccountUnavailable'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/logout:
+    post:
+      tags: [Auth]
+      operationId: logout
+      summary: Revogar o token atual
+      description: Aceita token `session` ou `verification` e revoga somente o token apresentado.
+      x-allowed-token-kinds: [session, verification]
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/logout-all:
+    post:
+      tags: [Auth]
+      operationId: logoutAll
+      summary: Revogar todos os tokens da conta
+      description: Exige token `session` e confirmação de `current_password`, inclusive para o token atual.
+      x-allowed-token-kinds: [session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrentPasswordRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/password/change:
+    post:
+      tags: [Auth]
+      operationId: changePassword
+      summary: Alterar a senha
+      description: Exige token `session` e revoga todos os tokens da conta após a alteração.
+      x-allowed-token-kinds: [session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/password/reset-request:
+    post:
+      tags: [Auth]
+      operationId: requestPasswordReset
+      summary: Solicitar recuperação de senha
+      description: |
+        Retorna sempre `202` para uma requisição válida, exista ou não conta elegível.
+        O token enviado fora de banda é de uso único e expira em 30 minutos.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/password/reset:
+    post:
+      tags: [Auth]
+      operationId: resetPassword
+      summary: Redefinir a senha
+      description: Consome token de uso único válido por 30 minutos e revoga todos os tokens da conta.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/email/verification-notification:
+    post:
+      tags: [Auth]
+      operationId: resendEmailVerification
+      summary: Reenviar a verificação de e-mail
+      description: Exige token restrito `verification`; o token enviado por e-mail expira em 60 minutos.
+      x-allowed-token-kinds: [verification]
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/auth/email/verify:
+    post:
+      tags: [Auth]
+      operationId: verifyEmail
+      summary: Verificar o e-mail explicitamente
+      description: |
+        Exige token `verification`, consome o token de uso único recebido por
+        e-mail e revoga a Restricted Session. Não emite sessão; um novo login é obrigatório.
+      x-allowed-token-kinds: [verification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/me:
+    get:
+      tags: [Auth]
+      operationId: getCurrentUser
+      summary: Consultar o usuário atual
+      description: Token restrito pode consultar somente o estado do próprio User.
+      x-allowed-token-kinds: [session, verification]
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+    patch:
+      tags: [Auth]
+      operationId: updateCurrentUser
+      summary: Alterar o nome do usuário atual
+      description: "`name` é o único campo aceito."
+      x-allowed-token-kinds: [session]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links:
+    get:
+      tags: [Links]
+      operationId: listLinks
+      summary: Listar links do proprietário
+      description: |
+        Usa cursor assinado e ordem fixa por criação mais recente, com ID como
+        desempate. A busca é case-insensitive e accent-sensitive: substring do
+        título ou prefixo do slug.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/PerPage'
+        - $ref: '#/components/parameters/Search'
+        - $ref: '#/components/parameters/LinkStatus'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkCollection'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+    post:
+      tags: [Links]
+      operationId: createLink
+      summary: Criar um link
+      description: |
+        Alias é normalizado para minúsculas. A mesma `Idempotency-Key` e o mesmo
+        comando normalizado reproduzem por 24 horas o `201`, corpo e headers
+        originais; comando diferente retorna `409`.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLinkRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/LinkCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/LinkConflict'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+    get:
+      tags: [Links]
+      operationId: getLink
+      summary: Consultar detalhes de um link
+      x-allowed-token-kinds: [session]
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkDetail'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+    patch:
+      tags: [Links]
+      operationId: updateLink
+      summary: Atualizar um link
+      description: |
+        Exige `If-Match`. Uma alteração semanticamente idêntica preserva
+        `updated_at`, histórico e ETag. Link bloqueado pode ser editado, mas não
+        desbloqueado por esta API. O slug é imutável.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLinkRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/PreconditionFailed'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}/history:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+    get:
+      tags: [Links]
+      operationId: listLinkHistory
+      summary: Listar o histórico de destinos
+      description: Retorna destinos do mais recente para o mais antigo, sem versão pública.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          $ref: '#/components/responses/LinkHistoryCollection'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}/analytics/summary:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - $ref: '#/components/parameters/TrafficType'
+    get:
+      tags: [Analytics]
+      operationId: getAnalyticsSummary
+      summary: Consultar o resumo de analytics
+      description: Período inclusivo, máximo de 366 dias e sem datas futuras.
+      x-allowed-token-kinds: [session]
+      responses:
+        '200':
+          $ref: '#/components/responses/AnalyticsSummary'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}/analytics/timeseries:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - $ref: '#/components/parameters/TrafficType'
+    get:
+      tags: [Analytics]
+      operationId: getAnalyticsTimeseries
+      summary: Consultar a série temporal densa
+      description: Inclui buckets zerados. `hour` aceita até 31 dias e `day`, até 366 dias.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/Granularity'
+      responses:
+        '200':
+          $ref: '#/components/responses/AnalyticsTimeseries'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}/analytics/referrers:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - $ref: '#/components/parameters/TrafficType'
+    get:
+      tags: [Analytics]
+      operationId: getAnalyticsReferrers
+      summary: Consultar os principais referenciadores
+      description: |
+         Retorna hosts públicos completos, sem path ou query. `direct` compete no
+         ranking e `other` fecha o total fora dos itens retornados.
+      x-allowed-token-kinds: [session]
+      parameters:
+        - $ref: '#/components/parameters/ReferrerLimit'
+      responses:
+        '200':
+          $ref: '#/components/responses/AnalyticsReferrers'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /api/v1/links/{link}/analytics/devices:
+    parameters:
+      - $ref: '#/components/parameters/LinkId'
+      - $ref: '#/components/parameters/From'
+      - $ref: '#/components/parameters/To'
+      - $ref: '#/components/parameters/TrafficType'
+    get:
+      tags: [Analytics]
+      operationId: getAnalyticsDevices
+      summary: Consultar totais por dispositivo
+      description: Retorna sempre as cinco categorias, inclusive quando o total é zero; não aceita `limit`.
+      x-allowed-token-kinds: [session]
+      responses:
+        '200':
+          $ref: '#/components/responses/AnalyticsDevices'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
+  /:
+    get:
+      tags: [Redirect]
+      operationId: redirectShortHostRoot
+      summary: Redirecionar a raiz para a landing page
+      description: Não gera analytics.
+      security: []
+      servers:
+        - url: https://{shortHost}
+          description: Host curto configurável; HSTS permanentemente ausente
+          variables:
+            shortHost:
+              default: go.localhost
+              description: Usa go.localhost em desenvolvimento e o domínio curto dedicado em produção
+      responses:
+        '302':
+          $ref: '#/components/responses/LandingRedirect'
+        '503':
+          $ref: '#/components/responses/RedirectUnavailable'
+  /robots.txt:
+    get:
+      tags: [Redirect]
+      operationId: getShortHostRobots
+      summary: Impedir indexação do host curto
+      security: []
+      servers:
+        - url: https://{shortHost}
+          description: Host curto configurável; HSTS permanentemente ausente
+          variables:
+            shortHost:
+              default: go.localhost
+              description: Usa go.localhost em desenvolvimento e o domínio curto dedicado em produção
+      responses:
+        '200':
+          $ref: '#/components/responses/Robots'
+  /{slug}:
+    parameters:
+      - $ref: '#/components/parameters/Slug'
+    get:
+      tags: [Redirect]
+      operationId: redirectShortLink
+      summary: Redirecionar um slug público
+      description: |
+        Uma barra final opcional tem a mesma semântica; essa equivalência é descrita
+        aqui porque templates OpenAPI que diferem apenas pela barra não são portáveis.
+        Letras maiúsculas são normalizadas. Percent-encoding e segmentos extras são
+        rejeitados. A query recebida é ignorada. Um `302` publica analytics de forma
+        assíncrona, sem tornar o redirect dependente da persistência.
+      security: []
+      servers:
+        - url: https://{shortHost}
+          description: Host curto configurável; HSTS permanentemente ausente
+          variables:
+            shortHost:
+              default: go.localhost
+              description: Usa go.localhost em desenvolvimento e o domínio curto dedicado em produção
+      responses:
+        '302':
+          $ref: '#/components/responses/ShortLinkRedirect'
+        '404':
+          $ref: '#/components/responses/SlugNotFound'
+        '410':
+          $ref: '#/components/responses/LinkUnavailable'
+        '429':
+          $ref: '#/components/responses/RedirectRateLimited'
+        '503':
+          $ref: '#/components/responses/RedirectUnavailable'
+    head:
+      tags: [Redirect]
+      operationId: inspectShortLink
+      summary: Consultar headers de redirect sem analytics
+      description: Retorna os mesmos headers do `GET`, sem corpo e sem publicar analytics.
+      security: []
+      servers:
+        - url: https://{shortHost}
+          description: Host curto configurável; HSTS permanentemente ausente
+          variables:
+            shortHost:
+              default: go.localhost
+              description: Usa go.localhost em desenvolvimento e o domínio curto dedicado em produção
+      responses:
+        '302':
+          $ref: '#/components/responses/ShortLinkRedirect'
+        '404':
+          $ref: '#/components/responses/SlugNotFound'
+        '410':
+          $ref: '#/components/responses/LinkUnavailable'
+        '429':
+          $ref: '#/components/responses/RedirectRateLimited'
+        '503':
+          $ref: '#/components/responses/RedirectUnavailable'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Opaque token
+      description: Token opaco `session` ou `verification`; o restrito pode consultar o User, verificar e fazer logout.
+  headers:
+    RequestId:
+      description: Identificador da requisição para correlação segura.
+      required: true
+      schema:
+        $ref: '#/components/schemas/RequestId'
+    PrivateCacheControl:
+      description: Impede armazenamento de respostas autenticadas ou sensíveis.
+      required: true
+      schema:
+        type: string
+        const: 'private, no-store'
+    NoStoreCacheControl:
+      description: Impede cache de destinos editáveis e de erros do redirect.
+      required: true
+      schema:
+        type: string
+        const: no-store
+    RetryAfter:
+      description: Segundos até uma nova tentativa.
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    ETag:
+      description: ETag forte e opaco; inclui o estado efetivo sem expor versão interna.
+      required: true
+      schema:
+        type: string
+        pattern: '^"[^"]+"$'
+    Location:
+      description: URI do recurso criado.
+      required: true
+      schema:
+        type: string
+        format: uri-reference
+  parameters:
+    LinkId:
+      name: link
+      in: path
+      required: true
+      description: ULID do link. Recursos de outro proprietário retornam `404`.
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    Cursor:
+      name: cursor
+      in: query
+      description: Cursor assinado e opaco da página anterior; valor inválido retorna `422 INVALID_CURSOR`.
+      schema:
+        type: string
+        minLength: 1
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      description: Substring do título ou prefixo do slug, case-insensitive e accent-sensitive.
+      schema:
+        type: string
+        minLength: 2
+        maxLength: 160
+    LinkStatus:
+      name: status
+      in: query
+      schema:
+        type: string
+        enum: [active, inactive, expired, blocked, all]
+        default: all
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Chave no escopo da conta, retida por 24 horas.
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 128
+        pattern: '^[A-Za-z0-9._:-]+$'
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: ETag forte e opaco obtido na criação, leitura ou atualização anterior.
+      schema:
+        type: string
+        pattern: '^"[^"]+"$'
+    From:
+      name: from
+      in: query
+      description: Primeira data UTC inclusiva; sem datas futuras. O padrão inicia o período de 30 dias.
+      schema:
+        type: string
+        format: date
+    To:
+      name: to
+      in: query
+      description: Última data UTC inclusiva; sem datas futuras. O padrão é hoje em UTC.
+      schema:
+        type: string
+        format: date
+    TrafficType:
+      name: traffic_type
+      in: query
+      schema:
+        type: string
+        enum: [human, bot, preview, unknown, all]
+        default: human
+    Granularity:
+      name: granularity
+      in: query
+      schema:
+        type: string
+        enum: [hour, day]
+        default: day
+    ReferrerLimit:
+      name: limit
+      in: query
+      description: Quantidade máxima de itens ranqueados; `direct` compete normalmente e `other` fecha o total.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Slug:
+      name: slug
+      in: path
+      required: true
+      description: Entrada ASCII; letras maiúsculas são normalizadas para minúsculas pelo servidor.
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 48
+        pattern: '^[A-Za-z0-9-]+$'
+  responses:
+    AuthIssued:
+      description: Token emitido. O valor completo aparece somente nesta resposta.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthResponse'
+    User:
+      description: Usuário atual.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserResponse'
+    Accepted:
+      description: Solicitação aceita sem revelar o estado da conta.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+    NoContent:
+      description: Operação concluída sem corpo.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+    LinkCollection:
+      description: Página de resumos, sem destino, ETag ou analytics.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkCollectionResponse'
+    LinkCreated:
+      description: Link criado ou resposta original reproduzida por idempotência.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+        Location:
+          $ref: '#/components/headers/Location'
+        ETag:
+          $ref: '#/components/headers/ETag'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkResponse'
+    LinkDetail:
+      description: Detalhes do link. Um no-op de atualização retorna o mesmo ETag.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+        ETag:
+          $ref: '#/components/headers/ETag'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkResponse'
+    LinkHistoryCollection:
+      description: Histórico paginado do destino, do mais recente para o mais antigo.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkHistoryCollectionResponse'
+    AnalyticsSummary:
+      description: Totais do período inclusivo.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AnalyticsSummaryResponse'
+    AnalyticsTimeseries:
+      description: Série temporal densa do período inclusivo.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AnalyticsTimeseriesResponse'
+    AnalyticsReferrers:
+      description: Totais por host referenciador, sem métricas de únicos.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AnalyticsReferrersResponse'
+    AnalyticsDevices:
+      description: Totais nas cinco categorias de dispositivo, sem métricas de únicos.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AnalyticsDevicesResponse'
+    BadRequest:
+      description: JSON ou requisição malformada.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: MALFORMED_REQUEST
+            message: The request is malformed.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    InvalidCredentials:
+      description: E-mail ou senha incorretos, sem distinguir a causa.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INVALID_CREDENTIALS
+            message: The provided credentials are invalid.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    Unauthenticated:
+      description: Bearer ausente, inválido ou expirado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: UNAUTHENTICATED
+            message: Authentication is required.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    RegistrationNotAllowed:
+      description: Resposta genérica para convite não autorizado ou e-mail duplicado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: REGISTRATION_NOT_ALLOWED
+            message: Registration is not available for these details.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    AccountUnavailable:
+      description: Conta suspensa ou em processo de exclusão.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            suspended:
+              value:
+                code: ACCOUNT_SUSPENDED
+                message: The account is suspended.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            pendingDeletion:
+              value:
+                code: ACCOUNT_PENDING_DELETION
+                message: The account is pending deletion.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    Forbidden:
+      description: O estado da conta ou tipo do token não permite a operação.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            restrictedToken:
+              value:
+                code: TOKEN_RESTRICTED
+                message: This token cannot perform the requested operation.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            suspended:
+              value:
+                code: ACCOUNT_SUSPENDED
+                message: The account is suspended.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            pendingDeletion:
+              value:
+                code: ACCOUNT_PENDING_DELETION
+                message: The account is pending deletion.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    NotFound:
+      description: Recurso ausente ou pertencente a outro usuário.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: RESOURCE_NOT_FOUND
+            message: The requested resource was not found.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    LinkConflict:
+      description: Alias indisponível ou chave idempotente reutilizada com outro comando normalizado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            aliasUnavailable:
+              value:
+                code: ALIAS_UNAVAILABLE
+                message: The requested alias is unavailable.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            idempotencyConflict:
+              value:
+                code: IDEMPOTENCY_KEY_REUSED
+                message: The idempotency key was used with a different request.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    PreconditionFailed:
+      description: O ETag não representa mais o estado efetivo atual.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: ETAG_MISMATCH
+            message: The resource has changed since it was read.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    PayloadTooLarge:
+      description: Corpo da requisição acima do limite permitido.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: PAYLOAD_TOO_LARGE
+            message: The request payload is too large.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    ValidationError:
+      description: Dados, cursor, período ou token de uso único inválidos.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+          example:
+            code: VALIDATION_FAILED
+            message: The given data was invalid.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            errors:
+              cursor:
+                - code: INVALID_CURSOR
+                  message: The cursor is invalid or has expired.
+    PreconditionRequired:
+      description: A atualização exige `If-Match`.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: IF_MATCH_REQUIRED
+            message: The If-Match header is required.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    TooManyRequests:
+      description: Rate limit excedido.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: RATE_LIMIT_EXCEEDED
+            message: Too many requests.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    InternalError:
+      description: Erro inesperado sem detalhes sensíveis.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INTERNAL_ERROR
+            message: An unexpected error occurred.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    ServiceUnavailable:
+      description: Serviço ou dependência temporariamente indisponível.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: SERVICE_UNAVAILABLE
+            message: The service is temporarily unavailable.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    GatewayTimeout:
+      description: Uma dependência ou gateway excedeu o timeout.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: GATEWAY_TIMEOUT
+            message: A dependency timed out.
+            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    LandingRedirect:
+      description: Redirect para a landing page da aplicação, sem analytics.
+      headers:
+        Location:
+          required: true
+          schema:
+            type: string
+            format: uri
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+    ShortLinkRedirect:
+      description: Destino atual do link; GET gera analytics e HEAD não gera.
+      headers:
+        Location:
+          required: true
+          schema:
+            $ref: '#/components/schemas/DestinationUrl'
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+    SlugNotFound:
+      description: HTML mínimo para slug desconhecido ou nunca reservado.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/RedirectErrorHtml'
+          example: '<!doctype html><title>Not Found</title><p>SLUG_NOT_FOUND: Short link not found. Request ID: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1</p>'
+    LinkUnavailable:
+      description: HTML mínimo para link inativo, expirado, bloqueado ou reserva órfã.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/RedirectErrorHtml'
+          example: '<!doctype html><title>Gone</title><p>LINK_UNAVAILABLE: This short link is unavailable. Request ID: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1</p>'
+    RedirectRateLimited:
+      description: HTML mínimo para limite excedido.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/RedirectErrorHtml'
+          example: '<!doctype html><title>Too Many Requests</title><p>RATE_LIMIT_EXCEEDED: Too many requests. Request ID: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1</p>'
+    RedirectUnavailable:
+      description: HTML mínimo para falha operacional, decriptação ou cache miss sem banco disponível.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/NoStoreCacheControl'
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/RedirectErrorHtml'
+          example: '<!doctype html><title>Unavailable</title><p>REDIRECT_UNAVAILABLE: The short link service is temporarily unavailable. Request ID: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1</p>'
+    Robots:
+      description: Regra estática que proíbe crawling do host curto.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+      content:
+        text/plain:
+          schema:
+            type: string
+            const: "User-agent: *\nDisallow: /\n"
+  schemas:
+    Ulid:
+      type: string
+      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+      examples: [01J2Z7FJ8M4W2N6P3Q9R5S1T0V]
+    RequestId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      examples: [01K0C2Y7Q3R4S5T6V7W8X9Y0Z1]
+    DateTimeUtc:
+      type: string
+      format: date-time
+      pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$'
+      examples: ['2026-07-16T14:30:00Z']
+    NullableDateTimeUtc:
+      type: [string, 'null']
+      format: date-time
+      pattern: '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$'
+    DestinationUrl:
+      type: string
+      format: uri
+      minLength: 1
+      maxLength: 2048
+      pattern: '^https?://'
+      not:
+        pattern: '^https?://[^/?#]*@'
+      description: |
+        URL HTTP ou HTTPS absoluta. A validação de aplicação exige hostname público,
+        rejeita IP literal, host local ou especial, `userinfo` e o próprio host curto,
+        valida a porta e preserva query e fragmento. JSON Schema não representa toda
+        a classificação de hosts.
+    Password:
+      type: string
+      format: password
+      minLength: 12
+      maxLength: 128
+      description: Deve conter letra ASCII minúscula, maiúscula, dígito e símbolo ASCII.
+    User:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - email
+        - status
+        - email_verified_at
+        - terms_version
+        - terms_accepted_at
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        status:
+          type: string
+          enum: [pending_verification, active, suspended, deletion_pending]
+        email_verified_at:
+          $ref: '#/components/schemas/NullableDateTimeUtc'
+        terms_version:
+          type: string
+          minLength: 1
+          maxLength: 32
+        terms_accepted_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+        created_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+        updated_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required: [name, email, password, password_confirmation, accept_terms]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          $ref: '#/components/schemas/Password'
+        password_confirmation:
+          $ref: '#/components/schemas/Password'
+        accept_terms:
+          type: boolean
+          const: true
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          format: password
+          maxLength: 128
+    CurrentPasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [current_password]
+      properties:
+        current_password:
+          type: string
+          format: password
+          maxLength: 128
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [current_password, password, password_confirmation]
+      properties:
+        current_password:
+          type: string
+          format: password
+          maxLength: 128
+        password:
+          $ref: '#/components/schemas/Password'
+        password_confirmation:
+          $ref: '#/components/schemas/Password'
+    PasswordResetRequest:
+      type: object
+      additionalProperties: false
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+    ResetPasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [email, token, password, password_confirmation]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        token:
+          type: string
+          minLength: 1
+          description: Token de uso único recebido fora de banda, válido por 30 minutos.
+        password:
+          $ref: '#/components/schemas/Password'
+        password_confirmation:
+          $ref: '#/components/schemas/Password'
+    VerifyEmailRequest:
+      type: object
+      additionalProperties: false
+      required: [token]
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Token de uso único recebido por e-mail, válido por 60 minutos.
+    UpdateUserRequest:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+    AuthData:
+      type: object
+      additionalProperties: false
+      required: [token, token_type, token_kind, expires_at, user]
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Valor completo exibido somente na emissão.
+        token_type:
+          type: string
+          const: Bearer
+        token_kind:
+          type: string
+          enum: [verification, session]
+        expires_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+        user:
+          $ref: '#/components/schemas/User'
+      description: |
+        `session` dura no máximo 7 dias e expira após 24 horas ocioso.
+        `verification` dura no máximo 24 horas e expira após 1 hora ocioso.
+    AuthResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AuthData'
+    UserResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+    Slug:
+      type: string
+      minLength: 3
+      maxLength: 48
+      pattern: '^[a-z0-9-]+$'
+    LinkStatusValue:
+      type: string
+      enum: [active, inactive, expired, blocked]
+      description: "`blocked` prevalece, seguido por `expired`, `inactive` e `active`."
+    LinkSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - slug
+        - short_url
+        - title
+        - slug_source
+        - is_enabled
+        - status
+        - expires_at
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        slug:
+          $ref: '#/components/schemas/Slug'
+        short_url:
+          type: string
+          format: uri
+        title:
+          type: [string, 'null']
+          maxLength: 160
+        slug_source:
+          type: string
+          enum: [automatic, custom]
+        is_enabled:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/LinkStatusValue'
+        expires_at:
+          $ref: '#/components/schemas/NullableDateTimeUtc'
+        created_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+        updated_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+    LinkDetail:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - slug
+        - short_url
+        - destination_url
+        - title
+        - slug_source
+        - is_enabled
+        - status
+        - expires_at
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        slug:
+          $ref: '#/components/schemas/Slug'
+        short_url:
+          type: string
+          format: uri
+        destination_url:
+          $ref: '#/components/schemas/DestinationUrl'
+        title:
+          type: [string, 'null']
+          maxLength: 160
+        slug_source:
+          type: string
+          enum: [automatic, custom]
+        is_enabled:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/LinkStatusValue'
+        expires_at:
+          $ref: '#/components/schemas/NullableDateTimeUtc'
+        created_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+        updated_at:
+          $ref: '#/components/schemas/DateTimeUtc'
+      description: Acrescenta o destino ao resumo; não expõe versão interna.
+    CustomAlias:
+      type: string
+      minLength: 3
+      maxLength: 48
+      pattern: '^[A-Za-z0-9](?:[A-Za-z0-9]|-(?!-)){1,46}[A-Za-z0-9]$'
+      description: Letras maiúsculas são aceitas e normalizadas para minúsculas antes da reserva.
+    CreateLinkRequest:
+      type: object
+      additionalProperties: false
+      required: [destination_url]
+      properties:
+        destination_url:
+          $ref: '#/components/schemas/DestinationUrl'
+        custom_alias:
+          $ref: '#/components/schemas/CustomAlias'
+        title:
+          type: [string, 'null']
+          maxLength: 160
+        expires_at:
+          allOf:
+            - $ref: '#/components/schemas/NullableDateTimeUtc'
+          description: Quando não nulo, precisa estar estritamente no futuro.
+    UpdateLinkRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        destination_url:
+          $ref: '#/components/schemas/DestinationUrl'
+        title:
+          type: [string, 'null']
+          maxLength: 160
+        is_enabled:
+          type: boolean
+        expires_at:
+          allOf:
+            - $ref: '#/components/schemas/NullableDateTimeUtc'
+          description: Quando não nulo, precisa estar estritamente no futuro.
+    LinkResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/LinkDetail'
+    CursorMeta:
+      type: object
+      additionalProperties: false
+      required: [next_cursor, per_page]
+      properties:
+        next_cursor:
+          type: [string, 'null']
+        per_page:
+          type: integer
+          minimum: 1
+          maximum: 100
+    LinkCollectionResponse:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkSummary'
+        meta:
+          $ref: '#/components/schemas/CursorMeta'
+    LinkHistoryItem:
+      type: object
+      additionalProperties: false
+      required: [destination_url, valid_from, valid_to]
+      properties:
+        destination_url:
+          $ref: '#/components/schemas/DestinationUrl'
+        valid_from:
+          $ref: '#/components/schemas/DateTimeUtc'
+        valid_to:
+          $ref: '#/components/schemas/NullableDateTimeUtc'
+    LinkHistoryCollectionResponse:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkHistoryItem'
+        meta:
+          $ref: '#/components/schemas/CursorMeta'
+    AnalyticsPeriod:
+      type: object
+      additionalProperties: false
+      required: [from, to, traffic_type]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        traffic_type:
+          type: string
+          enum: [human, bot, preview, unknown, all]
+      description: Intervalo UTC inclusivo, padrão de 30 dias incluindo hoje, máximo de 366 e sem futuro.
+    EstimatedUniqueClicks:
+      type: [integer, 'null']
+      minimum: 0
+      description: Inteiro somente para tráfego `human`; nulo para qualquer outro filtro, inclusive `all`.
+    AnalyticsSummaryData:
+      type: object
+      additionalProperties: false
+      required: [period, total_clicks, estimated_unique_clicks]
+      properties:
+        period:
+          $ref: '#/components/schemas/AnalyticsPeriod'
+        total_clicks:
+          type: integer
+          minimum: 0
+        estimated_unique_clicks:
+          $ref: '#/components/schemas/EstimatedUniqueClicks'
+    AnalyticsSummaryResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AnalyticsSummaryData'
+    TimeseriesPoint:
+      type: object
+      additionalProperties: false
+      required: [bucket, total_clicks, estimated_unique_clicks]
+      properties:
+        bucket:
+          $ref: '#/components/schemas/DateTimeUtc'
+        total_clicks:
+          type: integer
+          minimum: 0
+        estimated_unique_clicks:
+          $ref: '#/components/schemas/EstimatedUniqueClicks'
+    AnalyticsTimeseriesData:
+      type: object
+      additionalProperties: false
+      required: [period, granularity, points]
+      properties:
+        period:
+          $ref: '#/components/schemas/AnalyticsPeriod'
+        granularity:
+          type: string
+          enum: [hour, day]
+        points:
+          type: array
+          description: Série densa, ordenada e com buckets zerados em todo o período inclusivo.
+          items:
+            $ref: '#/components/schemas/TimeseriesPoint'
+    AnalyticsTimeseriesResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AnalyticsTimeseriesData'
+    ReferrerItem:
+      type: object
+      additionalProperties: false
+      required: [referrer, total_clicks]
+      properties:
+        referrer:
+          type: string
+          description: Host público completo normalizado, `other` ou `direct`; nunca contém path ou query.
+        total_clicks:
+          type: integer
+          minimum: 0
+    AnalyticsReferrersData:
+      type: object
+      additionalProperties: false
+      required: [period, items]
+      properties:
+        period:
+          $ref: '#/components/schemas/AnalyticsPeriod'
+        items:
+          type: array
+          description: Até `limit` itens ranqueados, incluindo `direct` quando aplicável, e `other` para fechar o total.
+          items:
+            $ref: '#/components/schemas/ReferrerItem'
+    AnalyticsReferrersResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AnalyticsReferrersData'
+    DeviceItem:
+      type: object
+      additionalProperties: false
+      required: [device, total_clicks]
+      properties:
+        device:
+          type: string
+          enum: [desktop, mobile, tablet, other, unknown]
+        total_clicks:
+          type: integer
+          minimum: 0
+    AnalyticsDevicesData:
+      type: object
+      additionalProperties: false
+      required: [period, items]
+      properties:
+        period:
+          $ref: '#/components/schemas/AnalyticsPeriod'
+        items:
+          type: array
+          minItems: 5
+          maxItems: 5
+          description: Contém exatamente uma entrada para cada uma das cinco categorias, inclusive zeros.
+          items:
+            $ref: '#/components/schemas/DeviceItem'
+    AnalyticsDevicesResponse:
+      type: object
+      additionalProperties: false
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AnalyticsDevicesData'
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+          pattern: '^[A-Z][A-Z0-9_]*$'
+        message:
+          type: string
+          minLength: 1
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+    FieldError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          pattern: '^[A-Z][A-Z0-9_]*$'
+        message:
+          type: string
+          minLength: 1
+    ValidationErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message, request_id, errors]
+      properties:
+        code:
+          type: string
+          const: VALIDATION_FAILED
+        message:
+          type: string
+          const: The given data was invalid.
+        request_id:
+          $ref: '#/components/schemas/RequestId'
+        errors:
+          type: object
+          minProperties: 1
+          additionalProperties:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/FieldError'
+    RedirectErrorHtml:
+      type: string
+      description: HTML mínimo contendo código, mensagem e request ID estáveis, sem dados do proprietário ou destino.
+security:
+  - bearerAuth: []

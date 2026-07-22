@@ -1,0 +1,7 @@
+extends:
+  - recommended
+
+rules:
+  # Health checks podem responder apenas 2xx/5xx, e o sucesso do redirect é 302.
+  operation-4xx-response: off
+  operation-2xx-response: off
