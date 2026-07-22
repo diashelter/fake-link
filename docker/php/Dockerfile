@@ -45,6 +45,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pecl install pcov \
+    && docker-php-ext-enable pcov
+
 FROM base AS prod
 
 FROM prod AS runtime
