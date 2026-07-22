@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+  SPEC_DEVIATION: phpmd/phpmd uses 3.x-dev (not a stable 2.x release).
+  Reason: stable phpmd 2.x cannot resolve with Laravel 13 / Symfony 8; 2.5.0
+  fatals at runtime on Symfony DI ExtensionInterface load return type void.
+  Composer md script uses phpmd 3 CLI: analyze paths with format text and ruleset phpmd.xml
+-->
+<ruleset name="Fake Link backend"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>
+        Complexity and coupling thresholds for the Fake Link Laravel API.
+        CyclomaticComplexity ≤ 12, ExcessiveMethodLength ≤ 40, ExcessiveClassLength ≤ 300,
+        CouplingBetweenObjects ≤ 13, TooManyPublicMethods ≤ 10.
+    </description>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/storage/*</exclude-pattern>
+    <exclude-pattern>*/bootstrap/cache/*</exclude-pattern>
+
+    <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
+        <properties>
+            <property name="reportLevel" value="12"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/codesize.xml/ExcessiveMethodLength">
+        <properties>
+            <property name="minimum" value="40"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/codesize.xml/ExcessiveClassLength">
+        <properties>
+            <property name="minimum" value="300"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/design.xml/CouplingBetweenObjects">
+        <properties>
+            <property name="minimum" value="13"/>
+        </properties>
+    </rule>
+
+    <rule ref="rulesets/codesize.xml/TooManyPublicMethods">
+        <properties>
+            <property name="maxmethods" value="10"/>
+        </properties>
+    </rule>
+</ruleset>
