@@ -1,0 +1,24 @@
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# TLS leaf certificates (CA is committed)
+docker/nginx/certs/*.crt
+docker/nginx/certs/*.key
+docker/nginx/certs/app.localhost.*
+docker/nginx/certs/go.localhost.*
+!docker/nginx/certs/.gitkeep
+!docker/nginx/certs/ca.pem
+
+# Dependencies (scaffolded later)
+backend/vendor/
+frontend/node_modules/
+frontend/.next/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
