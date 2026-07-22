@@ -1,0 +1,113 @@
+# Production override (DOCKER-23, DOCKER-24, DOCKER-26).
+# Reference sizing: 4 vCPU / 8 GB RAM VM.
+# Usage:
+#   docker compose --env-file docker/versions.env \
+#     -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+x-prod-backend-build: &prod-backend-build
+  context: docker/php
+  dockerfile: Dockerfile
+  target: prod
+  args:
+    PHP_VERSION: ${PHP_VERSION:-8.4.23}
+    COMPOSER_VERSION: ${COMPOSER_VERSION:-2.10.2}
+
+x-app-limits: &app-limits
+  cpus: "1.0"
+  memory: 512M
+
+x-worker-limits: &worker-limits
+  cpus: "0.75"
+  memory: 384M
+
+services:
+  postgres:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  redis-ephemeral:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  redis-queue:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  backend:
+    restart: unless-stopped
+    build: *prod-backend-build
+    volumes: !reset []
+    deploy:
+      resources:
+        limits: *app-limits
+
+  scheduler:
+    restart: unless-stopped
+    build: *prod-backend-build
+    volumes: !reset []
+    deploy:
+      resources:
+        limits: *worker-limits
+
+  analytics-worker:
+    restart: unless-stopped
+    build: *prod-backend-build
+    volumes: !reset []
+    deploy:
+      resources:
+        limits: *worker-limits
+
+  # Always on in production (2 analytics + 1 notification — AD-002).
+  analytics-worker-2:
+    profiles: !reset []
+    restart: unless-stopped
+    build: *prod-backend-build
+    volumes: !reset []
+    deploy:
+      resources:
+        limits: *worker-limits
+
+  notification-worker:
+    restart: unless-stopped
+    build: *prod-backend-build
+    volumes: !reset []
+    deploy:
+      resources:
+        limits: *worker-limits
+
+  frontend:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+      target: prod
+      args:
+        NODE_VERSION: ${NODE_VERSION:-24.18.0}
+        PNPM_VERSION: ${PNPM_VERSION:-11.15.1}
+        NEXT_VERSION: ${NEXT_VERSION:-16.2.11}
+    volumes: !reset []
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  nginx:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
