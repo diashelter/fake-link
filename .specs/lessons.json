@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 9,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "ac_gap::assert distinct redis host env vars or live pings for cache vs queue from the app container not only compose yaml",
+      "text": "Assert distinct Redis host env vars (or live pings) for cache vs queue from the app container, not only Compose YAML",
+      "signal": "ac_gap",
+      "scope": "compose,redis",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-12 (compose,redis)"
+      ],
+      "created": "2026-07-22T01:13:29Z",
+      "last_seen": "2026-07-22T01:13:29Z"
+    },
+    {
+      "id": "L-002",
+      "key": "ac_gap::when stop grace period or aof durability is specified add a sigterm or restart assertion that proves the queue store survives",
+      "text": "When stop_grace_period or AOF durability is specified, add a SIGTERM or restart assertion that proves the queue store survives",
+      "signal": "ac_gap",
+      "scope": "compose,redis",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-17 (compose,redis)"
+      ],
+      "created": "2026-07-22T01:13:30Z",
+      "last_seen": "2026-07-22T01:13:30Z"
+    },
+    {
+      "id": "L-003",
+      "key": "ac_gap::when healthchecks are a requirement fault inject an upstream failure and assert docker compose ps reports unhealthy",
+      "text": "When healthchecks are a requirement, fault-inject an upstream failure and assert docker compose ps reports unhealthy",
+      "signal": "ac_gap",
+      "scope": "compose,health",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-18 (compose,health)"
+      ],
+      "created": "2026-07-22T01:13:30Z",
+      "last_seen": "2026-07-22T01:13:30Z"
+    },
+    {
+      "id": "L-004",
+      "key": "spec_precision_gap::compose profile done when checks must be scripts invoked by make test not only manual docker compose config",
+      "text": "Compose profile Done-when checks must be scripts invoked by make test, not only manual docker compose config",
+      "signal": "spec_precision_gap",
+      "scope": "compose,profiles",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-21 (compose,profiles)"
+      ],
+      "created": "2026-07-22T01:13:30Z",
+      "last_seen": "2026-07-22T01:13:30Z"
+    },
+    {
+      "id": "L-005",
+      "key": "surviving_mutant::assert compose stop grace period from rendered config or stop without t do not hardcode docker stop t in the grace period test",
+      "text": "Assert Compose stop_grace_period from rendered config (or stop without -t); do not hardcode docker stop -t in the grace-period test",
+      "signal": "surviving_mutant",
+      "scope": "compose",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "tests/compose/graceful-stop.sh:10 / docker-compose.yml:34 (compose)"
+      ],
+      "created": "2026-07-22T01:31:40Z",
+      "last_seen": "2026-07-22T01:31:40Z"
+    },
+    {
+      "id": "L-006",
+      "key": "spec_precision_gap::run validate env against env example inside the full gate when the ac requires complete bootstrap env vars",
+      "text": "Run validate-env against .env.example inside the Full gate when the AC requires complete bootstrap env vars",
+      "signal": "spec_precision_gap",
+      "scope": "env",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-07 (env)"
+      ],
+      "created": "2026-07-22T01:31:40Z",
+      "last_seen": "2026-07-22T01:31:40Z"
+    },
+    {
+      "id": "L-007",
+      "key": "spec_precision_gap::parse compose config json for depends on service healthy conditions instead of relying on static file review alone",
+      "text": "Parse compose config JSON for depends_on service_healthy conditions instead of relying on static file review alone",
+      "signal": "spec_precision_gap",
+      "scope": "compose",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-16 (compose)"
+      ],
+      "created": "2026-07-22T01:31:40Z",
+      "last_seen": "2026-07-22T01:31:40Z"
+    },
+    {
+      "id": "L-008",
+      "key": "spec_precision_gap::either execute a multiarch buildx dry run in ci gate or explicitly document script only evidence as accepted for the multiarch ac",
+      "text": "Either execute a multiarch buildx dry-run in CI/gate or explicitly document script-only evidence as accepted for the multiarch AC",
+      "signal": "spec_precision_gap",
+      "scope": "docker",
+      "status": "candidate",
+      "features": [
+        "docker-foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "DOCKER-25 (docker)"
+      ],
+      "created": "2026-07-22T01:31:40Z",
+      "last_seen": "2026-07-22T01:34:58Z"
+    }
+  ]
+}

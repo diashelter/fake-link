@@ -15,14 +15,22 @@
 
 ## Handoff
 
-**Feature em andamento:** `docker-foundation` — Execute Batch 1 (T1–T8).
+**Feature:** `docker-foundation` — **PASS** (re-verify 2026-07-22)
 
-**Artefatos:** `spec.md`, `context.md`, `design.md`, `tasks.md` (Approved)
+**Branch:** `main`  
+**HEAD:** `5155c84`
 
-**Concluído:** T1–T10 (Batch 1 + início Batch 2)
+### Entregue
 
-**Em progresso:** T11 (Next.js stub)
+- T1–T25 + gaps do Verifier (cookies, nginx smoke, redis hosts, graceful stop, unhealthy, profiles, prod, multiarch, README)
+- Gate: `make test` green (Pest 5, Vitest 4, compose/smoke) — reconfirmado 2026-07-22
+- Sensor: stop_grace_period killed; prior 4/4 at HEAD
+- Relatório: `.specs/features/docker-foundation/validation.md`
 
-**Próximo passo:** T11–T12 → Compose P1 T13–T18
+### Residual conhecido
 
-**Contexto:** 25 tasks em 5 phases; P1 (T1–T18) desbloqueia critério de saída Fase 0.
+- DOCKER-25: multiarch documentado via `build-multiarch.sh` (`bash -n`); Full gate não executa buildx (spec-precision)
+
+### Próximo passo
+
+Iniciar próxima feature do roadmap (domínio Auth/Links) ou endurecer DOCKER-25 com gate buildx opcional.

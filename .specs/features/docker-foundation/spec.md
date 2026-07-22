@@ -213,35 +213,35 @@ Bump de patch de segurança: atualizar `docker/versions.env` + rebuild; minor/ma
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| DOCKER-01 | P1: Dev HTTPS | Tasks T14,T15,T18 | Mapped |
-| DOCKER-02 | P1: Dev HTTPS | Tasks T7,T11,T12,T15,T18 | Mapped |
-| DOCKER-03 | P1: Dev HTTPS | Tasks T8,T9,T10,T15,T18 | Mapped |
-| DOCKER-04 | P1: Dev HTTPS | Tasks T7,T15,T18 | Mapped |
-| DOCKER-05 | P1: Dev HTTPS | Tasks T8,T9,T10,T18 | Mapped |
-| DOCKER-06 | P1: Dev HTTPS | Tasks T3,T6,T11,T18 | Mapped |
-| DOCKER-07 | P1: Dev HTTPS | Tasks T1,T3,T16,T17 | Mapped |
-| DOCKER-08 | P1: Dev HTTPS | Tasks T2,T13,T18 | Mapped |
-| DOCKER-09 | P1: Datastores | Tasks T13,T18 | Mapped |
-| DOCKER-10 | P1: Datastores | Tasks T2,T13,T18 | Mapped |
-| DOCKER-11 | P1: Datastores | Tasks T2,T13,T18 | Mapped |
-| DOCKER-12 | P1: Datastores | Tasks T9,T14,T18 | Mapped |
-| DOCKER-13 | P1: Datastores | Tasks T17,T18 | Mapped |
-| DOCKER-14 | P1: Datastores | Tasks T14,T18 | Mapped |
-| DOCKER-15 | P1: Health checks | Tasks T4,T13,T14,T15 | Mapped |
-| DOCKER-16 | P1: Health checks | Tasks T14,T15 | Mapped |
-| DOCKER-17 | P1: Health checks | Tasks T14,T15 | Mapped |
-| DOCKER-18 | P1: Health checks | Tasks T15,T18 | Mapped |
-| DOCKER-19 | P2: Profiles | Tasks T19 | Mapped |
-| DOCKER-20 | P2: Profiles | Tasks T20 | Mapped |
-| DOCKER-21 | P2: Profiles | Tasks T21 | Mapped |
-| DOCKER-22 | P2: Profiles | Tasks T22 | Mapped |
-| DOCKER-23 | P2: Prod images | Tasks T23,T24 | Mapped |
-| DOCKER-24 | P2: Prod images | Tasks T23 | Mapped |
-| DOCKER-25 | P2: Prod images | Tasks T24 | Mapped |
-| DOCKER-26 | P2: Prod images | Tasks T23 | Mapped |
-| DOCKER-27 | P3: Ergonomia | Tasks T17,T25 | Mapped |
-| DOCKER-28 | P3: Ergonomia | Tasks T25 | Mapped |
-| DOCKER-29 | P3: Ergonomia | Tasks T25 | Mapped |
+| DOCKER-01 | P1: Dev HTTPS | Tasks T14,T15,T18 | ✅ Verified |
+| DOCKER-02 | P1: Dev HTTPS | Tasks T7,T11,T12,T15,T18 | ✅ Verified |
+| DOCKER-03 | P1: Dev HTTPS | Tasks T8,T9,T10,T15,T18 | ✅ Verified |
+| DOCKER-04 | P1: Dev HTTPS | Tasks T7,T15,T18 | ✅ Verified |
+| DOCKER-05 | P1: Dev HTTPS | Tasks T8,T9,T10,T18 | ✅ Verified |
+| DOCKER-06 | P1: Dev HTTPS | Tasks T3,T6,T11,T18 | ✅ Verified |
+| DOCKER-07 | P1: Dev HTTPS | Tasks T1,T3,T16,T17 | ✅ Verified |
+| DOCKER-08 | P1: Dev HTTPS | Tasks T2,T13,T18 | ✅ Verified |
+| DOCKER-09 | P1: Datastores | Tasks T13,T18 | ✅ Verified |
+| DOCKER-10 | P1: Datastores | Tasks T2,T13,T18 | ✅ Verified |
+| DOCKER-11 | P1: Datastores | Tasks T2,T13,T18 | ✅ Verified |
+| DOCKER-12 | P1: Datastores | Tasks T9,T14,T18 | ✅ Verified |
+| DOCKER-13 | P1: Datastores | Tasks T17,T18 | ✅ Verified |
+| DOCKER-14 | P1: Datastores | Tasks T14,T18 | ✅ Verified |
+| DOCKER-15 | P1: Health checks | Tasks T4,T13,T14,T15 | ✅ Verified |
+| DOCKER-16 | P1: Health checks | Tasks T14,T15 | ✅ Verified |
+| DOCKER-17 | P1: Health checks | Tasks T14,T15 | ✅ Verified |
+| DOCKER-18 | P1: Health checks | Tasks T15,T18 | ✅ Verified |
+| DOCKER-19 | P2: Profiles | Tasks T19 | ✅ Verified |
+| DOCKER-20 | P2: Profiles | Tasks T20 | ✅ Verified |
+| DOCKER-21 | P2: Profiles | Tasks T21 | ✅ Verified |
+| DOCKER-22 | P2: Profiles | Tasks T22 | ✅ Verified |
+| DOCKER-23 | P2: Prod images | Tasks T23,T24 | ✅ Verified |
+| DOCKER-24 | P2: Prod images | Tasks T23 | ✅ Verified |
+| DOCKER-25 | P2: Prod images | Tasks T24 | ⚠️ Spec-precision |
+| DOCKER-26 | P2: Prod images | Tasks T23 | ✅ Verified |
+| DOCKER-27 | P3: Ergonomia | Tasks T17,T25 | ✅ Verified |
+| DOCKER-28 | P3: Ergonomia | Tasks T25 | ✅ Verified |
+| DOCKER-29 | P3: Ergonomia | Tasks T25 | ✅ Verified |
 
 **Coverage:** 29 total, 29 mapped to tasks, 0 unmapped ✅
 
