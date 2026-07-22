@@ -114,5 +114,6 @@ md-backend: ## Run PHPMD in the backend container
 format-backend: ## Run Pint style check in the backend container
 	$(COMPOSE) run --rm --no-deps backend composer run lint
 
-lint: ## Placeholder for future container lint targets
-	@echo "lint targets will be added in a later phase"
+lint: ## Run backend static analysis then Pest tests (fail-fast)
+	$(MAKE) lint-backend
+	$(MAKE) test-backend
