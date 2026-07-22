@@ -363,9 +363,9 @@ T14 → T15
 
 **Done when**:
 
-- [ ] Script exit 0 quando gates passam
-- [ ] Script falha se `make lint` ainda for placeholder
-- [ ] Gate check passes: `bash tests/compose/backend-quality-gates.sh`
+- [x] Script exit 0 quando gates passam
+- [x] Script falha se `make lint` ainda for placeholder
+- [x] Gate check passes: `bash tests/compose/backend-quality-gates.sh`
 
 **Tests**: integration (script é o teste)  
 **Gate**: full

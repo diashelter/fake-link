@@ -90,6 +90,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/benchmark-profile.sh
 	bash tests/compose/observability-profile.sh
 	bash tests/compose/prod-config.sh
+	bash tests/compose/backend-quality-gates.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
 	$(COMPOSE) --profile docs up -d --wait
