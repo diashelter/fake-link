@@ -75,6 +75,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/config.sh
 	bash tests/compose/test-profile.sh
 	bash tests/compose/docs-profile.sh
+	bash tests/compose/prod-config.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
 	$(COMPOSE) --profile docs up -d --wait
