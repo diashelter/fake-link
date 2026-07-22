@@ -11,7 +11,7 @@
 ## 2. Princípios e ambiente
 
 - Todo teste, análise, build e benchmark é executado em containers. Docker Compose é a interface padrão e não há caminho local alternativo suportado.
-- Testes backend de integração usam PostgreSQL e as duas instâncias Redis reais, separadas para dados efêmeros e fila. SQLite não é permitido em nenhuma suíte.
+- Testes backend de integração usam PostgreSQL e as duas instâncias Redis reais, separadas para dados efêmeros e fila. SQLite in-memory é permitido somente em execuções rápidas via `make test-backend` (unit e feature sem I/O real); não substitui integração com PostgreSQL.
 - Perfis do Docker Compose separam desenvolvimento, testes, observabilidade e benchmark sem criar um ambiente de staging permanente.
 - CI, smoke tests e benchmarks criam composições efêmeras e descartáveis. Os únicos ambientes duradouros são local e produção.
 - Relógio, aleatoriedade, DNS e integrações externas devem ser controláveis nos testes.

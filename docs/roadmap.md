@@ -5,7 +5,7 @@
 - Entregar fatias verticais pequenas, executáveis e observáveis.
 - Manter OpenAPI, client TypeScript gerado, testes e documentação na mesma mudança.
 - Executar desenvolvimento, testes, análise, build e operação somente por Docker.
-- Validar integração com PostgreSQL e as instâncias Redis reais de dados efêmeros e fila; SQLite não faz parte do projeto.
+- Validar integração com PostgreSQL e as instâncias Redis reais de dados efêmeros e fila. SQLite in-memory serve apenas a feedback rápido em `make test-backend`; não é banco do produto nem substituto de integração.
 - Usar OpenAPI 3.1 design-first e SemVer para releases e contratos.
 - Manter `main` protegida, sem push direto e com todos os checks obrigatórios.
 - Usar apenas ambientes local e produção de forma permanente. CI, E2E e benchmark usam composições efêmeras; não haverá staging permanente.
