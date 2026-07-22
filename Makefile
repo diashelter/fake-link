@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-frontend lint
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-frontend lint lint-backend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -91,6 +91,18 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/unhealthy-report.sh
 	$(MAKE) smoke
 	$(MAKE) smoke-docs
+
+lint-backend: ## Run Pint, PHPStan, and PHPMD in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run quality
+
+analyse-backend: ## Run PHPStan/Larastan in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run analyse
+
+md-backend: ## Run PHPMD in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run md
+
+format-backend: ## Run Pint style check in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run lint
 
 lint: ## Placeholder for future container lint targets
 	@echo "lint targets will be added in a later phase"
