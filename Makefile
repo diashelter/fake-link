@@ -75,13 +75,18 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/config.sh
 	bash tests/compose/test-profile.sh
 	bash tests/compose/docs-profile.sh
+	bash tests/compose/benchmark-profile.sh
+	bash tests/compose/observability-profile.sh
 	bash tests/compose/prod-config.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
 	$(COMPOSE) --profile docs up -d --wait
 	$(COMPOSE) exec -T backend php artisan migrate --force
 	bash tests/compose/redis-policies.sh
+	bash tests/compose/redis-hosts.sh
 	bash tests/smoke/services-healthy.sh
+	bash tests/compose/graceful-stop.sh
+	bash tests/compose/unhealthy-report.sh
 	$(MAKE) smoke
 	$(MAKE) smoke-docs
 
