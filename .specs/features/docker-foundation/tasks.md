@@ -298,11 +298,11 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] `GET /health` → `200 {"status":"ok"}`
-- [ ] Stubs Short host retornam respostas mínimas (302 raiz, 200 robots, slug stub)
-- [ ] `.env` template compatível com variáveis Compose (DB_*, REDIS_*, REDIS_QUEUE_*)
-- [ ] Migrations vazias ou mínimas aplicáveis
-- [ ] Gate check passes: `make build` (backend image)
+- [x] `GET /health` → `200 {"status":"ok"}`
+- [x] Stubs Short host retornam respostas mínimas (302 raiz, 200 robots, slug stub)
+- [x] `.env` template compatível com variáveis Compose (DB_*, REDIS_*, REDIS_QUEUE_*)
+- [x] Migrations vazias ou mínimas aplicáveis
+- [x] Gate check passes: `make build` (backend image)
 
 **Tests**: none (testes em T10)  
 **Gate**: build
@@ -324,10 +324,10 @@ T23 → T24 → T25
 
 **Done when**:
 
-- [ ] Pest cobre GET `/health` → 200 JSON spec
-- [ ] Pest cobre stubs `/`, `/robots.txt`, `/{slug}` (happy paths)
-- [ ] Gate check passes: `make test-backend`
-- [ ] Test count: ≥3 tests pass (no silent deletions)
+- [x] Pest cobre GET `/health` → 200 JSON spec
+- [x] Pest cobre stubs `/`, `/robots.txt`, `/{slug}` (happy paths)
+- [x] Gate check passes: `make test-backend`
+- [x] Test count: ≥3 tests pass (no silent deletions)
 
 **Tests**: feature (Pest)  
 **Gate**: quick

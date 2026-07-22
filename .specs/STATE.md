@@ -19,10 +19,10 @@
 
 **Artefatos:** `spec.md`, `context.md`, `design.md`, `tasks.md` (Approved)
 
-**Concluído:** T1–T8 (Batch 1 — Docker base e imagens)
+**Concluído:** T1–T10 (Batch 1 + início Batch 2)
 
-**Em progresso:** T9 (Laravel API stub)
+**Em progresso:** T11 (Next.js stub)
 
-**Próximo passo:** T9 → T10 → T11 → T12 → Compose P1 (T13–T18)
+**Próximo passo:** T11–T12 → Compose P1 T13–T18
 
 **Contexto:** 25 tasks em 5 phases; P1 (T1–T18) desbloqueia critério de saída Fase 0.
