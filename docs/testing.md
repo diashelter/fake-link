@@ -17,6 +17,7 @@
 - Relógio, aleatoriedade, DNS e integrações externas devem ser controláveis nos testes.
 - Factories e fixtures usam dados determinísticos, não carregam segredos e nunca contêm tokens, senhas, IPs ou URLs sensíveis reais.
 - Testes concorrentes devem provar constraints, locks e transações reais, não apenas comportamento de mocks.
+- O banco `fake_link_testing` é criado automaticamente no primeiro boot do Postgres via `docker/postgres/init/01-create-testing-database.sql`. Volumes Postgres já existentes não reexecutam o init: recrie o volume (`docker compose down -v` e suba de novo) ou crie o banco manualmente com o script acima.
 
 ## 3. Estratégia por camada
 
