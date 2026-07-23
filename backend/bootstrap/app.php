@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'auth.bearer' => \Modules\Auth\Infrastructure\Http\Middleware\AuthenticateBearer::class,
+            'token.kind' => \Modules\Auth\Infrastructure\Http\Middleware\RequireTokenKind::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
