@@ -9,7 +9,9 @@ use DomainException;
 final class AuthDomainException extends DomainException
 {
     public const INVALID_EMAIL = 'INVALID_EMAIL';
+
     public const INVALID_USER_ID = 'INVALID_USER_ID';
+
     public const EMAIL_ALREADY_IN_USE = 'EMAIL_ALREADY_IN_USE';
 
     private function __construct(
