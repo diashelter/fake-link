@@ -22,6 +22,7 @@
     <source>
         <include>
             <directory>app</directory>
+            <directory>modules/Auth</directory>
         </include>
     </source>
     <coverage>

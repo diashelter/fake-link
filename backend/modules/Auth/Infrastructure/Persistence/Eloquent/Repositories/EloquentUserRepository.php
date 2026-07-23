@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Modules\Auth\Contracts\Repositories\UserRepository;
 use Modules\Auth\Contracts\Services\UserIdGenerator;
@@ -28,9 +29,11 @@ final class EloquentUserRepository implements UserRepository
 
     public function existsByEmail(EmailAddress $email): bool
     {
-        return UserModel::query()
-            ->where('email', $email->value())
-            ->exists();
+        /** @var Builder<UserModel> $query */
+        $query = UserModel::query();
+
+        // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder exists())
+        return $query->where('email', $email->value())->exists();
     }
 
     public function save(User $user): void
