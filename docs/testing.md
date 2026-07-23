@@ -11,7 +11,9 @@
 ## 2. Princípios e ambiente
 
 - Todo teste, análise, build e benchmark é executado em containers. Docker Compose é a interface padrão e não há caminho local alternativo suportado.
-- Testes backend de integração usam PostgreSQL e as duas instâncias Redis reais, separadas para dados efêmeros e fila. SQLite in-memory é permitido somente em execuções rápidas via `make test-backend` (unit e feature sem I/O real); não substitui integração com PostgreSQL.
+- **`make test-backend` e `make test-backend-coverage` usam exclusivamente PostgreSQL no banco `fake_link_testing`**. Nunca executam contra `fake_link` (desenvolvimento) nem contra bancos de produção.
+- `APP_ENV=testing` fixa `DB_DATABASE=fake_link_testing` via `backend/.env.testing` e `backend/phpunit.xml`.
+- Testes de integração Auth (constraints, unicidade, CHECK) exigem PostgreSQL real. **SQLite in-memory não substitui** esses testes nem valida constraints do Postgres.
 - Perfis do Docker Compose separam desenvolvimento, testes, observabilidade e benchmark sem criar um ambiente de staging permanente.
 - CI, smoke tests e benchmarks criam composições efêmeras e descartáveis. Os únicos ambientes duradouros são local e produção.
 - Relógio, aleatoriedade, DNS e integrações externas devem ser controláveis nos testes.
