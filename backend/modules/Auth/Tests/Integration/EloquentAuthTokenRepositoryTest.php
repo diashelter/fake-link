@@ -30,12 +30,13 @@ function makeAuthTokenRepository(): EloquentAuthTokenRepository
 function makePersistableAuthToken(
     UserId $userId,
     TokenKind $tokenKind = TokenKind::Session,
+    ?AuthTokenId $id = null,
 ): AuthToken {
     $createdAt = new DateTimeImmutable('2026-01-01T00:00:00+00:00');
     $expiresAt = $createdAt->modify('+7 days');
 
     return AuthToken::issue(
-        id: AuthTokenId::fromString('018e8b8a-7b6a-7000-8000-123456789abc'),
+        id: $id ?? AuthTokenId::fromString('018e8b8a-7b6a-7000-8000-123456789abc'),
         userId: $userId,
         tokenKind: $tokenKind,
         expiresAt: $expiresAt,
@@ -114,7 +115,10 @@ describe('EloquentAuthTokenRepository', function () {
             $hasher->hash('token-two'),
         );
         $repository->save(
-            makePersistableAuthToken(UserId::fromString($otherUser->id)),
+            makePersistableAuthToken(
+                UserId::fromString($otherUser->id),
+                id: AuthTokenId::fromString('018e8b8a-7b6a-7000-8000-123456789abe'),
+            ),
             $hasher->hash('other-user-token'),
         );
 
