@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Auth\Domain\Entities\User;
 use Modules\Auth\Domain\Enums\UserStatus;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
+use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Exceptions\AuthDomainException;
 use Modules\Auth\Infrastructure\Identity\Uuid7UserIdGenerator;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
@@ -107,5 +108,20 @@ describe('EloquentUserRepository', function () {
 
         expect($repository->existsByEmail(EmailAddress::fromString('EXISTS@example.com')))->toBeTrue()
             ->and($repository->existsByEmail(EmailAddress::fromString('missing@example.com')))->toBeFalse();
+    });
+
+    it('finds a user by id and returns null when missing', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'find-by-id@example.com');
+
+        $repository->save($user);
+
+        $found = $repository->findById($user->id());
+
+        expect($found)->not->toBeNull()
+            ->and($found->id()->value())->toBe($user->id()->value())
+            ->and($repository->findById(
+                UserId::fromString('018e8b8a-7b6a-7000-8000-999999999999')
+            ))->toBeNull();
     });
 });
