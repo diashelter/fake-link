@@ -88,6 +88,7 @@ describe('EloquentAuthTokenRepository', function () {
         $repository->save($token, $hash);
         $repository->deleteById($token->id());
 
+        // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
         expect(AuthTokenModel::query()->count())->toBe(0);
 
         $repository->deleteById($token->id());
@@ -125,7 +126,9 @@ describe('EloquentAuthTokenRepository', function () {
         $deleted = $repository->deleteAllForUser(UserId::fromString($user->id));
 
         expect($deleted)->toBe(2)
+            // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
             ->and(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
             ->and(AuthTokenModel::query()->where('user_id', $otherUser->id)->count())->toBe(1);
     });
 

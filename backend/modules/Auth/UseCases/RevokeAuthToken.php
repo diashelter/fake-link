@@ -6,7 +6,6 @@ namespace Modules\Auth\UseCases;
 
 use Modules\Auth\Contracts\Repositories\AuthTokenRepository;
 use Modules\Auth\Domain\ValueObjects\AuthTokenId;
-use Modules\Auth\Domain\ValueObjects\UserId;
 
 final class RevokeAuthToken
 {

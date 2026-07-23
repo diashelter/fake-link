@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Auth\Domain\Enums\TokenKind;
+use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Domain\ValueObjects\AuthTokenId;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Input\IssueAuthTokenDto;
@@ -13,7 +14,6 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\AuthTokenMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
-use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\RevokeAllUserTokens;
@@ -56,6 +56,7 @@ describe('RevokeAuthToken', function () {
 
         $revoke->byHash($hash);
 
+        // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
         expect(AuthTokenModel::query()->count())->toBe(0);
 
         $revoke->byHash($hash);
@@ -81,6 +82,7 @@ describe('RevokeAllUserTokens', function () {
         $deleted = makeRevokeAllUserTokensUseCase()->execute(UserId::fromString($user->id));
 
         expect($deleted)->toBe(2)
+            // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
             ->and(AuthTokenModel::query()->count())->toBe(0)
             ->and(makeRevokeAllUserTokensUseCase()->execute(UserId::fromString($user->id)))->toBe(0);
     });

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\UseCases;
 
-use DateTimeImmutable;
+use Illuminate\Support\Carbon;
 use Modules\Auth\Contracts\Repositories\AuthTokenRepository;
 use Modules\Auth\Contracts\Services\AuthTokenIdGenerator;
 use Modules\Auth\Contracts\Services\TokenHasher;
@@ -24,7 +24,7 @@ final class IssueAuthToken
 
     public function execute(IssueAuthTokenDto $dto): IssuedAuthTokenDto
     {
-        $now = new DateTimeImmutable('now');
+        $now = Carbon::now()->toDateTimeImmutable();
         $expiresAt = $now->modify(sprintf('+%d seconds', $dto->tokenKind->absoluteTtlSeconds()));
         $tokenId = $this->authTokenIdGenerator->generate();
         $plainText = $this->bearerTokenGenerator->generatePlainText();

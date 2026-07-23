@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Modules\Auth\Domain\Enums\TokenKind;
 use Modules\Auth\Domain\Enums\UserStatus;
+use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Input\IssueAuthTokenDto;
 use Modules\Auth\Exceptions\AuthTokenException;
@@ -18,7 +19,6 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
-use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\ValidateAuthToken;
@@ -75,17 +75,12 @@ describe('ValidateAuthToken', function () {
 
         Carbon::setTestNow('2026-01-02T00:00:00+00:00');
 
-        try {
-            makeValidateAuthTokenUseCase()->execute($plainText);
-        } catch (AuthTokenException) {
-            expect(AuthTokenModel::query()->first()?->last_used_at)->toBeNull();
+        expect(fn () => makeValidateAuthTokenUseCase()->execute($plainText))
+            ->toThrow(AuthTokenException::class, 'Authentication is required.');
 
-            Carbon::setTestNow();
+        expect(AuthTokenModel::query()->first()?->last_used_at)->toBeNull();
 
-            return;
-        }
-
-        throw new RuntimeException('Expected AuthTokenException');
+        Carbon::setTestNow();
     });
 
     it('rejects idle expired tokens without updating last_used_at', function () {
@@ -95,17 +90,12 @@ describe('ValidateAuthToken', function () {
 
         Carbon::setTestNow('2026-01-01T01:00:01+00:00');
 
-        try {
-            makeValidateAuthTokenUseCase()->execute($plainText);
-        } catch (AuthTokenException) {
-            expect(AuthTokenModel::query()->first()?->last_used_at)->toBeNull();
+        expect(fn () => makeValidateAuthTokenUseCase()->execute($plainText))
+            ->toThrow(AuthTokenException::class, 'Authentication is required.');
 
-            Carbon::setTestNow();
+        expect(AuthTokenModel::query()->first()?->last_used_at)->toBeNull();
 
-            return;
-        }
-
-        throw new RuntimeException('Expected AuthTokenException');
+        Carbon::setTestNow();
     });
 
     it('rejects suspended accounts with account suspended', function () {

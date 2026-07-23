@@ -60,6 +60,7 @@ final class EloquentAuthTokenRepository implements AuthTokenRepository
         $updated = AuthTokenModel::query()
             ->where('id', $id->value())
             ->where(function ($query) use ($threshold): void {
+                // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder whereNull/orWhere)
                 $query->whereNull('last_used_at')
                     ->orWhere('last_used_at', '<', $threshold);
             })

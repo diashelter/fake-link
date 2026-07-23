@@ -19,4 +19,3 @@ if (app()->environment('testing')) {
             ->middleware(['auth.bearer', 'token.kind:session,verification']);
     });
 }
-

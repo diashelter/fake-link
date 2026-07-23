@@ -29,7 +29,7 @@ describe('AuthorizesOwnedResource', function () {
             userStatus: UserStatus::Active,
             tokenKind: TokenKind::Session,
             tokenId: AuthTokenId::fromString('018e8b8a-7b6a-7000-8000-123456789abd'),
-            expiresAt: new \DateTimeImmutable('2026-01-08T00:00:00+00:00'),
+            expiresAt: new DateTimeImmutable('2026-01-08T00:00:00+00:00'),
         );
 
         (new OwnedResourceProbe)->check($principal, $userId);
@@ -43,7 +43,7 @@ describe('AuthorizesOwnedResource', function () {
             userStatus: UserStatus::Active,
             tokenKind: TokenKind::Session,
             tokenId: AuthTokenId::fromString('018e8b8a-7b6a-7000-8000-123456789abd'),
-            expiresAt: new \DateTimeImmutable('2026-01-08T00:00:00+00:00'),
+            expiresAt: new DateTimeImmutable('2026-01-08T00:00:00+00:00'),
         );
 
         (new OwnedResourceProbe)->check(

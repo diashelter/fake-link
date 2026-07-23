@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Modules\Auth\Domain\Enums\TokenKind;
+use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Input\IssueAuthTokenDto;
 use Modules\Auth\Infrastructure\Hashing\Sha256TokenHasher;
@@ -13,7 +14,6 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\AuthTokenMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
-use Modules\Auth\Domain\Services\BearerTokenGenerator;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Tests\TestCase;
@@ -45,7 +45,7 @@ describe('IssueAuthToken', function () {
         $hasher = new Sha256TokenHasher;
 
         expect($issued->tokenKind)->toBe(TokenKind::Verification)
-            ->and($issued->expiresAt->format('Y-m-d H:i:s'))->toBe('2026-01-02 00:00:00')
+            ->and($issued->expiresAt->format('Y-m-d\TH:i:sP'))->toBe('2026-01-02T00:00:00+00:00')
             ->and($model?->token_hash)->toBe($hasher->hash($issued->plainTextToken))
             ->and($model?->token_hash)->not->toBe($issued->plainTextToken);
 
@@ -61,7 +61,7 @@ describe('IssueAuthToken', function () {
         );
 
         expect($issued->tokenKind)->toBe(TokenKind::Session)
-            ->and($issued->expiresAt->format('Y-m-d H:i:s'))->toBe('2026-01-08 00:00:00');
+            ->and($issued->expiresAt->format('Y-m-d\TH:i:sP'))->toBe('2026-01-08T00:00:00+00:00');
 
         Carbon::setTestNow();
     });
@@ -75,7 +75,8 @@ describe('IssueAuthToken', function () {
         $second = $useCase->execute($dto);
         $hasher = new Sha256TokenHasher;
 
-        expect($hasher->hash($first->plainTextToken))->not->toBe($hasher->hash($second->plainTextToken))
-            ->and(AuthTokenModel::query()->count())->toBe(2);
+        expect($hasher->hash($first->plainTextToken))->not->toBe($hasher->hash($second->plainTextToken));
+        // @phpstan-ignore staticMethod.dynamicCall (Eloquent builder count)
+        expect(AuthTokenModel::query()->count())->toBe(2);
     });
 });
