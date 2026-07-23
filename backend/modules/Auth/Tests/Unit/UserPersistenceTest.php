@@ -9,11 +9,13 @@ use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Infrastructure\Identity\Uuid7UserIdGenerator;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 describe('UserMapper', function () {
     it('maps persistence attributes to the domain entity', function () {
-        $model = new UserModel;
-        $model->forceFill([
+        $model = (new UserModel)->forceFill([
             'id' => '018e8b8a-7b6a-7000-8000-123456789abc',
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',

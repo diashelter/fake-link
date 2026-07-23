@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers;
 
 use DateTimeImmutable;
+use Illuminate\Support\Carbon;
 use Modules\Auth\Domain\Entities\User;
 use Modules\Auth\Domain\Enums\UserStatus;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
@@ -40,9 +41,11 @@ final class UserMapper
             'email' => $user->email()->value(),
             'password' => $user->passwordHash(),
             'status' => $user->status()->value,
-            'email_verified_at' => $user->emailVerifiedAt(),
+            'email_verified_at' => $user->emailVerifiedAt() !== null
+                ? Carbon::instance($user->emailVerifiedAt())
+                : null,
             'terms_version' => $user->termsVersion(),
-            'terms_accepted_at' => $user->termsAcceptedAt(),
+            'terms_accepted_at' => Carbon::instance($user->termsAcceptedAt()),
         ];
     }
 }

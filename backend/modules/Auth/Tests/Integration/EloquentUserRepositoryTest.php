@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Auth\Domain\Entities\User;
 use Modules\Auth\Domain\Enums\UserStatus;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
@@ -10,9 +11,15 @@ use Modules\Auth\Infrastructure\Identity\Uuid7UserIdGenerator;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
+use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
+use Tests\TestCase;
+
+uses(TestCase::class, RefreshDatabase::class);
 
 function makeAuthUserRepository(): EloquentUserRepository
 {
+    DatabaseSafetyGuard::assertIsolated((string) config('database.connections.pgsql.database'));
+
     return new EloquentUserRepository(
         userIdGenerator: new Uuid7UserIdGenerator,
         userMapper: new UserMapper,
