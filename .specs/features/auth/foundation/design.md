@@ -467,8 +467,7 @@ test-backend:
 | Makefile usa SQLite + `--no-deps` | `Makefile:59–87` | Integration impossível; viola spec | Task dedicada FND-10/11 antes de repository tests |
 | Init Postgres só em volume vazio | `docker/postgres/init/` | Devs com volume existente sem `fake_link_testing` | Documentar recreate ou script `make test-db-ensure` |
 | `DatabaseSeeder` referencia `App\Models\User` | `database/seeders/DatabaseSeeder.php` | Quebra após remoção do model | Limpar seeder nesta fatia (sem seed de User até registration) |
-| `docs/data-model.md` ainda diz ULID | `docs/data-model.md` §3 | Drift documental | Task de sync no Execute; AD-010 |
-| `backend-quality-tooling` design citava SQLite gate | `.specs/features/backend-quality-tooling/design.md` | Contradição aparente | Supersedido por decisão confirmada na spec foundation; atualizar `docs/testing.md` |
+| `docs/testing.md` §2 desatualizado | `docs/testing.md` | Contradição aparente com foundation | Atualizado na fatia foundation |
 | Argon2id lento em CI | `config/hashing.php` | Suite mais lenta | Manter params documentados; `ARGON_TIME` menor só em `.env.testing` se necessário (documentar trade-off) |
 | Pest não descobre `modules/Auth/Tests` | `phpunit.xml` | Zero testes do módulo | Adicionar directory na testsuite |
 | PHPStan ignora `modules/` | `phpstan.neon:8–10` | Regressões de tipo no módulo | Incluir `modules/Auth` nos paths |
@@ -479,7 +478,7 @@ test-backend:
 
 | Decision | Choice | Rationale |
 | --- | --- | --- |
-| Identificador de `User` | UUID v7 (PostgreSQL `uuid`) | Confirmado pelo mantenedor; ordenação temporal; substitui ULID nesta entidade |
+| Identificador de `User` | UUID v7 (PostgreSQL `uuid`) | AD-010/AD-012; padrão canônico do projeto |
 | Geração UUID | Port `UserIdGenerator` + `Str::uuid7()` na infra | Domain permanece livre de Laravel |
 | Nome do VO de e-mail | `EmailAddress` (não `Email`) | Consistência com spec e OpenAPI |
 | Política de senha | Domain service, não Form Request | Spec: regra não vaza para HTTP |
@@ -494,8 +493,9 @@ test-backend:
 
 | ID proposto | Decisão |
 | --- | --- |
-| **AD-010** | `users.id` e identidade Auth usam **UUID v7** (PostgreSQL `uuid`); ULID deixa de ser o padrão para contas |
-| **AD-011** | Testes backend com I/O de banco usam exclusivamente PostgreSQL **`fake_link_testing`**; proibido `fake_link` (dev) e produção |
+| **AD-010** | `users.id` e identidade Auth usam **UUID v7** (PostgreSQL `uuid`) |
+| **AD-011** | Testes backend com I/O de banco usam exclusivamente PostgreSQL **`fake_link_testing`** |
+| **AD-012** | Todas as entidades de domínio e FKs usam **UUID v7**; ULID não é utilizado |
 
 ---
 

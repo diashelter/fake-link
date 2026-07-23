@@ -531,7 +531,7 @@ T15 → T16 → T17 → T18
 **Where**: `.specs/STATE.md`  
 **Depends on**: T16  
 **Reuses**: Design §Tech Decisions  
-**Requirement**: (rastreabilidade spec desvio ULID)
+**Requirement**: (rastreabilidade AD-010/AD-012 — UUID v7)
 
 **Tools**:
 

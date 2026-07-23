@@ -11,8 +11,6 @@ Antes de expor endpoints HTTP, o módulo `Auth` precisa existir como unidade hex
 
 O skeleton Laravel atual traz `App\Models\User`, migration `users` com `bigint` e tabelas legadas (`password_reset_tokens`, `sessions`, `remember_token`) incompatíveis com autenticação Bearer documentada. A fundação substitui esse legado pelo módulo `Modules\Auth` sem quebrar gates de qualidade já verdes.
 
-**Desvio documentado:** `docs/data-model.md` §3 ainda descreve ULID para `users.id`. Esta fatia estabelece **UUID v7** como identificador canônico de `User`; a sincronização de `docs/data-model.md`, `docs/api.md` e demais referências ULID→UUID v7 para contas ocorre durante o Execute (tarefa de alinhamento documental).
-
 ## Goals
 
 - [ ] Estrutura `backend/modules/Auth/` criada conforme `LARAVEL_CODE_DESIGN.md` e `docs/architecture.md` §4.
@@ -38,7 +36,7 @@ O skeleton Laravel atual traz `App\Models\User`, migration `users` com `bigint` 
 | Representação pública HTTP do `User` (`UserResource`) | Fatia `session-and-profile` |
 | Imutabilidade de e-mail no perfil | Fatia `session-and-profile` |
 | Calibração de Argon2id em hardware de produção | Checklist pré-lançamento (`docs/security.md` §4.2); fundação entrega config documentada e testável em dev |
-| Migração ULID→UUID v7 em módulos ainda não implementados (Links, etc.) | Escopo limitado a `users` nesta fatia; demais entidades seguem em specs próprias |
+| Implementação de módulos ainda não entregues (Links, Analytics, etc.) | Escopo limitado a `users` nesta fatia; demais entidades seguem em specs próprias |
 
 ---
 
@@ -50,7 +48,7 @@ O skeleton Laravel atual traz `App\Models\User`, migration `users` com `bigint` 
 | Substituição da migration skeleton | Alterar `0001_01_01_000000_create_users_table.php` in place (projeto pré-produção, sem dados a preservar) | Evita drift entre schema Laravel default e modelo acordado; uma única fonte desde o bootstrap | y |
 | Tabelas Laravel legadas | Remover `password_reset_tokens` e `sessions` da migration inicial; reset usa `email_action_tokens` (fatia posterior); sessão usa Bearer + BFF | ADR 0002; sessões server-side Laravel e reset nativo não fazem parte do produto | y |
 | `remember_token` | Não existe na tabela `users` | Autenticação é Bearer; campo não faz parte do modelo | y |
-| PK de `users` | **UUID v7** — coluna PostgreSQL `uuid`, gerado na aplicação (time-ordered) | Decisão confirmada pelo mantenedor; substitui ULID para contas | y |
+| PK de `users` | **UUID v7** — coluna PostgreSQL `uuid`, gerado na aplicação (time-ordered) | AD-010/AD-012; padrão canônico do projeto | y |
 | Formato UUID v7 | RFC 9562; geração via API Laravel/PHP suportada (ex.: `Str::uuid7()`); persistido como tipo `uuid` nativo | Ordenação temporal útil para índices; interoperável com PostgreSQL | y |
 | `App\Models\User` | Remover; Eloquent fica em `Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel` com mapper para entidade de domínio | Gates Pest Arch e decisão modular em `docs/decisions.md` | y |
 | `Database\Factories\UserFactory` | Realocar para o módulo Auth (ex.: `Modules\Auth\Infrastructure\Persistence\Eloquent\Factories\UserModelFactory`) e apontar para `UserModel` | Testes de persistência e fatias seguintes precisam de factory determinística | y |
@@ -316,7 +314,6 @@ E-mail imutável após criação (regra de domínio documentada; enforcement com
 - [ ] Pest Arch falha se controller Auth importar Eloquent model diretamente (discrimination sensor preparado).
 - [ ] Cobertura do código em `modules/Auth/` atinge ≥80% linhas e ≥80% branches nos arquivos de domínio e infraestrutura entregues.
 - [ ] Fatia `bearer-tokens` pode iniciar sem alterar schema `users` nem mover pastas do módulo.
-- [ ] `docs/data-model.md` §3 sincronizado com UUID v7 para `users.id` (tarefa de alinhamento documental).
 
 ---
 
@@ -337,7 +334,7 @@ E-mail imutável após criação (regra de domínio documentada; enforcement com
 
 - [Índice Auth](../README.md)
 - `CONTEXT.md` — `User`, `User Status`
-- `docs/data-model.md` §3 (`users`) — **atualizar para UUID v7 no Execute**
+- `docs/data-model.md` §3 (`users`)
 - `docs/security.md` §4.2 (senha)
 - `docs/decisions.md` — identidade e backend modular
 - `docs/architecture.md` §4.1, §4 (estrutura de módulos)

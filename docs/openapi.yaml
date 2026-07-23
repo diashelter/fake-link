@@ -816,9 +816,9 @@ components:
       name: link
       in: path
       required: true
-      description: ULID do link. Recursos de outro proprietário retornam `404`.
+      description: UUID v7 do link. Recursos de outro proprietário retornam `404`.
       schema:
-        $ref: '#/components/schemas/Ulid'
+        $ref: '#/components/schemas/UuidV7'
     Cursor:
       name: cursor
       in: query
@@ -1401,10 +1401,11 @@ components:
             type: string
             const: "User-agent: *\nDisallow: /\n"
   schemas:
-    Ulid:
+    UuidV7:
       type: string
-      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-      examples: [01J2Z7FJ8M4W2N6P3Q9R5S1T0V]
+      format: uuid
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+      examples: ['018f5c3d-7b2a-7890-a456-426614174000']
     RequestId:
       type: string
       minLength: 1
@@ -1453,7 +1454,7 @@ components:
         - updated_at
       properties:
         id:
-          $ref: '#/components/schemas/Ulid'
+          $ref: '#/components/schemas/UuidV7'
         name:
           type: string
           minLength: 1
@@ -1637,7 +1638,7 @@ components:
         - updated_at
       properties:
         id:
-          $ref: '#/components/schemas/Ulid'
+          $ref: '#/components/schemas/UuidV7'
         slug:
           $ref: '#/components/schemas/Slug'
         short_url:
@@ -1676,7 +1677,7 @@ components:
         - updated_at
       properties:
         id:
-          $ref: '#/components/schemas/Ulid'
+          $ref: '#/components/schemas/UuidV7'
         slug:
           $ref: '#/components/schemas/Slug'
         short_url:

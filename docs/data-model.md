@@ -3,7 +3,7 @@
 ## 1. Princípios
 
 - PostgreSQL é a fonte de verdade. Redis é somente cache, broker de filas e armazenamento efêmero reconstruível.
-- Identificadores das entidades de domínio usam ULID. Eventos de clique usam UUIDv7.
+- Identificadores das entidades de domínio usam **UUID v7** (PostgreSQL `uuid`, RFC 9562), gerados na aplicação.
 - Datas e horas são armazenadas como `timestamptz` em UTC; buckets diários usam a data UTC.
 - Alterações de destino são versionadas e preservam o histórico enquanto o link existir.
 - Slugs têm semântica global sem diferenciação de caixa, são persistidos em minúsculas e nunca são reutilizados.
@@ -48,8 +48,8 @@ erDiagram
     }
 
     SHORT_LINKS {
-        ulid id PK
-        ulid user_id FK
+        uuid id PK
+        uuid user_id FK
         varchar slug FK,UK
         text slug_source
         varchar title
@@ -62,8 +62,8 @@ erDiagram
     }
 
     LINK_DESTINATION_VERSIONS {
-        ulid id PK
-        ulid short_link_id FK
+        uuid id PK
+        uuid short_link_id FK
         text destination_url
         varchar key_id
         timestamptz valid_from
@@ -73,7 +73,7 @@ erDiagram
     CLICK_EVENTS {
         timestamptz occurred_at PK
         uuid event_id PK
-        ulid short_link_id FK
+        uuid short_link_id FK
         char visitor_hash
         boolean is_estimated_unique
         varchar referrer_host
@@ -83,12 +83,12 @@ erDiagram
 
     DAILY_LINK_VISITORS {
         date occurred_on PK
-        ulid short_link_id PK
+        uuid short_link_id PK
         char visitor_hash PK
     }
 
     LINK_METRICS_HOURLY {
-        ulid short_link_id PK
+        uuid short_link_id PK
         timestamptz bucket_start PK
         text traffic_type PK
         bigint total_clicks
@@ -96,7 +96,7 @@ erDiagram
     }
 
     LINK_METRICS_DAILY {
-        ulid short_link_id PK
+        uuid short_link_id PK
         date bucket_date PK
         text traffic_type PK
         bigint total_clicks
@@ -104,7 +104,7 @@ erDiagram
     }
 
     LINK_REFERRER_DAILY_METRICS {
-        ulid short_link_id PK
+        uuid short_link_id PK
         date bucket_date PK
         text traffic_type PK
         varchar referrer_group PK
@@ -112,7 +112,7 @@ erDiagram
     }
 
     LINK_DEVICE_DAILY_METRICS {
-        ulid short_link_id PK
+        uuid short_link_id PK
         date bucket_date PK
         text traffic_type PK
         text device_type PK
@@ -147,8 +147,8 @@ Tokens Bearer seguem o armazenamento por hash do Laravel. O valor completo exist
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
-| `user_id` | ULID | Conta associada |
+| `id` | UUID v7 (`uuid`) | Chave primária |
+| `user_id` | UUID v7 (`uuid`) | Conta associada |
 | `token_hash` | char(64) | Hash do token, único; o valor bruto não é persistido |
 | `token_kind` | text | `CHECK` para `verification` ou `session` |
 | `expires_at` | timestamptz | Expiração absoluta obrigatória |
@@ -163,8 +163,8 @@ Tokens enviados por e-mail são de uso único e contêm somente o necessário pa
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
-| `user_id` | ULID | Conta associada |
+| `id` | UUID v7 (`uuid`) | Chave primária |
+| `user_id` | UUID v7 (`uuid`) | Conta associada |
 | `token_hash` | char(64) | Hash único; nunca o token bruto |
 | `purpose` | text | Finalidade permitida, validada por `CHECK` e enum no código |
 | `expires_at` | timestamptz | Expiração absoluta |
@@ -187,8 +187,8 @@ A validação exige finalidade correta, não expiração e `used_at IS NULL`; co
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
-| `user_id` | ULID | FK imutável para `users.id`, com `RESTRICT` |
+| `id` | UUID v7 (`uuid`) | Chave primária |
+| `user_id` | UUID v7 (`uuid`) | FK imutável para `users.id`, com `RESTRICT` |
 | `slug` | varchar(48) | FK para `slug_reservations.slug`, único, global, minúsculo e imutável |
 | `slug_source` | text | `CHECK` para `automatic` ou `custom` |
 | `title` | varchar(160), nullable | Nome privado para organização |
@@ -243,8 +243,8 @@ Como toda entrada é convertida antes da validação e a chave persistida é min
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT` |
+| `id` | UUID v7 (`uuid`) | Chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT` |
 | `destination_url` | text criptografado | Envelope AES-256-GCM da URL normalizada, limite de 2.048 caracteres antes da criptografia |
 | `key_id` | varchar | Identifica a chave do keyring de destinos |
 | `valid_from` | timestamptz | Início inclusivo da vigência |
@@ -278,8 +278,8 @@ Tabela particionada diariamente por `occurred_at`. Partições são pré-criadas
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
 | `occurred_at` | timestamptz | Instante imutável recebido pelo redirect e chave de particionamento |
-| `event_id` | UUIDv7 | Identificador imutável do evento |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT` |
+| `event_id` | UUID v7 (`uuid`) | Identificador imutável do evento |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT` |
 | `visitor_hash` | char(64), nullable | HMAC diário, preenchido somente para tráfego `human` |
 | `is_estimated_unique` | boolean, nullable | Preenchido somente para tráfego `human` |
 | `referrer_host` | varchar(253), nullable | Host público completo e normalizado; nulo para acesso direto ou referência inválida |
@@ -320,7 +320,7 @@ Tabela particionada diariamente por `occurred_on` e mantida por sete dias.
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
 | `occurred_on` | date | Data UTC e chave de particionamento |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
 | `visitor_hash` | char(64) | Parte da chave primária |
 
 A chave primária é `(occurred_on, short_link_id, visitor_hash)`. Para evento humano com hash disponível, o worker tenta inserir com `ON CONFLICT DO NOTHING`; inserção bem-sucedida define `is_estimated_unique = true` e conflito define `false`.
@@ -339,7 +339,7 @@ Uma linha por link, hora UTC e tipo de tráfego.
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
 | `bucket_start` | timestamptz | Hora UTC truncada, parte da chave primária |
 | `traffic_type` | text | Parte da chave primária, com o mesmo `CHECK` dos eventos |
 | `total_clicks` | bigint | Total de eventos da categoria |
@@ -354,7 +354,7 @@ Uma linha por link, dia UTC e tipo de tráfego, com os mesmos campos semânticos
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
 | `bucket_date` | date | Dia UTC, parte da chave primária |
 | `traffic_type` | text | Parte da chave primária |
 | `total_clicks` | bigint | Total de eventos da categoria |
@@ -369,7 +369,7 @@ Uma linha por link, dia UTC, tipo de tráfego e grupo de referência.
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
 | `bucket_date` | date | Dia UTC, parte da chave primária |
 | `traffic_type` | text | Parte da chave primária |
 | `referrer_group` | varchar(253) | Host público completo e normalizado ou o valor reservado `direct` |
@@ -384,7 +384,7 @@ Uma linha por link, dia UTC, tipo de tráfego e categoria de dispositivo.
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `short_link_id` | ULID | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
+| `short_link_id` | UUID v7 (`uuid`) | FK para `short_links.id`, com `RESTRICT`, e parte da chave primária |
 | `bucket_date` | date | Dia UTC, parte da chave primária |
 | `traffic_type` | text | Parte da chave primária |
 | `device_type` | text | Parte da chave primária, com o mesmo `CHECK` dos eventos |
@@ -401,7 +401,7 @@ O header `Idempotency-Key` é opcional. Quando enviado, deve ter entre 16 e 128 
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `user_id` | ULID | FK para `users.id`, com `RESTRICT`, e parte da chave única |
+| `user_id` | UUID v7 (`uuid`) | FK para `users.id`, com `RESTRICT`, e parte da chave única |
 | `key_hash` | char(64) | HMAC do valor recebido e parte da chave única; nunca a chave bruta |
 | `request_fingerprint` | char(64) | HMAC do comando normalizado, incluindo operação e payload |
 | `response_snapshot` | bytea criptografado | Snapshot exato do status, headers originais e bytes do corpo original |
@@ -421,7 +421,7 @@ Tabela append-only para comandos executados por Operations e ações administrat
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
+| `id` | UUID v7 (`uuid`) | Chave primária |
 | `action` | varchar | Ação estável, definida no código |
 | `target_type` | varchar | Tipo lógico do alvo |
 | `target_id` | varchar | Identificador opaco, sem FK |
