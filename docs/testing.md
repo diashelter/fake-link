@@ -75,6 +75,8 @@ Não existe baseline tolerado ou cobertura herdada abaixo das metas. Os gates va
 | Auth, Analytics e BFF | 80% | 80% |
 | Domínios frontend | 75% | 75% |
 
+PCOV mede cobertura de **linhas** e **métodos** no relatório HTML (`storage/coverage/modules/{Module}/index.html`). Não há métrica nativa de branches no PHP com PCOV; para módulos backend, **cobertura de métodos** substitui o gate de branches. O script `backend/scripts/check-auth-coverage-gate.php` (executado após `make test-backend-coverage`) falha se linhas ou métodos do módulo Auth ficarem abaixo de 80%.
+
 Cobertura numérica não substitui casos relevantes. Exclusões exigem justificativa técnica explícita e não podem remover regras de domínio, segurança ou tratamento de falhas do cálculo.
 
 Os gates estáticos obrigatórios são:

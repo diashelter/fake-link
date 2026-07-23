@@ -69,7 +69,8 @@
             "@md"
         ],
         "test:coverage": [
-            "@php vendor/bin/pest --coverage"
+            "@php vendor/bin/pest --coverage",
+            "@php scripts/check-auth-coverage-gate.php"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

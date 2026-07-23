@@ -240,3 +240,23 @@ Notable low-coverage classes: `UserModelFactory` 0%, `UserModel` 80%, `UserId::e
 5. Branch coverage metric unavailable — 80% branch gate unverified
 
 **Next steps**: Execute Fix 1–3 (Major) before marking foundation fully verified; Fix 4–6 as follow-up; re-run Verifier after fixes
+
+---
+
+## Re-verification after Fix 1–6 (2026-07-23)
+
+**Overall**: ✅ Ready
+
+| Fix | Status | Evidence |
+| --- | --- | --- |
+| Fix 1: AuthServiceProvider registration | ✅ | `AuthServiceProviderTest.php` — provider in bootstrap + container bindings |
+| Fix 2: Migration schema contract | ✅ | `UsersSchemaContractTest.php` — columns, CHECK, no legacy tables |
+| Fix 3: Postgres `fake_link_testing` exists | ✅ | `DatabaseSafetyTest.php` — `pg_database` query |
+| Fix 4: Hashing config defaults | ✅ | `HashingConfigTest.php` — `argon2id` + memory ≥65536 |
+| Fix 5: Edge-case persistence | ✅ | `UsersPersistenceConstraintsTest.php` — NOT NULL terms, CHECK status, UUID v4 |
+| Fix 6: Branch coverage gate | ✅ | `scripts/check-auth-coverage-gate.php` + `docs/testing.md` §4 |
+
+**Gate (post-fix)**: 74 passed, 0 failed (`make lint && make test-backend && make test-backend-coverage`)  
+**Coverage gate**: lines 84.67%, methods 91.30% (branch proxy)  
+**Spec-anchored check**: gaps from Fix 1–5 closed; doc-only AC (FND-11) remains manual by design  
+**Sensor**: not re-run (prior 3/3 killed retained)

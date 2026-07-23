@@ -18,15 +18,16 @@
 
 ## Handoff
 
-**Feature:** `auth/foundation` — **Execute complete** / **Verifier FAIL** (2026-07-23)
+**Feature:** `auth/foundation` — **Verifier PASS** (2026-07-23, pós fix tasks)
 
 **Branch:** `feature/auth-fundation`  
-**Next:** fechar gaps do Verifier (ver `foundation/validation.md`) → fatia `bearer-tokens`
+**Next:** fatia `bearer-tokens`
 
 ### Progresso
 
-- T1–T18: completo (21 commits na branch)
-- Verifier: FAIL — 4 ACs sem evidência de teste; sensor 3/3 killed; cobertura linhas 83.77%
+- T1–T18: completo
+- Fix tasks 1–6: completo (+10 testes)
+- Verifier: PASS (re-verificação pós-fixes)
 
 ### Próximo passo
 
