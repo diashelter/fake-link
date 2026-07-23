@@ -75,11 +75,15 @@ Cobertura numérica não substitui casos relevantes. Exclusões exigem justifica
 Os gates estáticos obrigatórios são:
 
 - Laravel Pint.
-- Larastan no nível estrito máximo sustentável definido e fixado pelo projeto.
+- Larastan no **nível 6**, com `phpstan/phpstan-strict-rules` (fixado pelo projeto; AD-009).
+- PHPMD (complexidade e acoplamento; ruleset em `backend/phpmd.xml`).
+- Pest Architecture (limites do monólito modular; §3.1).
 - TypeScript com `strict` habilitado.
 - ESLint.
 - Prettier.
 - Lint da especificação OpenAPI 3.1 e detecção de breaking changes.
+
+Não fazem parte da stack backend: PHPCS, PHP-CS-Fixer e PHP Insights. Localmente e no CI, os gates backend rodam **somente via Docker** (`make lint`, `make test-backend-coverage`, workflow `backend-quality.yml`).
 
 Warnings novos não são aceitos como forma de aprovação do pipeline.
 
@@ -274,13 +278,14 @@ Vulnerabilidade alta ou crítica bloqueia release. Uma exceção exige risco doc
 
 Todo pull request executa:
 
-1. Pint, Larastan, TypeScript strict, ESLint e Prettier.
-2. OpenAPI lint, exemplos, contract tests, diff e verificação do client TypeScript gerado.
-3. Pest unit, feature, integration e architecture com cobertura.
-4. Vitest, React Testing Library e MSW com cobertura.
-5. Playwright funcional, snapshots visuais estáveis e `axe` nos fluxos críticos.
-6. Auditorias de dependência, Gitleaks e Trivy aplicáveis.
-7. Builds das aplicações e smoke da composição completa.
+1. Gates backend via Docker (workflow `.github/workflows/backend-quality.yml`): Pint, Larastan nível 6, PHPMD, Pest Architecture e Pest com cobertura PCOV — paridade com `make lint` / `make test-backend-coverage`. Sem instalação de PHP/Composer no runner.
+2. TypeScript strict, ESLint e Prettier (quando o job frontend estiver ativo).
+3. OpenAPI lint, exemplos, contract tests, diff e verificação do client TypeScript gerado.
+4. Pest unit, feature, integration e architecture com cobertura (o slice backend já cobre Architecture + cobertura no workflow acima).
+5. Vitest, React Testing Library e MSW com cobertura.
+6. Playwright funcional, snapshots visuais estáveis e `axe` nos fluxos críticos.
+7. Auditorias de dependência, Gitleaks e Trivy aplicáveis.
+8. Builds das aplicações e smoke da composição completa.
 
 Regras de entrega:
 

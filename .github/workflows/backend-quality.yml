@@ -1,0 +1,40 @@
+name: Backend Quality
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  backend-quality:
+    name: Backend quality gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Build backend Docker image
+        run: docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.dev.yml build backend
+
+      - name: Install Composer dependencies
+        run: docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.dev.yml run --rm --no-deps backend composer install --no-interaction --prefer-dist
+
+      - name: Pint style check
+        run: make format-backend
+
+      - name: PHPStan / Larastan analyse
+        run: make analyse-backend
+
+      - name: PHPMD complexity check
+        run: make md-backend
+
+      - name: Pest Architecture suite
+        run: make test-architecture
+
+      - name: Pest tests with PCOV coverage
+        run: make test-backend-coverage

@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-frontend lint
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend lint lint-backend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -66,6 +66,26 @@ test-backend: ## Run Pest tests in the backend container
 		-e QUEUE_CONNECTION=sync \
 		backend php artisan test
 
+test-architecture: ## Run Pest Architecture suite in the backend container
+	@test -f .env || cp .env.example .env
+	$(COMPOSE) run --rm --no-deps \
+		-e DB_CONNECTION=sqlite \
+		-e DB_DATABASE=:memory: \
+		-e CACHE_STORE=array \
+		-e SESSION_DRIVER=array \
+		-e QUEUE_CONNECTION=sync \
+		backend vendor/bin/pest tests/Architecture
+
+test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend container
+	@test -f .env || cp .env.example .env
+	$(COMPOSE) run --rm --no-deps \
+		-e DB_CONNECTION=sqlite \
+		-e DB_DATABASE=:memory: \
+		-e CACHE_STORE=array \
+		-e SESSION_DRIVER=array \
+		-e QUEUE_CONNECTION=sync \
+		backend composer run test:coverage
+
 test-frontend: ## Run Vitest tests in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend pnpm test
 
@@ -80,6 +100,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/benchmark-profile.sh
 	bash tests/compose/observability-profile.sh
 	bash tests/compose/prod-config.sh
+	bash tests/compose/backend-quality-gates.sh
 	@test -f .env || cp .env.example .env
 	@$(MAKE) trust-ca
 	$(COMPOSE) --profile docs up -d --wait
@@ -92,5 +113,19 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) smoke
 	$(MAKE) smoke-docs
 
-lint: ## Placeholder for future container lint targets
-	@echo "lint targets will be added in a later phase"
+lint-backend: ## Run Pint, PHPStan, and PHPMD in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run quality
+
+analyse-backend: ## Run PHPStan/Larastan in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run analyse
+
+md-backend: ## Run PHPMD in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run md
+
+format-backend: ## Run Pint style check in the backend container
+	$(COMPOSE) run --rm --no-deps backend composer run lint
+
+lint: ## Run backend static analysis, Architecture suite, then Pest tests (fail-fast)
+	$(MAKE) lint-backend
+	$(MAKE) test-architecture
+	$(MAKE) test-backend

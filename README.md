@@ -86,9 +86,13 @@ O script gera os certificados em `docker/nginx/certs/` e imprime o comando de im
 | `make up` / `make down` | Sobe / derruba a stack |
 | `make up-docs` | Stack + Swagger UI |
 | `make smoke` | Health + rotas Nginx |
+| `make lint` | Gates de qualidade backend (Pint, Larastan, PHPMD, Pest Arch, Pest) via Docker |
+| `make test-backend-coverage` | Pest com cobertura PCOV no container backend |
 | `make test` | Pest, Vitest, compose gates e smoke |
 | `make test-backend` / `make test-frontend` | Suites isoladas |
 | `make logs` / `make ps` | Observabilidade operacional |
+
+CI backend: workflow [`.github/workflows/backend-quality.yml`](.github/workflows/backend-quality.yml) (PR e push em `main`) executa os mesmos targets via Docker Compose — sem PHP/Composer no host do runner.
 
 Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
 

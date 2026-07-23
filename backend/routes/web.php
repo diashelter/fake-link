@@ -6,10 +6,6 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
 
-Route::get('/api/v1/health', function () {
-    return response()->json(['status' => 'ok']);
-});
-
 Route::get('/robots.txt', function () {
     return response("User-agent: *\nDisallow: /\n", 200, [
         'Content-Type' => 'text/plain; charset=UTF-8',

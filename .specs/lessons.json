@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 9,
+  "next_id": 11,
   "lessons": [
     {
       "id": "L-001",
@@ -148,6 +148,42 @@
       ],
       "created": "2026-07-22T01:31:40Z",
       "last_seen": "2026-07-22T01:34:58Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_deviation::when laravel symfony majors break stable phpmd pin phpmd 3 x dev with a spec deviation and adapt the cli to analyze format ruleset flags rather than inventing a substitute smell tool",
+      "text": "When Laravel/Symfony majors break stable PHPMD, pin phpmd 3.x-dev with a SPEC_DEVIATION and adapt the CLI to analyze/format/ruleset flags rather than inventing a substitute smell tool",
+      "signal": "spec_deviation",
+      "scope": "backend-quality",
+      "status": "candidate",
+      "features": [
+        "backend-quality-tooling"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/phpmd.xml:3-7 (backend-quality)"
+      ],
+      "created": "2026-07-22T22:39:47Z",
+      "last_seen": "2026-07-22T22:39:47Z"
+    },
+    {
+      "id": "L-010",
+      "key": "spec_deviation::for phpstan 2 x drop obsolete neon params removed upstream and scope pest feature testcall ignoreerrors to tests instead of disabling strict analysis globally",
+      "text": "For PHPStan 2.x, drop obsolete neon params removed upstream and scope Pest Feature TestCall ignoreErrors to tests/* instead of disabling strict analysis globally",
+      "signal": "spec_deviation",
+      "scope": "backend-quality",
+      "status": "candidate",
+      "features": [
+        "backend-quality-tooling"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "backend/phpstan.neon:14-20 (backend-quality)"
+      ],
+      "created": "2026-07-22T22:39:47Z",
+      "last_seen": "2026-07-22T22:39:47Z"
     }
   ]
 }

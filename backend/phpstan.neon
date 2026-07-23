@@ -1,0 +1,20 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/pestphp/pest/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - app
+        - tests
+    excludePaths:
+        - bootstrap/cache/*
+        - storage/*
+    # SPEC_DEVIATION: design listed checkMissingIterableValueType / checkGenericClassInNonGenericObjectType
+    # Reason: removed in PHPStan 2.x; equivalent checks are always enabled by default
+    ignoreErrors:
+        # Pest binds Feature closures to Tests\TestCase at runtime; PHPStan types $this as TestCall.
+        -
+            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+            path: tests/*
