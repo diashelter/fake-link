@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Persistence\Eloquent\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Factories\UserModelFactory;
 
 /**
  * @property string $id
@@ -20,6 +22,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class UserModel extends Model
 {
+    /** @use HasFactory<UserModelFactory> */
+    use HasFactory;
+
     public $incrementing = false;
 
     protected $keyType = 'string';
@@ -47,5 +52,10 @@ final class UserModel extends Model
             'email_verified_at' => 'datetime',
             'terms_accepted_at' => 'datetime',
         ];
+    }
+
+    protected static function newFactory(): UserModelFactory
+    {
+        return UserModelFactory::new();
     }
 }

@@ -16,6 +16,10 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
     ->in('Feature');
 
+pest()->extend(TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class, Modules\Auth\Tests\Support\DatabaseSafety::class)
+    ->in('modules/Auth/Tests/Integration');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations
