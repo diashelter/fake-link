@@ -22,3 +22,6 @@ parameters:
         -
             message: '#Access to an undefined property Pest\\PendingCalls\\TestCall::#'
             path: modules/Auth/Tests/*
+        -
+            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+            path: modules/Auth/Tests/Feature/*

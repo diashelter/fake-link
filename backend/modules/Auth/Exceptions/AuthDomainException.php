@@ -14,6 +14,8 @@ final class AuthDomainException extends DomainException
 
     public const EMAIL_ALREADY_IN_USE = 'EMAIL_ALREADY_IN_USE';
 
+    public const INVALID_AUTH_TOKEN_ID = 'INVALID_AUTH_TOKEN_ID';
+
     private function __construct(
         private readonly string $errorCode,
         string $message,
@@ -42,6 +44,14 @@ final class AuthDomainException extends DomainException
         return new self(
             errorCode: self::EMAIL_ALREADY_IN_USE,
             message: 'The email address is already in use.',
+        );
+    }
+
+    public static function invalidAuthTokenId(string $raw): self
+    {
+        return new self(
+            errorCode: self::INVALID_AUTH_TOKEN_ID,
+            message: 'The provided auth token identifier is invalid.',
         );
     }
 

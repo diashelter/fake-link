@@ -14,5 +14,7 @@ interface UserRepository
 
     public function existsByEmail(EmailAddress $email): bool;
 
+    public function findById(UserId $id): ?User;
+
     public function save(User $user): void;
 }
