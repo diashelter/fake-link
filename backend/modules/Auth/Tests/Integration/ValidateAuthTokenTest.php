@@ -68,6 +68,20 @@ describe('ValidateAuthToken', function () {
         makeValidateAuthTokenUseCase()->execute('unknown-token-value');
     })->throws(AuthTokenException::class, 'Authentication is required.');
 
+    it('does not include presented plaintext in validation failure messages', function () {
+        $sentinel = 'SENTINEL-PLAINTEXT-TOKEN-MARKER-12345';
+
+        try {
+            makeValidateAuthTokenUseCase()->execute($sentinel);
+        } catch (AuthTokenException $exception) {
+            expect($exception->getMessage())->not->toContain($sentinel);
+
+            return;
+        }
+
+        expect(false)->toBeTrue('Expected AuthTokenException');
+    });
+
     it('rejects absolutely expired tokens without updating last_used_at', function () {
         Carbon::setTestNow('2026-01-01T00:00:00+00:00');
         $user = UserModel::factory()->create(['status' => UserStatus::Active->value]);
