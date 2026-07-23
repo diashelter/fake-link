@@ -45,6 +45,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
+COPY pcov.ini /usr/local/etc/php/conf.d/98-fake-link-pcov.ini
+
 RUN pecl install pcov \
     && docker-php-ext-enable pcov
 
