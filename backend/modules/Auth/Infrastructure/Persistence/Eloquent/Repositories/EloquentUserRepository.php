@@ -36,6 +36,18 @@ final class EloquentUserRepository implements UserRepository
         return $query->where('email', $email->value())->exists();
     }
 
+    public function findById(UserId $id): ?User
+    {
+        /** @var UserModel|null $model */
+        $model = UserModel::query()->find($id->value());
+
+        if ($model === null) {
+            return null;
+        }
+
+        return $this->userMapper->toDomain($model);
+    }
+
     public function save(User $user): void
     {
         try {
