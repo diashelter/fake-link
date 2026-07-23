@@ -28,7 +28,7 @@ Explicitamente excluído. Documentado para evitar scope creep.
 | PHP Insights | Substituído por PHPMD para smells/complexidade (decisão confirmada) |
 | Frontend lint (ESLint, Prettier, TypeScript strict) | Escopo backend; frontend mantém placeholder até feature própria |
 | OpenAPI lint e contract tests | Escopo de contrato/API; citado em `docs/testing.md` mas não parte desta feature |
-| Scaffold completo de `app/Modules/*` | Feature de domínio; Pest Arch aqui define regras e baseline testável no skeleton |
+| Scaffold completo de `modules/*` | Feature de domínio; Pest Arch aqui define regras e baseline testável no skeleton |
 | Enforcement imediato de cobertura 90/85% e 80/80% por pasta de módulo | Código de domínio ainda não existe; infraestrutura de cobertura sim, thresholds por módulo quando módulos forem criados |
 | Instalação local de PHP/Composer fora de container | Proibido pelo projeto |
 
@@ -51,7 +51,7 @@ Explicitamente excluído. Documentado para evitar scope creep.
 | CI GitHub Actions | Workflow em `.github/workflows/` dispara em `pull_request` e `push` para `main`; executa gates backend via `docker compose run` | Alinha AD-003 e proibição de tooling no host; escopo backend desta feature | y |
 | Paridade local/CI | CI invoca os mesmos comandos/scripts que `make lint` / `make test-backend` (sem drift) | Evita green local + red CI por configs divergentes | y |
 | PCOV no Dockerfile | Instalar via `pecl install pcov` no stage `dev` (e usado em `compose run`) | Prod/runtime não precisa de cobertura | y |
-| Pest Arch no skeleton | Regras mínimas + regras modulares para namespace futuro `App\Modules\*` | Permite gate verde hoje e endurecimento quando módulos existirem | y |
+| Pest Arch no skeleton | Regras mínimas + regras modulares para namespace futuro `Modules\{Module}\*` | Permite gate verde hoje e endurecimento quando módulos existirem | y |
 | Threshold global de cobertura inicial | Relatório gerado sem `--min` bloqueante no P1; documentar como ativar por pasta depois | Evita gate falso-negativo antes dos módulos | y |
 
 **Open questions:** none — all resolved or logged above.
@@ -170,7 +170,7 @@ Explicitamente excluído. Documentado para evitar scope creep.
 
 1. WHEN `tests/Architecture/` contém testes Pest Arch THEN SHALL usar `pestphp/pest-plugin-arch`.
 2. WHEN um Controller em `app/Http/Controllers` (fora de módulos futuros) contém chamada Eloquent direta adicionada em teste de mutação THEN o teste de arquitetura SHALL falhar (prova de discriminação mínima).
-3. WHEN código referencia `App\Modules\{Other}\Models\*` a partir de outro módulo (fixture de teste ou regra preset) THEN SHALL falhar conforme `docs/testing.md` §3.1.
+3. WHEN código referencia `Modules\{Other}\Infrastructure\Persistence\Eloquent\Models\*` a partir de outro módulo (fixture de teste ou regra preset) THEN SHALL falhar conforme `docs/testing.md` §3.1.
 4. WHEN `make lint` ou target dedicado `test-architecture` roda THEN SHALL incluir suite Architecture com exit 0 no baseline atual.
 5. WHEN Pest Arch está implementado THEN workflow GitHub Actions SHALL incluir suite Architecture no job backend (mesmo job ou step adicional documentado).
 

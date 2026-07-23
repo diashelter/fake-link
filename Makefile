@@ -58,9 +58,13 @@ smoke-docs: ## Run Swagger UI smoke check via app.localhost/docs
 
 test-backend: ## Run Pest tests in the backend container
 	@test -f .env || cp .env.example .env
-	$(COMPOSE) run --rm --no-deps \
-		-e DB_CONNECTION=sqlite \
-		-e DB_DATABASE=:memory: \
+	$(COMPOSE) run --rm \
+		-e APP_ENV=testing \
+		-e DB_CONNECTION=pgsql \
+		-e DB_HOST=postgres \
+		-e DB_DATABASE=fake_link_testing \
+		-e DB_USERNAME=fake_link \
+		-e DB_PASSWORD=change-me \
 		-e CACHE_STORE=array \
 		-e SESSION_DRIVER=array \
 		-e QUEUE_CONNECTION=sync \
@@ -78,9 +82,13 @@ test-architecture: ## Run Pest Architecture suite in the backend container
 
 test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend container
 	@test -f .env || cp .env.example .env
-	$(COMPOSE) run --rm --no-deps \
-		-e DB_CONNECTION=sqlite \
-		-e DB_DATABASE=:memory: \
+	$(COMPOSE) run --rm \
+		-e APP_ENV=testing \
+		-e DB_CONNECTION=pgsql \
+		-e DB_HOST=postgres \
+		-e DB_DATABASE=fake_link_testing \
+		-e DB_USERNAME=fake_link \
+		-e DB_PASSWORD=change-me \
 		-e CACHE_STORE=array \
 		-e SESSION_DRIVER=array \
 		-e QUEUE_CONNECTION=sync \

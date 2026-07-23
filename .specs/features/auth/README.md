@@ -21,7 +21,7 @@
 
 | Ordem | Fatia | Pasta | Status | Depende de | Endpoints / entrega |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Fundação do módulo | [foundation](./foundation/spec.md) | Rascunho | Fase 0 (Docker, quality gates) | Scaffold hexagonal, migrations, domínio compartilhado |
+| 1 | Fundação do módulo | [foundation](./foundation/spec.md) | Concluída | Fase 0 (Docker, quality gates) | Scaffold hexagonal, migrations, domínio compartilhado |
 | 2 | Tokens Bearer | [bearer-tokens](./bearer-tokens/spec.md) | Pendente | foundation | Middleware, emissão, revogação, TTL e idle |
 | 3 | Registro por convite | [registration](./registration/spec.md) | Pendente | bearer-tokens | `POST /api/v1/auth/register` |
 | 4 | Login | [login](./login/spec.md) | Pendente | bearer-tokens | `POST /api/v1/auth/login` |

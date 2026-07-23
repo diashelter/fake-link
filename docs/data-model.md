@@ -30,7 +30,7 @@ erDiagram
     SHORT_LINKS ||--o{ LINK_DEVICE_DAILY_METRICS : aggregates
 
     USERS {
-        ulid id PK
+        uuid id PK
         varchar name
         varchar email UK
         varchar password
@@ -128,7 +128,7 @@ erDiagram
 
 | Campo | Tipo conceitual | Regra |
 | --- | --- | --- |
-| `id` | ULID | Chave primária |
+| `id` | UUID v7 (`uuid`) | Chave primária; gerado na aplicação (RFC 9562) |
 | `name` | varchar(120) | Obrigatório |
 | `email` | varchar(254) | Obrigatório, normalizado para minúsculas e único |
 | `password` | varchar | Hash Argon2id; nunca contém senha reversível |

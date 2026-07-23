@@ -11,12 +11,15 @@
 ## 2. Princípios e ambiente
 
 - Todo teste, análise, build e benchmark é executado em containers. Docker Compose é a interface padrão e não há caminho local alternativo suportado.
-- Testes backend de integração usam PostgreSQL e as duas instâncias Redis reais, separadas para dados efêmeros e fila. SQLite in-memory é permitido somente em execuções rápidas via `make test-backend` (unit e feature sem I/O real); não substitui integração com PostgreSQL.
+- **`make test-backend` e `make test-backend-coverage` usam exclusivamente PostgreSQL no banco `fake_link_testing`**. Nunca executam contra `fake_link` (desenvolvimento) nem contra bancos de produção.
+- `APP_ENV=testing` fixa `DB_DATABASE=fake_link_testing` via `backend/.env.testing` e `backend/phpunit.xml`.
+- Testes de integração Auth (constraints, unicidade, CHECK) exigem PostgreSQL real. **SQLite in-memory não substitui** esses testes nem valida constraints do Postgres.
 - Perfis do Docker Compose separam desenvolvimento, testes, observabilidade e benchmark sem criar um ambiente de staging permanente.
 - CI, smoke tests e benchmarks criam composições efêmeras e descartáveis. Os únicos ambientes duradouros são local e produção.
 - Relógio, aleatoriedade, DNS e integrações externas devem ser controláveis nos testes.
 - Factories e fixtures usam dados determinísticos, não carregam segredos e nunca contêm tokens, senhas, IPs ou URLs sensíveis reais.
 - Testes concorrentes devem provar constraints, locks e transações reais, não apenas comportamento de mocks.
+- O banco `fake_link_testing` é criado automaticamente no primeiro boot do Postgres via `docker/postgres/init/01-create-testing-database.sql`. Volumes Postgres já existentes não reexecutam o init: recrie o volume (`docker compose down -v` e suba de novo) ou crie o banco manualmente com o script acima.
 
 ## 3. Estratégia por camada
 
@@ -24,14 +27,16 @@
 
 O backend usa PestPHP em quatro camadas:
 
-- Unit: value objects, regras puras, normalização, classificação e Actions sem I/O.
+- Unit: Value Objects, Entities, regras puras, normalização, classificação e UseCases (com fakes de Contracts).
 - Feature: endpoints, Form Requests, Resources, autenticação, autorização, rate limiting e respostas HTTP.
 - Integration: PostgreSQL, Redis efêmero, Redis de fila, criptografia, concorrência, jobs, partições e transações reais.
 - Architecture: gates obrigatórios para os limites do monólito modular.
 
+Módulos de domínio ficam em `backend/modules/{Module}/` com namespace `Modules\{Module}` (ver `LARAVEL_CODE_DESIGN.md`). Eloquent Models permanecem em `Infrastructure/Persistence/Eloquent/Models` dentro de cada módulo.
+
 Os testes de arquitetura devem falhar quando:
 
-- Um módulo acessa diretamente `Models` de outro módulo.
+- Um módulo acessa diretamente Models Eloquent ou Entities de domínio de outro módulo.
 - Uma dependência cruza a interface pública permitida do módulo.
 - Um Controller contém regra de negócio, consulta Eloquent direta ou lógica de persistência.
 - Validação HTTP fica fora de Form Requests ou representação HTTP fica fora de Resources quando aplicável.
@@ -69,6 +74,8 @@ Não existe baseline tolerado ou cobertura herdada abaixo das metas. Os gates va
 | Backend Links e Redirects | 90% | 85% |
 | Auth, Analytics e BFF | 80% | 80% |
 | Domínios frontend | 75% | 75% |
+
+PCOV mede cobertura de **linhas** e **métodos** no relatório HTML (`storage/coverage/modules/{Module}/index.html`). Não há métrica nativa de branches no PHP com PCOV; para módulos backend, **cobertura de métodos** substitui o gate de branches. O script `backend/scripts/check-auth-coverage-gate.php` (executado após `make test-backend-coverage`) falha se linhas ou métodos do módulo Auth ficarem abaixo de 80%.
 
 Cobertura numérica não substitui casos relevantes. Exclusões exigem justificativa técnica explícita e não podem remover regras de domínio, segurança ou tratamento de falhas do cálculo.
 

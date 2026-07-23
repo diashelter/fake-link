@@ -228,8 +228,8 @@ BACKEND_TEST_ENV := -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: ...
 | Regra | Mecanismo Pest Arch |
 | --- | --- |
 | Controllers finos — sem Eloquent direto | `arch()->preset('laravel')->controllers()` + `not->toUse('Illuminate\Database\Eloquent\Model')` ou equivalente |
-| Módulos não importam Models de outros módulos | `expect('App\Modules\*\...')->not->toUse('App\Modules\*\Models\*')` com namespace guards |
-| Shared não depende de domínio | `expect('App\Modules\Shared\...')->not->toDependOn('App\Modules\Auth|Links|...')` |
+| Módulos não importam Models de outros módulos | `expect('Modules\{Module}\Infrastructure\Persistence\Eloquent\Models\...')->toOnlyBeUsedIn('Modules\{Module}')` |
+| Shared não depende de domínio | `expect('Modules\Shared\...')->not->toUse('Modules\Auth|Links|...')` |
 | Form Requests para validação HTTP | Preset/custom quando módulos existirem; skeleton: regra preparatória documentada |
 
 - **phpunit.xml:** testsuite `Architecture` → `tests/Architecture`
@@ -258,7 +258,7 @@ BACKEND_TEST_ENV := -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: ...
 | Larastan nível 6 no skeleton Laravel | `app/Models/User.php`, providers | Job bloqueado na T4 | Corrigir tipos; ignores mínimos documentados |
 | CI build time | `.github/workflows/` | Feedback lento em PR | Cache Docker layers (BuildKit) — P2 optimization |
 | `make lint` vs frontend lint | `Makefile:95` | Confusão semântica | Documentar que `lint` = backend slice até feature frontend tooling |
-| Pest Arch sem módulos | `app/Modules/` ausente | Regras vacuamente verdadeiras | Regras namespace-aware + sentinela de discriminação (QTOOL-20) |
+| Pest Arch sem módulos | `modules/` ausente | Regras vacuamente verdadeiras | Regras namespace-aware + sentinela de discriminação (QTOOL-20) |
 | Strict rules + Laravel 13 | phpstan.neon | Falsos positivos | Ajuste pontual; não desligar strict rules globalmente |
 | PCOV só em dev stage | `docker/php/Dockerfile:42` | CI usa dev target — OK | Confirmar compose CI usa `target: dev` |
 

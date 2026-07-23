@@ -42,6 +42,15 @@ Ver [ADR 0001](adr/0001-production-minded-invite-only-scope.md).
 
 Ver [ADR 0002](adr/0002-bff-token-architecture.md).
 
+## Backend modular
+
+| Tema | Decisão |
+| --- | --- |
+| Localização | Módulos de negócio em `backend/modules/{Module}/` com namespace `Modules\{Module}` |
+| `app/` global | Bootstrap HTTP, envelope de API, FormRequest base e handlers globais — não domínio |
+| Camadas | Hexagonal conforme `LARAVEL_CODE_DESIGN.md` (`Domain`, `UseCases`, `Contracts`, `Infrastructure`, …) |
+| Comunicação | Módulos não importam Models Eloquent nem detalhes internos de outros módulos |
+
 ## Short Link e slug
 
 | Tema | Decisão |

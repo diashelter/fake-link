@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 11,
+  "next_id": 16,
   "lessons": [
     {
       "id": "L-001",
@@ -184,6 +184,96 @@
       ],
       "created": "2026-07-22T22:39:47Z",
       "last_seen": "2026-07-22T22:39:47Z"
+    },
+    {
+      "id": "L-011",
+      "key": "ac_gap::add an automated smoke that asserts fake link testing exists when postgres init runs infra only scripts are not verified by green unit tests alone",
+      "text": "Add an automated smoke that asserts fake_link_testing exists when Postgres init runs; infra-only scripts are not verified by green unit tests alone",
+      "signal": "ac_gap",
+      "scope": "docker/postgres",
+      "status": "candidate",
+      "features": [
+        "auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-10 AC1 | validation.md (docker/postgres)"
+      ],
+      "created": "2026-07-23T12:31:01Z",
+      "last_seen": "2026-07-23T12:31:01Z"
+    },
+    {
+      "id": "L-012",
+      "key": "ac_gap::assert migration schema contracts in integration tests via information schema or pg catalog not only by reading migration source files",
+      "text": "Assert migration schema contracts in integration tests via information_schema or pg_catalog, not only by reading migration source files",
+      "signal": "ac_gap",
+      "scope": "migrations",
+      "status": "candidate",
+      "features": [
+        "auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-05 | migration AC2 | validation.md (migrations)"
+      ],
+      "created": "2026-07-23T12:31:01Z",
+      "last_seen": "2026-07-23T12:31:01Z"
+    },
+    {
+      "id": "L-013",
+      "key": "ac_gap::boot tests must assert serviceprovider registration by resolving a module port from the container not only that the application starts",
+      "text": "Boot tests must assert ServiceProvider registration by resolving a module port from the container, not only that the application starts",
+      "signal": "ac_gap",
+      "scope": "service-providers",
+      "status": "candidate",
+      "features": [
+        "auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-01 AC1 | validation.md (service-providers)"
+      ],
+      "created": "2026-07-23T12:31:01Z",
+      "last_seen": "2026-07-23T12:31:01Z"
+    },
+    {
+      "id": "L-014",
+      "key": "spec_precision_gap::hashing tests must assert published config defaults from config files not only override config in test beforeeach",
+      "text": "Hashing tests must assert published config defaults from config files, not only override config in test beforeEach",
+      "signal": "spec_precision_gap",
+      "scope": "auth/hashing",
+      "status": "candidate",
+      "features": [
+        "auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-08 AC6 | validation.md (auth/hashing)"
+      ],
+      "created": "2026-07-23T12:31:02Z",
+      "last_seen": "2026-07-23T12:31:02Z"
+    },
+    {
+      "id": "L-015",
+      "key": "ac_gap::integration tests must cover not null and check constraint failures for required persistence fields listed as spec edge cases",
+      "text": "Integration tests must cover NOT NULL and CHECK constraint failures for required persistence fields listed as spec edge cases",
+      "signal": "ac_gap",
+      "scope": "auth/integration",
+      "status": "candidate",
+      "features": [
+        "auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "edge-case terms/status | validation.md (auth/integration)"
+      ],
+      "created": "2026-07-23T12:31:02Z",
+      "last_seen": "2026-07-23T12:31:02Z"
     }
   ]
 }

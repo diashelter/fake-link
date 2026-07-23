@@ -7,6 +7,7 @@ parameters:
     level: 6
     paths:
         - app
+        - modules/Auth
         - tests
     excludePaths:
         - bootstrap/cache/*
@@ -18,3 +19,6 @@ parameters:
         -
             message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
             path: tests/*
+        -
+            message: '#Access to an undefined property Pest\\PendingCalls\\TestCall::#'
+            path: modules/Auth/Tests/*

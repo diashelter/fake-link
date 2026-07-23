@@ -74,6 +74,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: backend/phpstan.neon:14-20 (backend-quality)
 - last seen: 2026-07-22T22:39:47Z
 
+### L-011 — Add an automated smoke that asserts fake_link_testing exists when Postgres init runs; infra-only scripts are not verified by green unit tests alone
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `docker/postgres` · harmful: 0
+- features: auth/foundation
+- evidence: FND-10 AC1 | validation.md (docker/postgres)
+- last seen: 2026-07-23T12:31:01Z
+
+### L-012 — Assert migration schema contracts in integration tests via information_schema or pg_catalog, not only by reading migration source files
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `migrations` · harmful: 0
+- features: auth/foundation
+- evidence: FND-05 | migration AC2 | validation.md (migrations)
+- last seen: 2026-07-23T12:31:01Z
+
+### L-013 — Boot tests must assert ServiceProvider registration by resolving a module port from the container, not only that the application starts
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `service-providers` · harmful: 0
+- features: auth/foundation
+- evidence: FND-01 AC1 | validation.md (service-providers)
+- last seen: 2026-07-23T12:31:01Z
+
+### L-014 — Hashing tests must assert published config defaults from config files, not only override config in test beforeEach
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth/hashing` · harmful: 0
+- features: auth/foundation
+- evidence: AUTH-08 AC6 | validation.md (auth/hashing)
+- last seen: 2026-07-23T12:31:02Z
+
+### L-015 — Integration tests must cover NOT NULL and CHECK constraint failures for required persistence fields listed as spec edge cases
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth/integration` · harmful: 0
+- features: auth/foundation
+- evidence: edge-case terms/status | validation.md (auth/integration)
+- last seen: 2026-07-23T12:31:02Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

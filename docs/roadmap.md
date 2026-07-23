@@ -15,7 +15,7 @@
 
 ### Entregáveis
 
-- Monorepo com `backend`, `frontend`, `docker`, `docs` e módulos iniciais Auth, Links, Redirects, Analytics, Operations e Shared.
+- Monorepo com `backend`, `frontend`, `docker`, `docs` e módulos iniciais Auth, Links, Redirects, Analytics, Operations e Shared em `backend/modules/`.
 - Escolha, registro e pin das versões exatas stable-supported de PHP, Laravel, Composer, Node.js, Next.js, PostgreSQL, Redis, Nginx e ferramentas no momento do scaffold.
 - pnpm fixado por Corepack e lockfile reproduzível para dependências JavaScript.
 - Docker Compose com perfis para desenvolvimento, testes, observabilidade e benchmark.
@@ -23,7 +23,7 @@
 - HTTPS local pelo Nginx com certificado de desenvolvimento, sem reduzir propriedades de segurança dos cookies.
 - Health checks, migrations, seeder determinístico restrito a local/CI e comandos únicos via Docker.
 - OpenAPI 3.1 design-first, lint, diff, exemplos executáveis, Swagger UI e geração do client TypeScript.
-- Limites do monólito modular e gates Pest para seams, Controllers finos e proibição de acesso cross-module a `Models`.
+- Limites do monólito modular e gates Pest para seams, Controllers finos, UseCases e proibição de acesso cross-module a Models Eloquent e Domain de outros módulos.
 - Base Next.js server-first, Route Handlers do BFF, TypeScript strict, ESLint, Prettier, Vitest, React Testing Library, MSW e Playwright.
 - Base visual com Tailwind CSS, Radix Primitives, tokens próprios e tema claro único.
 - Base Laravel API Only com Pest, Pint, Larastan no nível estrito máximo sustentável e PostgreSQL real nos testes.
