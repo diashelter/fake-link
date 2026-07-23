@@ -18,10 +18,10 @@ Objetivos do desenho:
 ## 2. Princípios e limites
 
 - PostgreSQL é a fonte de verdade para Users, Short Links, versões de destino, tokens, eventos, agregados, operações e auditoria.
-- Eloquent é uma implementação interna dos módulos. Não há `Repository` genérico, Active Record compartilhado nem interfaces artificiais sobre persistência.
+- Eloquent é uma implementação interna de cada módulo, confinada à camada `Infrastructure`. Contracts de persistência existem apenas quando orientados a um caso de uso concreto; não há `Repository` genérico, Active Record compartilhado nem interfaces artificiais sobre persistência.
 - Interfaces existem somente em seams reais entre módulos ou infraestrutura substituível.
 - `Shared` contém apenas contratos cross-cutting sem owner natural. Não contém `BaseService`, `BaseRepository`, helpers genéricos ou regras emprestadas de outros módulos.
-- Comunicação entre módulos ocorre no mesmo processo por interfaces explícitas, Actions e eventos internos; não há chamadas de rede internas.
+- Comunicação entre módulos ocorre no mesmo processo por interfaces explícitas, UseCases públicos e eventos internos; não há chamadas de rede internas.
 - O caminho de redirect não espera analytics nem notificações.
 - Falha de analytics reduz cobertura de métricas, não disponibilidade do redirect.
 - Aliases são globais, únicos e permanentemente reservados, inclusive após exclusão de conta.
@@ -72,6 +72,26 @@ flowchart LR
 ```
 
 ## 4. Módulos do backend
+
+### 4.0 Organização física e camadas
+
+Os módulos de negócio do backend ficam em `backend/modules/{Module}/`, com namespace raiz `Modules\{Module}`. A pasta `backend/app/` permanece reservada a componentes globais da aplicação (bootstrap HTTP, envelope de resposta, FormRequest base e tratamento centralizado de exceções).
+
+Cada módulo segue arquitetura hexagonal conforme `LARAVEL_CODE_DESIGN.md`:
+
+| Camada | Namespace (ex.: Auth) | Responsabilidade |
+| --- | --- | --- |
+| `Domain` | `Modules\Auth\Domain\...` | Entities, Value Objects, regras puras |
+| `UseCases` | `Modules\Auth\UseCases\...` | Intenções da aplicação |
+| `Contracts` | `Modules\Auth\Contracts\...` | Portas de saída e integrações |
+| `DTOs` | `Modules\Auth\DTOs\...` | Transporte entre HTTP e UseCases |
+| `Infrastructure` | `Modules\Auth\Infrastructure\...` | HTTP, Eloquent, filas, e-mail, providers |
+| `ServiceProviders` | `Modules\Auth\ServiceProviders\...` | Composição e registro do módulo |
+| `Tests` | `Modules\Auth\Tests\...` | Testes do módulo (preferencial) |
+
+Autoload PSR-4: `"Modules\\": "modules/"` em `backend/composer.json`. Migrations globais continuam em `backend/database/migrations/` até haver decisão contrária documentada.
+
+Um módulo **não** deve importar Models Eloquent, Entities de domínio ou detalhes de `Infrastructure` de outro módulo. A comunicação ocorre por contratos públicos, DTOs estáveis ou eventos internos.
 
 ### 4.1 Auth
 
@@ -138,7 +158,7 @@ Não são eventos de integração distribuídos e não exigem outbox. Workflows 
 ### 6.1 Criação e alteração de link
 
 1. A API autentica o User, aplica rate limit e valida o request em `FormRequest`.
-2. Uma Action de `Links` normaliza e valida o destino, reserva o slug e persiste a versão inicial em uma transação.
+2. Um UseCase de `Links` normaliza e valida o destino, reserva o slug e persiste a versão inicial em uma transação.
 3. A restrição `UNIQUE` do PostgreSQL decide colisões; slugs automáticos têm poucas novas tentativas limitadas.
 4. Mudanças futuras encerram a vigência anterior e criam uma nova versão na mesma transação.
 5. O commit publica o evento interno de invalidação síncrona best-effort.

@@ -31,6 +31,7 @@ Em caso de divergência durante essa fase, [decisions.md](docs/decisions.md) reg
 - [Segurança e privacidade](docs/security.md)
 - [Estratégia de testes](docs/testing.md)
 - [Roadmap](docs/roadmap.md)
+- [Guia de design PHP/Laravel](LARAVEL_CODE_DESIGN.md)
 
 ## Escopo resumido
 

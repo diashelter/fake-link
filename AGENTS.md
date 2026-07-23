@@ -19,6 +19,10 @@ Fake Link: plataforma de encurtamento de URLs com links personalizados, redirect
 
 Backend: `Auth`, `Links`, `Redirects`, `Analytics`, `Operations`, `Shared`
 
+- Código de domínio backend fica em `backend/modules/{Module}/` com namespace `Modules\{Module}` (hexagonal).
+- `app/` contém apenas bootstrap global (ex.: `ApiFormRequest`, `ApiResponse`, exception handler).
+- Estrutura de camadas, autoload e convenções: `LARAVEL_CODE_DESIGN.md`.
+
 Frontend: `auth`, `links`, `analytics`, `shared`
 
 ## Descoberta progressiva
@@ -59,5 +63,5 @@ Não carregue toda a documentação de uma vez. Leia somente os arquivos indicad
 | Fases e prioridades | `docs/roadmap.md` | Sequência de entrega |
 | Decisões confirmadas | `docs/decisions.md` | Prevalece sobre docs temáticos divergentes |
 | ADRs pontuais | `docs/adr/*.md` | Registros formais de decisão |
-| Padrões PHP/Laravel do projeto | `LARAVEL_CODE_DESIGN.md` | Controllers, Actions, Form Requests, DTOs |
+| Padrões PHP/Laravel do projeto | `LARAVEL_CODE_DESIGN.md` | Módulos em `modules/`, UseCases, Form Requests, DTOs |
 | Ambiente Docker | `README.md` | Bootstrap, Makefile, troubleshooting |

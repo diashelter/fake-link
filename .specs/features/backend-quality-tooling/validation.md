@@ -90,7 +90,7 @@
 | --------- | -------------------- | -------- | ------ |
 | QTOOL-19 Architecture tests use pest-plugin-arch | Plugin + arch() API | `composer.json:23` pest-plugin-arch; `ModularMonolithTest.php:31-36` — `arch(...)->expect(...)->not->toUse(...)` | ✅ PASS |
 | QTOOL-20 Controller+Eloquent mutant fails arch test | Discrimination | Rule `ModularMonolithTest.php:31-36`; sensor M1: inject `MutantController` + `use App\Models\User` → FAIL `Expecting 'App\Http\Controllers' not to use 'App\Models'` (exit 1) | ✅ PASS |
-| QTOOL-21 Cross-module Models usage fails | Rule per docs/testing.md §3.1 | `ModularMonolithTest.php:47-49` — `expect("App\\Modules\\{$module}\\Models")->toOnlyBeUsedIn("App\\Modules\\{$module}")` (vacuous until modules exist; namespace-based, not Finder) | ✅ PASS |
+| QTOOL-21 Cross-module Models usage fails | Rule per docs/testing.md §3.1 | `ModularMonolithTest.php` — `expect("Modules\\{$module}\\Infrastructure\\Persistence\\Eloquent\\Models")->toOnlyBeUsedIn("Modules\\{$module}")` (vacuous until modules exist; namespace-based, not Finder) | ✅ PASS |
 | QTOOL-22 make lint / test-architecture includes Arch suite exit 0 | Suite green in pipeline | `Makefile:69-77,128-131`; gate: Architecture 12 passed; `phpunit.xml:14-16` Architecture suite | ✅ PASS |
 | QTOOL-34 GHA includes Architecture suite | CI step | `backend-quality.yml:36-37` — `make test-architecture` | ✅ PASS |
 

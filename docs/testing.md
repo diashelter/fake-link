@@ -24,14 +24,16 @@
 
 O backend usa PestPHP em quatro camadas:
 
-- Unit: value objects, regras puras, normalização, classificação e Actions sem I/O.
+- Unit: Value Objects, Entities, regras puras, normalização, classificação e UseCases (com fakes de Contracts).
 - Feature: endpoints, Form Requests, Resources, autenticação, autorização, rate limiting e respostas HTTP.
 - Integration: PostgreSQL, Redis efêmero, Redis de fila, criptografia, concorrência, jobs, partições e transações reais.
 - Architecture: gates obrigatórios para os limites do monólito modular.
 
+Módulos de domínio ficam em `backend/modules/{Module}/` com namespace `Modules\{Module}` (ver `LARAVEL_CODE_DESIGN.md`). Eloquent Models permanecem em `Infrastructure/Persistence/Eloquent/Models` dentro de cada módulo.
+
 Os testes de arquitetura devem falhar quando:
 
-- Um módulo acessa diretamente `Models` de outro módulo.
+- Um módulo acessa diretamente Models Eloquent ou Entities de domínio de outro módulo.
 - Uma dependência cruza a interface pública permitida do módulo.
 - Um Controller contém regra de negócio, consulta Eloquent direta ou lógica de persistência.
 - Validação HTTP fica fora de Form Requests ou representação HTTP fica fora de Resources quando aplicável.
