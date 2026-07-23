@@ -6,6 +6,7 @@ namespace Modules\Auth\Infrastructure\Persistence\Eloquent\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Factories\UserModelFactory;
 
 /**
@@ -14,11 +15,11 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Factories\UserModelFactory;
  * @property string $email
  * @property string $password
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property Carbon|null $email_verified_at
  * @property string $terms_version
- * @property \Illuminate\Support\Carbon $terms_accepted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon $terms_accepted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 final class UserModel extends Model
 {

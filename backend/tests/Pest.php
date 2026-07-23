@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Auth\Tests\Support\DatabaseSafety;
 use Tests\TestCase;
 
 /*
@@ -17,7 +19,7 @@ pest()->extend(TestCase::class)
     ->in('Feature');
 
 pest()->extend(TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class, Modules\Auth\Tests\Support\DatabaseSafety::class)
+    ->use(RefreshDatabase::class, DatabaseSafety::class)
     ->in('modules/Auth/Tests/Integration');
 
 /*

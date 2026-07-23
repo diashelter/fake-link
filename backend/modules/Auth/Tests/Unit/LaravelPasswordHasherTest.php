@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Hash;
 use Modules\Auth\Infrastructure\Hashing\LaravelPasswordHasher;
+use Tests\TestCase;
 
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 describe('LaravelPasswordHasher', function () {
     beforeEach(function () {
