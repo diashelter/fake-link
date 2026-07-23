@@ -16,28 +16,29 @@
 
 ## Handoff
 
-**Feature:** `backend-quality-tooling` — **Execute em andamento** (2026-07-22)
+**Feature:** `backend-quality-tooling` — **COMPLETE** (2026-07-22)
 
 **Branch:** `feature/package-defaults`  
-**Mode:** Sub-agents (usuário escolheu A)
+**HEAD (implementation):** `72dccea`  
+**Validation:** PASS — `.specs/features/backend-quality-tooling/validation.md`
 
 ### Progresso
 
-- Worker 1 (T1–T9, fases 1–3): **completo** — commits `9cb7f68`…`76bec2e`
-- Worker 2 (T10–T14, fases 4–6 parciais): **completo** — AD-009 registrado; falta T15 (meta-teste)
-- Verifier: aguardando último commit da feature (T15)
+- Worker 1 (T1–T9): completo — `9cb7f68`…`76bec2e`
+- Worker 2 (T10–T15): completo — `3a56a10`…`72dccea`
+- Verifier: **PASS** — 34/34 ACs, gate green, 3/3 mutants killed; lessons L-009/L-010 (SPEC_DEVIATION)
 
-### Deviations (Worker 1)
+### Deviations documentados
 
-- `phpmd/phpmd` + `pdepend/pdepend` em `3.x-dev` (Symfony 8 / Laravel 13)
-- PHPStan 2 neon params ajustados; Pest `TestCall` ignore justificado
+- PHPMD `3.x-dev` (Symfony 8 / Laravel 13)
+- PHPStan 2 neon params; Pest `TestCall` ignore
 
-### Artefatos
+### Uncommitted (pós-Execute)
 
-- Spec: `.specs/features/backend-quality-tooling/spec.md` — **Fechada**
-- Design: `.specs/features/backend-quality-tooling/design.md` — **Approved**
-- Tasks: `.specs/features/backend-quality-tooling/tasks.md` — T1–T14 done; T15 pending
+- `.specs/features/backend-quality-tooling/{spec,design,tasks,validation}.md` (artefatos de spec + relatório)
+- `.specs/LESSONS.md`, `.specs/lessons.json`, `.specs/STATE.md` (handoff + lessons)
+- `backend/storage/coverage/` — não versionar
 
 ### Próximo passo
 
-T15 (`QualityToolingTest`) → summary Worker 2 → Verifier automático.
+Commit dos artefatos `.specs/` se desejado; abrir PR da branch `feature/package-defaults` quando pronto.

@@ -62,6 +62,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: DOCKER-25 (docker)
 - last seen: 2026-07-22T01:34:58Z
 
+### L-009 — When Laravel/Symfony majors break stable PHPMD, pin phpmd 3.x-dev with a SPEC_DEVIATION and adapt the CLI to analyze/format/ruleset flags rather than inventing a substitute smell tool
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `backend-quality` · harmful: 0
+- features: backend-quality-tooling
+- evidence: backend/phpmd.xml:3-7 (backend-quality)
+- last seen: 2026-07-22T22:39:47Z
+
+### L-010 — For PHPStan 2.x, drop obsolete neon params removed upstream and scope Pest Feature TestCall ignoreErrors to tests/* instead of disabling strict analysis globally
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `backend-quality` · harmful: 0
+- features: backend-quality-tooling
+- evidence: backend/phpstan.neon:14-20 (backend-quality)
+- last seen: 2026-07-22T22:39:47Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
