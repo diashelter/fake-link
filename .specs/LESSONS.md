@@ -104,6 +104,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: edge-case terms/status | validation.md (auth/integration)
 - last seen: 2026-07-23T12:31:02Z
 
+### L-016 — Finalize feature spec.md with precise WHEN/THEN outcomes before Execute so verification does not have to reconstruct ACs from product docs
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: spec.md:DRAFT (no WHEN/THEN ACs) (specs)
+- last seen: 2026-07-26T19:11:45Z
+
+### L-017 — Register module Feature test directories in phpunit.xml so default CI and make test-backend discover HTTP probe tests
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `backend/tests` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: AUTH-18/AUTH-19 — backend/phpunit.xml Feature suite omits modules/Auth/Tests/Feature (backend/tests)
+- last seen: 2026-07-26T19:11:45Z
+
+### L-018 — Register every new module test directory in phpunit.xml suites so CI and make test-backend discover Feature tests
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `backend/phpunit.xml` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: validation.md:Gate / phpunit.xml Feature suite (backend/phpunit.xml)
+- last seen: 2026-07-26T19:12:00Z
+
+### L-019 — Complete WHEN/THEN acceptance criteria in spec.md before marking a feature slice verified
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: validation.md:spec.md draft without WHEN/THEN (specs)
+- last seen: 2026-07-26T19:12:00Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

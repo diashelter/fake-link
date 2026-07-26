@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 16,
+  "next_id": 20,
   "lessons": [
     {
       "id": "L-001",
@@ -274,6 +274,78 @@
       ],
       "created": "2026-07-23T12:31:02Z",
       "last_seen": "2026-07-23T12:31:02Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::finalize feature spec md with precise when then outcomes before execute so verification does not have to reconstruct acs from product docs",
+      "text": "Finalize feature spec.md with precise WHEN/THEN outcomes before Execute so verification does not have to reconstruct ACs from product docs",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:DRAFT (no WHEN/THEN ACs) (specs)"
+      ],
+      "created": "2026-07-26T19:11:45Z",
+      "last_seen": "2026-07-26T19:11:45Z"
+    },
+    {
+      "id": "L-017",
+      "key": "ac_gap::register module feature test directories in phpunit xml so default ci and make test backend discover http probe tests",
+      "text": "Register module Feature test directories in phpunit.xml so default CI and make test-backend discover HTTP probe tests",
+      "signal": "ac_gap",
+      "scope": "backend/tests",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-18/AUTH-19 — backend/phpunit.xml Feature suite omits modules/Auth/Tests/Feature (backend/tests)"
+      ],
+      "created": "2026-07-26T19:11:45Z",
+      "last_seen": "2026-07-26T19:11:45Z"
+    },
+    {
+      "id": "L-018",
+      "key": "gate_fail::register every new module test directory in phpunit xml suites so ci and make test backend discover feature tests",
+      "text": "Register every new module test directory in phpunit.xml suites so CI and make test-backend discover Feature tests",
+      "signal": "gate_fail",
+      "scope": "backend/phpunit.xml",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md:Gate / phpunit.xml Feature suite (backend/phpunit.xml)"
+      ],
+      "created": "2026-07-26T19:12:00Z",
+      "last_seen": "2026-07-26T19:12:00Z"
+    },
+    {
+      "id": "L-019",
+      "key": "spec_precision_gap::complete when then acceptance criteria in spec md before marking a feature slice verified",
+      "text": "Complete WHEN/THEN acceptance criteria in spec.md before marking a feature slice verified",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md:spec.md draft without WHEN/THEN (specs)"
+      ],
+      "created": "2026-07-26T19:12:00Z",
+      "last_seen": "2026-07-26T19:12:00Z"
     }
   ]
 }

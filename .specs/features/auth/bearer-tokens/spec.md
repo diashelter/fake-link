@@ -1,6 +1,6 @@
 # Auth — Tokens Bearer
 
-**Status:** Implementada — aguardando re-verificação pós Fix CI (2026-07-26)  
+**Status:** Fechada — confirmada 2026-07-26 (Verifier PASS)  
 **Fatia:** 2 de 7 — ver [índice](../README.md)  
 **Requirement IDs (catálogo):** AUTH-13 … AUTH-19, AUTH-33 (parcial), AUTH-37, AUTH-38  
 **Requirement IDs (fatia):** BT-01 … BT-12  

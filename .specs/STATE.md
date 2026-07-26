@@ -19,18 +19,11 @@
 
 ## Handoff
 
-**Feature:** `auth/bearer-tokens` — **Execute complete** (2026-07-23)
-
-**Branch:** `feature/bearer-tokens`  
-**Commits:** `d2e4ed4..6bdf333` (19 commits)
-
-### Progresso
-
-- T1–T18 implementados com commits atômicos
-- Gates: `make lint`, `make test-backend`, `make test-backend-coverage` — exit 0
-- Verifier: conditional PASS; gap BT-15 fechado em `6bdf333`
-- Relatório: `.specs/features/auth/bearer-tokens/validation.md`
-
-### Próximo passo
-
-Fatia `auth/registration` ou `auth/login` — consumir `IssueAuthToken` + middleware `auth.bearer`.
+- **Feature**: `auth/bearer-tokens` — **Verifier PASS** (2026-07-26)
+- **Phase / Task**: fatia fechada (Fix CI discovery + ACs formais + re-verify)
+- **Completed**: AUTH-13…19, AUTH-33 parcial, AUTH-37, AUTH-38; BT-01…BT-12; gate 133 passed; sensor 6/6
+- **In-progress**: none
+- **Next step**: abrir / especificar fatia `auth/registration` (`POST /api/v1/auth/register`)
+- **Blockers**: none
+- **Uncommitted files**: none (após commit de status)
+- **Branch**: `main` (ahead of origin — commits locais; não fazer push direto na main)
