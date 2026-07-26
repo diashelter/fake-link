@@ -60,6 +60,18 @@ final class AuthErrorResponseFactory
         );
     }
 
+    public function rateLimitExceeded(int $retryAfter, ?string $requestId = null): JsonResponse
+    {
+        return response()->json([
+            'code' => 'RATE_LIMIT_EXCEEDED',
+            'message' => 'Too many requests.',
+            'request_id' => $requestId ?? 'stub-request-id',
+        ], 429)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'Retry-After' => (string) max(0, $retryAfter),
+        ]);
+    }
+
     public function fromAuthTokenException(AuthTokenException $exception, ?string $requestId = null): JsonResponse
     {
         return match ($exception->errorCode()) {

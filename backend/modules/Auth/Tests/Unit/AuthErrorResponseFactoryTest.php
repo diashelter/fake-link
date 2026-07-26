@@ -45,4 +45,17 @@ describe('AuthErrorResponseFactory', function () {
         expect($response->getStatusCode())->toBe(404)
             ->and($response->getData(true)['code'])->toBe(ResourceNotFoundException::RESOURCE_NOT_FOUND);
     });
+
+    it('builds rate limit exceeded responses with Retry-After', function () {
+        $response = (new AuthErrorResponseFactory)->rateLimitExceeded(42, 'req-429');
+
+        expect($response->getStatusCode())->toBe(429)
+            ->and($response->getData(true))->toBe([
+                'code' => 'RATE_LIMIT_EXCEEDED',
+                'message' => 'Too many requests.',
+                'request_id' => 'req-429',
+            ])
+            ->and($response->headers->get('Retry-After'))->toBe('42')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store');
+    });
 });

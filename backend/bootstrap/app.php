@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Modules\Auth\Infrastructure\Http\Middleware\AuthenticateBearer;
 use Modules\Auth\Infrastructure\Http\Middleware\RequireTokenKind;
+use Modules\Auth\Infrastructure\Http\Middleware\ThrottleRegistration;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.bearer' => AuthenticateBearer::class,
             'token.kind' => RequireTokenKind::class,
+            'throttle.registration' => ThrottleRegistration::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
