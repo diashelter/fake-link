@@ -1,6 +1,6 @@
 # Auth — Registro por convite
 
-**Status:** Confirmada — 2026-07-26  
+**Status:** Verified — 2026-07-26  
 **Fatia:** 3 de 7 — ver [índice](../README.md)  
 **Requirement IDs (catálogo):** AUTH-01 … AUTH-05  
 **Requirement IDs (fatia):** REG-01 … REG-10  
@@ -207,21 +207,21 @@ Decisões confirmadas em revisão (2026-07-26).
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| AUTH-01 | P1: Allowlist | Execute | Done |
-| AUTH-02 | P1: Anti-enumeração | Execute | Done |
-| AUTH-03 | P1: Registro bem-sucedido | Execute | Done |
-| AUTH-04 | P1: Registro bem-sucedido | Execute | Done |
-| AUTH-05 | P1: Registro bem-sucedido | Execute | Done |
-| REG-01 | P1: Registro bem-sucedido | Execute | Done |
-| REG-02 | P1: Registro bem-sucedido | Execute | Done |
-| REG-03 | P1: Registro bem-sucedido | Execute | Done |
-| REG-04 | P1: Registro bem-sucedido | Execute | Done |
-| REG-05 | P1: Allowlist | Execute | Done |
-| REG-06 | P1: Anti-enumeração | Execute | Done |
-| REG-07 | P1: Validação HTTP | Execute | Done |
-| REG-08 | P1: Rate limiting | Execute | Done |
-| REG-09 | P2: Contrato HTTP | Execute | Done |
-| REG-10 | P2: Test discovery | Execute | Done |
+| AUTH-01 | P1: Allowlist | Verified | ✅ Verified |
+| AUTH-02 | P1: Anti-enumeração | Verified | ✅ Verified |
+| AUTH-03 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| AUTH-04 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| AUTH-05 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| REG-01 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| REG-02 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| REG-03 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| REG-04 | P1: Registro bem-sucedido | Verified | ✅ Verified |
+| REG-05 | P1: Allowlist | Verified | ✅ Verified |
+| REG-06 | P1: Anti-enumeração | Verified | ✅ Verified |
+| REG-07 | P1: Validação HTTP | Verified | ✅ Verified |
+| REG-08 | P1: Rate limiting | Verified | ✅ Verified |
+| REG-09 | P2: Contrato HTTP | Verified | ✅ Verified |
+| REG-10 | P2: Test discovery | Verified | ✅ Verified |
 
 **Coverage:** 15 total, 15 mapped to tasks ✅
 

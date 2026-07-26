@@ -23,7 +23,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 1 | Fundação do módulo | [foundation](./foundation/spec.md) | Concluída | Fase 0 (Docker, quality gates) | Scaffold hexagonal, migrations, domínio compartilhado |
 | 2 | Tokens Bearer | [bearer-tokens](./bearer-tokens/spec.md) | Concluída | foundation | Middleware, emissão, revogação, TTL e idle |
-| 3 | Registro por convite | [registration](./registration/spec.md) | Pendente | bearer-tokens | `POST /api/v1/auth/register` |
+| 3 | Registro por convite | [registration](./registration/spec.md) | Concluída | bearer-tokens | `POST /api/v1/auth/register` |
 | 4 | Login | [login](./login/spec.md) | Pendente | bearer-tokens | `POST /api/v1/auth/login` |
 | 5 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Pendente | registration, login | `POST …/email/verify`, `POST …/email/verification-notification` |
 | 6 | Senha (alterar e recuperar) | [password](./password/spec.md) | Pendente | bearer-tokens, login | `POST …/password/change`, `…/reset-request`, `…/reset` |

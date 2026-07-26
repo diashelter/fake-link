@@ -19,11 +19,12 @@
 
 ## Handoff
 
-- **Feature**: `auth/registration` — **Execute complete** (2026-07-26); awaiting Verifier
-- **Phase / Task**: Batch 2 (Phases 5–7) T9–T15 complete
-- **Completed**: Batch 1 T1–T8 (`66e2b09`…`50e701e`); Batch 2 T9–T14 (`b3a0a3a`…`af99f3d`) + T15 (this commit); 173 tests green
+- **Feature**: `auth/registration` — **Verified ✅** (2026-07-26)
+- **Phase / Task**: Execute + Verifier complete (PASS after Fix loop 2)
+- **Completed**: T1–T15; Fix loops 1–2; AUTH-01…05 + REG-01…10 Verified; gate 190; sensor 6/6
 - **In-progress**: none
-- **Next step**: Verifier automático (spec-anchored coverage + discrimination sensor)
+- **Next step**: Próxima fatia Auth (`login`) ou commit dos artefatos `.specs/` (design/validation/README) se desejado
 - **Blockers**: none
-- **Uncommitted files**: `.specs/features/auth/registration/design.md`, `.specs/features/auth/README.md` (docs outside T15 scope)
+- **Report**: `.specs/features/auth/registration/validation.md`
 - **Branch**: `auth/registration`
+- **Uncommitted docs**: `design.md`, `validation.md`, README/STATE/spec status, lessons (L-023 da iteração anterior)
