@@ -114,4 +114,39 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Terms of service version
+    |--------------------------------------------------------------------------
+    */
+
+    'terms' => [
+        'current_version' => env('AUTH_TERMS_CURRENT_VERSION', '2026-01'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Invite allowlist
+    |--------------------------------------------------------------------------
+    */
+
+    'invite_allowlist' => [
+        'path' => env('AUTH_INVITE_ALLOWLIST_PATH', base_path('config/invite-allowlist.testing.json')),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate limits
+    |--------------------------------------------------------------------------
+    */
+
+    'rate_limits' => [
+        'registration' => [
+            'max_attempts' => 5,
+            'decay_seconds' => 3600,
+        ],
+    ],
+
+    'rate_limit_hmac_key' => env('AUTH_RATE_LIMIT_HMAC_KEY'),
+
 ];
