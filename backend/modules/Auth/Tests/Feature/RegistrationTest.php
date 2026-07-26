@@ -348,4 +348,64 @@ describe('POST /api/v1/auth/register', function () {
             ->and($response->json())->not->toHaveKey('data')
             ->and($response->json('code'))->toBe('REGISTRATION_NOT_ALLOWED');
     });
+
+    it('returns 403 REGISTRATION_NOT_ALLOWED for unlisted plus-alias of allowlisted email', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'email' => 'invited+alias@example.com',
+            ]));
+
+        $response->assertForbidden()
+            ->assertJsonPath('code', 'REGISTRATION_NOT_ALLOWED')
+            ->assertJsonPath('message', 'Registration is not available for these details.');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED for unicode password outside ASCII categories', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'password' => 'café1234567!',
+                'password_confirmation' => 'café1234567!',
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 400 MALFORMED_REQUEST for malformed JSON body', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->call(
+                'POST',
+                '/api/v1/auth/register',
+                [],
+                [],
+                [],
+                [
+                    'CONTENT_TYPE' => 'application/json',
+                    'HTTP_ACCEPT' => 'application/json',
+                    'REMOTE_ADDR' => $this->clientIp,
+                ],
+                '{not-json',
+            );
+
+        $response->assertStatus(400)
+            ->assertJsonPath('code', 'MALFORMED_REQUEST')
+            ->assertJsonPath('message', 'The request is malformed.');
+
+        expect($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
 });
