@@ -20,7 +20,7 @@
 - Respostas de autenticação e de recursos privados enviam `Cache-Control: private, no-store`.
 - Datas e horas são UTC no formato ISO 8601 estrito com sufixo `Z`, por exemplo `2026-07-16T14:30:00Z`.
 - Datas dos filtros de analytics usam `YYYY-MM-DD` e representam dias UTC completos.
-- IDs de recursos são ULIDs. Identificadores internos de clique nunca são expostos.
+- IDs de recursos são UUID v7 (RFC 9562). Identificadores internos de clique nunca são expostos.
 - Recursos privados inexistentes ou pertencentes a outro usuário retornam o mesmo `404`.
 - Métodos não suportados retornam `405 METHOD_NOT_ALLOWED`. Corpos acima do limite retornam `413 PAYLOAD_TOO_LARGE`.
 - Requests da API e do BFF aceitam no máximo 64 KiB; o host curto não aceita body.
