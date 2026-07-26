@@ -19,11 +19,11 @@
 
 ## Handoff
 
-- **Feature**: `auth/bearer-tokens` — **Verifier PASS** (2026-07-26)
-- **Phase / Task**: fatia fechada (Fix CI discovery + ACs formais + re-verify)
-- **Completed**: AUTH-13…19, AUTH-33 parcial, AUTH-37, AUTH-38; BT-01…BT-12; gate 133 passed; sensor 6/6
+- **Feature**: `auth/registration` — **Execute complete** (2026-07-26); awaiting Verifier
+- **Phase / Task**: Batch 2 (Phases 5–7) T9–T15 complete
+- **Completed**: Batch 1 T1–T8 (`66e2b09`…`50e701e`); Batch 2 T9–T14 (`b3a0a3a`…`af99f3d`) + T15 (this commit); 173 tests green
 - **In-progress**: none
-- **Next step**: abrir / especificar fatia `auth/registration` (`POST /api/v1/auth/register`)
+- **Next step**: Verifier automático (spec-anchored coverage + discrimination sensor)
 - **Blockers**: none
-- **Uncommitted files**: none (após commit de status)
-- **Branch**: `main` (ahead of origin — commits locais; não fazer push direto na main)
+- **Uncommitted files**: `.specs/features/auth/registration/design.md`, `.specs/features/auth/README.md` (docs outside T15 scope)
+- **Branch**: `auth/registration`
