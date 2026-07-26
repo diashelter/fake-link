@@ -11,16 +11,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Laravel's Request::json() silently coerces invalid JSON to an empty bag.
- * API clients that send application/json must get 400 MALFORMED_REQUEST instead.
+ * API write requests must declare a JSON Content-Type.
+ * Laravel's Request::json() silently coerces invalid JSON to an empty bag;
+ * clients that send application/json must get 400 MALFORMED_REQUEST instead.
  */
 final class RejectMalformedJson
 {
+    private const array WRITE_METHODS = ['POST', 'PUT', 'PATCH'];
+
     /**
      * @param  Closure(Request): Response  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($this->requiresJsonContentType($request) && ! $request->isJson()) {
+            throw new BadRequestHttpException('The request is malformed.');
+        }
+
         if (! $request->isJson()) {
             return $next($request);
         }
@@ -38,5 +45,10 @@ final class RejectMalformedJson
         }
 
         return $next($request);
+    }
+
+    private function requiresJsonContentType(Request $request): bool
+    {
+        return in_array($request->method(), self::WRITE_METHODS, true);
     }
 }
