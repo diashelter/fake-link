@@ -408,4 +408,54 @@ describe('POST /api/v1/auth/register', function () {
             // @phpstan-ignore staticMethod.dynamicCall
             ->and(AuthTokenModel::query()->count())->toBe(0);
     });
+
+    it('returns 400 MALFORMED_REQUEST when Content-Type is missing', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->call(
+                'POST',
+                '/api/v1/auth/register',
+                [],
+                [],
+                [],
+                [
+                    'HTTP_ACCEPT' => 'application/json',
+                    'REMOTE_ADDR' => $this->clientIp,
+                ],
+                json_encode(registerPayload(), JSON_THROW_ON_ERROR),
+            );
+        $response->assertStatus(400)
+            ->assertJsonPath('code', 'MALFORMED_REQUEST')
+            ->assertJsonPath('message', 'The request is malformed.');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 400 MALFORMED_REQUEST when Content-Type is not JSON', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->call(
+                'POST',
+                '/api/v1/auth/register',
+                [],
+                [],
+                [],
+                [
+                    'CONTENT_TYPE' => 'text/plain',
+                    'HTTP_ACCEPT' => 'application/json',
+                    'REMOTE_ADDR' => $this->clientIp,
+                ],
+                http_build_query(registerPayload()),
+            );
+
+        $response->assertStatus(400)
+            ->assertJsonPath('code', 'MALFORMED_REQUEST')
+            ->assertJsonPath('message', 'The request is malformed.');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
 });
