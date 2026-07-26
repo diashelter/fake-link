@@ -72,6 +72,26 @@ final class AuthErrorResponseFactory
         ]);
     }
 
+    public function registrationNotAllowed(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 403,
+            code: 'REGISTRATION_NOT_ALLOWED',
+            message: 'Registration is not available for these details.',
+            requestId: $requestId,
+        );
+    }
+
+    public function serviceUnavailable(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 503,
+            code: 'SERVICE_UNAVAILABLE',
+            message: 'The service is temporarily unavailable.',
+            requestId: $requestId,
+        );
+    }
+
     public function fromAuthTokenException(AuthTokenException $exception, ?string $requestId = null): JsonResponse
     {
         return match ($exception->errorCode()) {

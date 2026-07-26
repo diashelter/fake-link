@@ -58,4 +58,30 @@ describe('AuthErrorResponseFactory', function () {
             ->and($response->headers->get('Retry-After'))->toBe('42')
             ->and($response->headers->get('Cache-Control'))->toContain('no-store');
     });
+
+    it('builds registration not allowed responses matching OpenAPI example fields', function () {
+        $response = (new AuthErrorResponseFactory)->registrationNotAllowed('01K0C2Y7Q3R4S5T6V7W8X9Y0Z1');
+
+        expect($response->getStatusCode())->toBe(403)
+            ->and($response->getData(true))->toBe([
+                'code' => 'REGISTRATION_NOT_ALLOWED',
+                'message' => 'Registration is not available for these details.',
+                'request_id' => '01K0C2Y7Q3R4S5T6V7W8X9Y0Z1',
+            ])
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->getData(true))->not->toHaveKey('data')
+            ->and($response->getData(true))->not->toHaveKey('token');
+    });
+
+    it('builds service unavailable responses matching OpenAPI example fields', function () {
+        $response = (new AuthErrorResponseFactory)->serviceUnavailable('01K0C2Y7Q3R4S5T6V7W8X9Y0Z1');
+
+        expect($response->getStatusCode())->toBe(503)
+            ->and($response->getData(true))->toBe([
+                'code' => 'SERVICE_UNAVAILABLE',
+                'message' => 'The service is temporarily unavailable.',
+                'request_id' => '01K0C2Y7Q3R4S5T6V7W8X9Y0Z1',
+            ])
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store');
+    });
 });
