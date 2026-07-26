@@ -19,6 +19,10 @@ pest()->extend(TestCase::class)
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->in('modules/Auth/Tests/Feature');
+
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
     ->in('modules/Auth/Tests/Integration');
 
 /*
