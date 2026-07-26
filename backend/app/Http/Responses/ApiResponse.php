@@ -23,4 +23,15 @@ final class ApiResponse
             'Cache-Control' => 'private, no-store',
         ]);
     }
+
+    public static function malformedRequest(?string $requestId = null): JsonResponse
+    {
+        return response()->json([
+            'code' => 'MALFORMED_REQUEST',
+            'message' => 'The request is malformed.',
+            'request_id' => $requestId ?? 'stub-request-id',
+        ], Response::HTTP_BAD_REQUEST)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
 }

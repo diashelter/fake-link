@@ -51,6 +51,22 @@ describe('ApiResponse', function () {
         expect($requestId)->toBeString();
         expect($requestId)->not->toBe('');
     });
+
+    it('builds OpenAPI MALFORMED_REQUEST envelope with required fields and headers', function () {
+        $response = ApiResponse::malformedRequest('req-400');
+        $payload = $response->getData(true);
+
+        expect($response->getStatusCode())->toBe(400)
+            ->and($payload)->toBe([
+                'code' => 'MALFORMED_REQUEST',
+                'message' => 'The request is malformed.',
+                'request_id' => 'req-400',
+            ])
+            ->and($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store');
+
+        expect(array_key_exists('success', $payload))->toBeFalse();
+    });
 });
 
 describe('ApiFormRequest', function () {
