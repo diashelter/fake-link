@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Support\Facades\Log;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
 use Modules\Auth\Exceptions\InviteAllowlistUnavailableException;
 use Modules\Auth\Infrastructure\Allowlist\JsonFileInviteAllowlist;
@@ -87,6 +89,26 @@ describe('JsonFileInviteAllowlist', function () {
         expect($caught)->toBeInstanceOf(InviteAllowlistUnavailableException::class)
             ->and($caught->getMessage())->not->toContain($email)
             ->and($caught->getMessage())->not->toContain('@');
+    });
+
+    it('does not log consulted emails when checking the allowlist', function () {
+        // Laravel 13 has no Log::fake(); MessageLogged + Log::listen is the native spy.
+        $captured = [];
+        Log::listen(function (MessageLogged $event) use (&$captured): void {
+            $captured[] = $event;
+        });
+
+        $email = 'privacy-spy@example.com';
+        $path = tempAllowlistFile([$email]);
+
+        $allowlist = new JsonFileInviteAllowlist($path);
+        expect($allowlist->isInvited(EmailAddress::fromString($email)))->toBeTrue();
+        expect($allowlist->isInvited(EmailAddress::fromString('other@example.com')))->toBeFalse();
+
+        foreach ($captured as $event) {
+            expect($event->message)->not->toContain($email)
+                ->and(json_encode($event->context))->not->toContain($email);
+        }
     });
 });
 
