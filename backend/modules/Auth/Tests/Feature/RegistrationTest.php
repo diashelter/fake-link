@@ -157,6 +157,103 @@ describe('POST /api/v1/auth/register', function () {
         expect(UserModel::query()->count())->toBe(0);
     });
 
+    it('returns 422 VALIDATION_FAILED when password confirmation does not match', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'password' => 'ValidPass1!xy',
+                'password_confirmation' => 'ValidPass1!zz',
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED when name is empty', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'name' => '',
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED when name exceeds 120 characters', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'name' => str_repeat('n', 121),
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED when accept_terms is omitted', function () {
+        $payload = registerPayload();
+        unset($payload['accept_terms']);
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', $payload);
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED when accept_terms is a non-boolean string', function () {
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'accept_terms' => 'yes',
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
+    it('returns 422 VALIDATION_FAILED when email exceeds 254 characters', function () {
+        // Valid-looking local@label.label...com shape that exceeds RFC max length 254.
+        $email = 'user@'.implode('.', array_fill(0, 4, str_repeat('x', 61))).'.com';
+
+        expect(strlen($email))->toBeGreaterThan(254);
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/register', registerPayload([
+                'email' => $email,
+            ]));
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(UserModel::query()->count())->toBe(0)
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(AuthTokenModel::query()->count())->toBe(0);
+    });
+
     it('returns 422 when payload contains extra fields', function () {
         $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
             ->postJson('/api/v1/auth/register', registerPayload([

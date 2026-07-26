@@ -43,7 +43,7 @@ final class RegisterUserRequest extends ApiFormRequest
             'email' => ['required', 'email', 'max:254'],
             'password' => ['required', 'string', 'confirmed', new PasswordPolicyRule],
             'password_confirmation' => ['required', 'string'],
-            'accept_terms' => ['required', 'accepted'],
+            'accept_terms' => ['required', 'boolean', 'accepted'],
         ];
     }
 
