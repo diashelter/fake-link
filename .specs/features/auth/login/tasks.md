@@ -309,10 +309,10 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] `authenticated(LoggedInUserDto)` retorna HTTP 200 (não 201)
-- [ ] Unit test estende `AuthResponseFactoryTest` assert status + schema + headers
-- [ ] `issued()` permanece `201` inalterado
-- [ ] Gate check passes: `make test-backend`
+- [x] `authenticated(LoggedInUserDto)` retorna HTTP 200 (não 201)
+- [x] Unit test estende `AuthResponseFactoryTest` assert status + schema + headers
+- [x] `issued()` permanece `201` inalterado
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
