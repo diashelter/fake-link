@@ -108,7 +108,9 @@ describe('AuthErrorResponseFactory', function () {
 
     it('builds invalid verification token responses with exact OpenAPI-aligned fields', function () {
         expect(InvalidVerificationTokenException::invalid()->errorCode())
-            ->toBe(InvalidVerificationTokenException::INVALID_VERIFICATION_TOKEN);
+            ->toBe(InvalidVerificationTokenException::INVALID_VERIFICATION_TOKEN)
+            ->and(InvalidVerificationTokenException::invalid()->getMessage())
+            ->toBe('The verification token is invalid or has expired.');
 
         $response = (new AuthErrorResponseFactory)->invalidVerificationToken('01K0C2Y7Q3R4S5T6V7W8X9Y0Z1');
 
@@ -124,7 +126,9 @@ describe('AuthErrorResponseFactory', function () {
 
     it('builds email already verified responses with exact OpenAPI-aligned fields', function () {
         expect(EmailAlreadyVerifiedException::alreadyVerified()->errorCode())
-            ->toBe(EmailAlreadyVerifiedException::EMAIL_ALREADY_VERIFIED);
+            ->toBe(EmailAlreadyVerifiedException::EMAIL_ALREADY_VERIFIED)
+            ->and(EmailAlreadyVerifiedException::alreadyVerified()->getMessage())
+            ->toBe('The email address is already verified.');
 
         $response = (new AuthErrorResponseFactory)->emailAlreadyVerified('01K0C2Y7Q3R4S5T6V7W8X9Y0Z1');
 

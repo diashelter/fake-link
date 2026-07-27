@@ -254,6 +254,50 @@ describe('POST /api/v1/auth/email/verification-notification', function () {
         Queue::assertNothingPushed();
     });
 
+    it('returns 401 when bearer is missing and 403 TOKEN_RESTRICTED for session tokens', function () {
+        Queue::fake();
+
+        $user = UserModel::factory()->create();
+        $session = app(IssueAuthToken::class)->execute(
+            new IssueAuthTokenDto(UserId::fromString($user->id), TokenKind::Session),
+        )->plainTextToken;
+
+        $this->postJson('/api/v1/auth/email/verification-notification', [])
+            ->assertUnauthorized()
+            ->assertJsonPath('code', 'UNAUTHENTICATED');
+
+        $this->postJson('/api/v1/auth/email/verification-notification', [], [
+            'Authorization' => 'Bearer '.$session,
+        ])->assertForbidden()
+            ->assertJsonPath('code', 'TOKEN_RESTRICTED');
+
+        Queue::assertNothingPushed();
+    });
+
+    it('returns 403 ACCOUNT_SUSPENDED and ACCOUNT_PENDING_DELETION for blocked accounts', function () {
+        Queue::fake();
+
+        $suspended = UserModel::factory()->suspended()->create();
+        $suspendedBearer = issueVerificationBearer($suspended);
+        clearEmailVerificationRateLimits(UserId::fromString($suspended->id));
+
+        $this->postJson('/api/v1/auth/email/verification-notification', [], [
+            'Authorization' => 'Bearer '.$suspendedBearer,
+        ])->assertForbidden()
+            ->assertJsonPath('code', 'ACCOUNT_SUSPENDED');
+
+        $pendingDeletion = UserModel::factory()->deletionPending()->create();
+        $pendingBearer = issueVerificationBearer($pendingDeletion);
+        clearEmailVerificationRateLimits(UserId::fromString($pendingDeletion->id));
+
+        $this->postJson('/api/v1/auth/email/verification-notification', [], [
+            'Authorization' => 'Bearer '.$pendingBearer,
+        ])->assertForbidden()
+            ->assertJsonPath('code', 'ACCOUNT_PENDING_DELETION');
+
+        Queue::assertNothingPushed();
+    });
+
     it('returns 429 on the fourth resend attempt', function () {
         Queue::fake();
 

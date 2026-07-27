@@ -6,6 +6,8 @@ namespace Modules\Auth\Infrastructure\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
 use Modules\Auth\Exceptions\AuthTokenException;
+use Modules\Auth\Exceptions\EmailAlreadyVerifiedException;
+use Modules\Auth\Exceptions\InvalidVerificationTokenException;
 use Modules\Auth\Exceptions\ResourceNotFoundException;
 
 final class AuthErrorResponseFactory
@@ -94,20 +96,24 @@ final class AuthErrorResponseFactory
 
     public function invalidVerificationToken(?string $requestId = null): JsonResponse
     {
+        $exception = InvalidVerificationTokenException::invalid();
+
         return $this->errorResponse(
             status: 403,
-            code: 'INVALID_VERIFICATION_TOKEN',
-            message: 'The verification token is invalid or has expired.',
+            code: $exception->errorCode(),
+            message: $exception->getMessage(),
             requestId: $requestId,
         );
     }
 
     public function emailAlreadyVerified(?string $requestId = null): JsonResponse
     {
+        $exception = EmailAlreadyVerifiedException::alreadyVerified();
+
         return $this->errorResponse(
             status: 403,
-            code: 'EMAIL_ALREADY_VERIFIED',
-            message: 'The email address is already verified.',
+            code: $exception->errorCode(),
+            message: $exception->getMessage(),
             requestId: $requestId,
         );
     }
