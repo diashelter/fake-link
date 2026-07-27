@@ -155,9 +155,29 @@ return [
                 'decay_seconds' => 60,
             ],
         ],
+        'email_verification_resend' => [
+            'max_attempts' => 3,
+            'decay_seconds' => 3600,
+        ],
+        'email_verification_verify' => [
+            'max_attempts' => 5,
+            'decay_seconds' => 3600,
+        ],
     ],
 
     'rate_limit_hmac_key' => env('AUTH_RATE_LIMIT_HMAC_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email verification
+    |--------------------------------------------------------------------------
+    */
+
+    'email_verification' => [
+        'frontend_base_url' => env('APP_URL', 'https://app.localhost'),
+        'path' => '/verify-email',
+        'token_ttl_seconds' => 3600,
+    ],
 
     /*
     |--------------------------------------------------------------------------
