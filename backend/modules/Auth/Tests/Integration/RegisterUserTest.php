@@ -133,6 +133,11 @@ final class RaceUserRepository implements UserRepository
     {
         throw AuthDomainException::emailAlreadyInUse();
     }
+
+    public function update(User $user): void
+    {
+        // Intentionally unused — race fixture only exercises create conflicts.
+    }
 }
 
 function makeRegisterUser(

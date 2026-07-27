@@ -45,4 +45,33 @@ describe('User entity', function () {
 
         expect($user->email()->value())->toBe('jane@example.com');
     });
+
+    it('markEmailVerified returns active status with emailVerifiedAt and leaves other fields unchanged', function () {
+        $acceptedAt = new DateTimeImmutable('2026-01-01T00:00:00+00:00');
+        $verifiedAt = new DateTimeImmutable('2026-01-02T12:00:00+00:00');
+        $original = User::create(
+            id: UserId::fromString('018e8b8a-7b6a-7000-8000-123456789abc'),
+            name: 'Jane Doe',
+            email: EmailAddress::fromString('jane@example.com'),
+            passwordHash: '$argon2id$v=19$m=65536,t=4,p=1$hash',
+            status: UserStatus::PendingVerification,
+            emailVerifiedAt: null,
+            termsVersion: '2026-01',
+            termsAcceptedAt: $acceptedAt,
+        );
+
+        $verified = $original->markEmailVerified($verifiedAt);
+
+        expect($verified)->not->toBe($original)
+            ->and($verified->status())->toBe(UserStatus::Active)
+            ->and($verified->emailVerifiedAt())->toEqual($verifiedAt)
+            ->and($verified->id()->value())->toBe($original->id()->value())
+            ->and($verified->name())->toBe('Jane Doe')
+            ->and($verified->email()->value())->toBe('jane@example.com')
+            ->and($verified->passwordHash())->toBe('$argon2id$v=19$m=65536,t=4,p=1$hash')
+            ->and($verified->termsVersion())->toBe('2026-01')
+            ->and($verified->termsAcceptedAt())->toEqual($acceptedAt)
+            ->and($original->status())->toBe(UserStatus::PendingVerification)
+            ->and($original->emailVerifiedAt())->toBeNull();
+    });
 });

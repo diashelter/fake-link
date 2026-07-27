@@ -151,4 +151,26 @@ describe('EloquentUserRepository', function () {
             ->and($found->id()->value())->toBe($user->id()->value())
             ->and($found->email()->value())->toBe('case.user@example.com');
     });
+
+    it('updates status to active and persists email_verified_at', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'verify-update@example.com');
+        $repository->save($user);
+
+        $verifiedAt = new DateTimeImmutable('2026-03-01T15:30:00+00:00');
+        $verified = $user->markEmailVerified($verifiedAt);
+
+        $repository->update($verified);
+
+        $model = UserModel::query()->find($user->id()->value());
+        $reloaded = $repository->findById($user->id());
+
+        expect($model?->status)->toBe('active')
+            ->and($model?->email_verified_at?->toIso8601String())->toBe('2026-03-01T15:30:00+00:00')
+            ->and($model?->name)->toBe('Jane Doe')
+            ->and($model?->email)->toBe('verify-update@example.com')
+            ->and($reloaded)->not->toBeNull()
+            ->and($reloaded->status())->toBe(UserStatus::Active)
+            ->and($reloaded->emailVerifiedAt()?->format('Y-m-d\TH:i:sP'))->toBe('2026-03-01T15:30:00+00:00');
+    });
 });

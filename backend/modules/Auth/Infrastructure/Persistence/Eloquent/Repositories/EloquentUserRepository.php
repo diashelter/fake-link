@@ -68,4 +68,11 @@ final class EloquentUserRepository implements UserRepository
             throw AuthDomainException::emailAlreadyInUse();
         }
     }
+
+    public function update(User $user): void
+    {
+        UserModel::query()
+            ->where('id', $user->id()->value())
+            ->update($this->userMapper->toPersistenceUpdate($user));
+    }
 }

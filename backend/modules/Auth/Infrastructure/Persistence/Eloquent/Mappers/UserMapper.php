@@ -48,4 +48,17 @@ final class UserMapper
             'terms_accepted_at' => Carbon::instance($user->termsAcceptedAt()),
         ];
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toPersistenceUpdate(User $user): array
+    {
+        return [
+            'status' => $user->status()->value,
+            'email_verified_at' => $user->emailVerifiedAt() !== null
+                ? Carbon::instance($user->emailVerifiedAt())
+                : null,
+        ];
+    }
 }
