@@ -490,8 +490,8 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Stack: auth → kind → throttle resend
-- [ ] Gate check passes: `make test-backend`
+- [x] Stack: auth → kind → throttle resend
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (via T17)  
 **Gate**: build
