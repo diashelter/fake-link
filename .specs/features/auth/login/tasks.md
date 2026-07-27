@@ -283,9 +283,9 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] `toDto()` retorna `LoginUserDto`
+- [x] `toDto()` retorna `LoginUserDto`
 - [ ] Validação coberta em Feature tests (T12) — task verificada quando T12 passa
-- [ ] Gate check passes: `make test-backend`
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (via T12)  
 **Gate**: full
