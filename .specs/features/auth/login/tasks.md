@@ -336,8 +336,8 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Rota registrada; controller fino mapeia exceções → 401/403/500
-- [ ] Gate check passes: `make test-backend`
+- [x] Rota registrada; controller fino mapeia exceções → 401/403/500
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (via T12)  
 **Gate**: full
