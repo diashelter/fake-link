@@ -465,8 +465,8 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Stack: `auth.bearer` → `token.kind:verification` → `throttle.email_verification.verify`
-- [ ] Gate check passes: `make test-backend`
+- [x] Stack: `auth.bearer` → `token.kind:verification` → `throttle.email_verification.verify`
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (via T17)  
 **Gate**: build
