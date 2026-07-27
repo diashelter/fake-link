@@ -361,8 +361,8 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Factory states produzem usuários persistíveis com senha conhecida nos Feature tests
-- [ ] Gate check passes: `make test-backend`
+- [x] Factory states produzem usuários persistíveis com senha conhecida nos Feature tests
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none  
 **Gate**: quick
