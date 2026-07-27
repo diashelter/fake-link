@@ -361,9 +361,9 @@ T17 → T18
 
 **Done when**:
 
-- [ ] `dispatch(UserId)` emite token + enfileira job
-- [ ] `RegisterUser` fluxo inalterado no contrato
-- [ ] Gate check passes: `make test-backend`
+- [x] `dispatch(UserId)` emite token + enfileira job
+- [x] `RegisterUser` fluxo inalterado no contrato
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none (coberto T17/T18 regressão)  
 **Gate**: full
