@@ -233,8 +233,8 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] DTOs readonly com typehints explícitos
-- [ ] Gate check passes: `make test-backend`
+- [x] DTOs readonly com typehints explícitos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none  
 **Gate**: quick
