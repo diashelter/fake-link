@@ -104,6 +104,54 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: edge-case terms/status | validation.md (auth/integration)
 - last seen: 2026-07-23T12:31:02Z
 
+### L-016 — Finalize feature spec.md with precise WHEN/THEN outcomes before Execute so verification does not have to reconstruct ACs from product docs
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: spec.md:DRAFT (no WHEN/THEN ACs) (specs)
+- last seen: 2026-07-26T19:11:45Z
+
+### L-017 — Register module Feature test directories in phpunit.xml so default CI and make test-backend discover HTTP probe tests
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `backend/tests` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: AUTH-18/AUTH-19 — backend/phpunit.xml Feature suite omits modules/Auth/Tests/Feature (backend/tests)
+- last seen: 2026-07-26T19:11:45Z
+
+### L-018 — Register every new module test directory in phpunit.xml suites so CI and make test-backend discover Feature tests
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `backend/phpunit.xml` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: validation.md:Gate / phpunit.xml Feature suite (backend/phpunit.xml)
+- last seen: 2026-07-26T19:12:00Z
+
+### L-019 — Complete WHEN/THEN acceptance criteria in spec.md before marking a feature slice verified
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `specs` · harmful: 0
+- features: auth/bearer-tokens
+- evidence: validation.md:spec.md draft without WHEN/THEN (specs)
+- last seen: 2026-07-26T19:12:00Z
+
+### L-020 — Cover every Form Request validation branch named in the AC matrix with an HTTP 422 assertion and zero side effects, not only a subset of fields
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth,routes,validation` · harmful: 0
+- features: auth/registration
+- evidence: REG-07 validation ACs 2/4/5/6 — validation.md (auth,routes,validation)
+- last seen: 2026-07-26T20:23:10Z
+
+### L-021 — For allowlist privacy ACs, assert via Log::fake or channel spy that consulted emails never appear in log, trace, or metric records
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth,allowlist,telemetry` · harmful: 0
+- features: auth/registration
+- evidence: Allowlist AC3 — JsonFileInviteAllowlistTest.php:71-89 (auth,allowlist,telemetry)
+- last seen: 2026-07-26T20:23:10Z
+
+### L-022 — When an edge case names an HTTP status outcome, assert that status in a Feature or HTTP test, not only a unit-level boolean or domain violation
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth,routes,testing` · harmful: 0
+- features: auth/registration
+- evidence: Edge cases +alias/unicode/malformed — validation.md (auth,routes,testing)
+- last seen: 2026-07-26T20:23:10Z
+
+### L-023 — When a spec edge lists alternate HTTP triggers with OR (missing Content-Type or malformed JSON), assert each trigger path reaches the specified status
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth,routes,http` · harmful: 0
+- features: auth/registration
+- evidence: Edge: missing Content-Type → 400 — RejectMalformedJson.php:24-26 | validation.md (auth,routes,http)
+- last seen: 2026-07-26T20:36:46Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

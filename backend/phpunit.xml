@@ -11,6 +11,7 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <directory>modules/Auth/Tests/Feature</directory>
         </testsuite>
         <testsuite name="Integration">
             <directory>modules/Auth/Tests/Integration</directory>
@@ -50,5 +51,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="AUTH_TERMS_CURRENT_VERSION" value="2026-01"/>
+        <env name="AUTH_INVITE_ALLOWLIST_PATH" value="/var/www/html/config/invite-allowlist.testing.json"/>
+        <env name="AUTH_RATE_LIMIT_HMAC_KEY" value="testing-auth-rate-limit-hmac-key"/>
     </php>
 </phpunit>

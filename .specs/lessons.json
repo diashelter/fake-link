@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 16,
+  "next_id": 24,
   "lessons": [
     {
       "id": "L-001",
@@ -274,6 +274,150 @@
       ],
       "created": "2026-07-23T12:31:02Z",
       "last_seen": "2026-07-23T12:31:02Z"
+    },
+    {
+      "id": "L-016",
+      "key": "spec_precision_gap::finalize feature spec md with precise when then outcomes before execute so verification does not have to reconstruct acs from product docs",
+      "text": "Finalize feature spec.md with precise WHEN/THEN outcomes before Execute so verification does not have to reconstruct ACs from product docs",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md:DRAFT (no WHEN/THEN ACs) (specs)"
+      ],
+      "created": "2026-07-26T19:11:45Z",
+      "last_seen": "2026-07-26T19:11:45Z"
+    },
+    {
+      "id": "L-017",
+      "key": "ac_gap::register module feature test directories in phpunit xml so default ci and make test backend discover http probe tests",
+      "text": "Register module Feature test directories in phpunit.xml so default CI and make test-backend discover HTTP probe tests",
+      "signal": "ac_gap",
+      "scope": "backend/tests",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-18/AUTH-19 — backend/phpunit.xml Feature suite omits modules/Auth/Tests/Feature (backend/tests)"
+      ],
+      "created": "2026-07-26T19:11:45Z",
+      "last_seen": "2026-07-26T19:11:45Z"
+    },
+    {
+      "id": "L-018",
+      "key": "gate_fail::register every new module test directory in phpunit xml suites so ci and make test backend discover feature tests",
+      "text": "Register every new module test directory in phpunit.xml suites so CI and make test-backend discover Feature tests",
+      "signal": "gate_fail",
+      "scope": "backend/phpunit.xml",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md:Gate / phpunit.xml Feature suite (backend/phpunit.xml)"
+      ],
+      "created": "2026-07-26T19:12:00Z",
+      "last_seen": "2026-07-26T19:12:00Z"
+    },
+    {
+      "id": "L-019",
+      "key": "spec_precision_gap::complete when then acceptance criteria in spec md before marking a feature slice verified",
+      "text": "Complete WHEN/THEN acceptance criteria in spec.md before marking a feature slice verified",
+      "signal": "spec_precision_gap",
+      "scope": "specs",
+      "status": "candidate",
+      "features": [
+        "auth/bearer-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md:spec.md draft without WHEN/THEN (specs)"
+      ],
+      "created": "2026-07-26T19:12:00Z",
+      "last_seen": "2026-07-26T19:12:00Z"
+    },
+    {
+      "id": "L-020",
+      "key": "ac_gap::cover every form request validation branch named in the ac matrix with an http 422 assertion and zero side effects not only a subset of fields",
+      "text": "Cover every Form Request validation branch named in the AC matrix with an HTTP 422 assertion and zero side effects, not only a subset of fields",
+      "signal": "ac_gap",
+      "scope": "auth,routes,validation",
+      "status": "candidate",
+      "features": [
+        "auth/registration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "REG-07 validation ACs 2/4/5/6 — validation.md (auth,routes,validation)"
+      ],
+      "created": "2026-07-26T20:23:10Z",
+      "last_seen": "2026-07-26T20:23:10Z"
+    },
+    {
+      "id": "L-021",
+      "key": "ac_gap::for allowlist privacy acs assert via log fake or channel spy that consulted emails never appear in log trace or metric records",
+      "text": "For allowlist privacy ACs, assert via Log::fake or channel spy that consulted emails never appear in log, trace, or metric records",
+      "signal": "ac_gap",
+      "scope": "auth,allowlist,telemetry",
+      "status": "candidate",
+      "features": [
+        "auth/registration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Allowlist AC3 — JsonFileInviteAllowlistTest.php:71-89 (auth,allowlist,telemetry)"
+      ],
+      "created": "2026-07-26T20:23:10Z",
+      "last_seen": "2026-07-26T20:23:10Z"
+    },
+    {
+      "id": "L-022",
+      "key": "ac_gap::when an edge case names an http status outcome assert that status in a feature or http test not only a unit level boolean or domain violation",
+      "text": "When an edge case names an HTTP status outcome, assert that status in a Feature or HTTP test, not only a unit-level boolean or domain violation",
+      "signal": "ac_gap",
+      "scope": "auth,routes,testing",
+      "status": "candidate",
+      "features": [
+        "auth/registration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge cases +alias/unicode/malformed — validation.md (auth,routes,testing)"
+      ],
+      "created": "2026-07-26T20:23:10Z",
+      "last_seen": "2026-07-26T20:23:10Z"
+    },
+    {
+      "id": "L-023",
+      "key": "ac_gap::when a spec edge lists alternate http triggers with or missing content type or malformed json assert each trigger path reaches the specified status",
+      "text": "When a spec edge lists alternate HTTP triggers with OR (missing Content-Type or malformed JSON), assert each trigger path reaches the specified status",
+      "signal": "ac_gap",
+      "scope": "auth,routes,http",
+      "status": "candidate",
+      "features": [
+        "auth/registration"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge: missing Content-Type → 400 — RejectMalformedJson.php:24-26 | validation.md (auth,routes,http)"
+      ],
+      "created": "2026-07-26T20:36:46Z",
+      "last_seen": "2026-07-26T20:36:46Z"
     }
   ]
 }

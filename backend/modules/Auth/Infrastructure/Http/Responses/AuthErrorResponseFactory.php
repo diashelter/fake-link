@@ -60,6 +60,38 @@ final class AuthErrorResponseFactory
         );
     }
 
+    public function rateLimitExceeded(int $retryAfter, ?string $requestId = null): JsonResponse
+    {
+        return response()->json([
+            'code' => 'RATE_LIMIT_EXCEEDED',
+            'message' => 'Too many requests.',
+            'request_id' => $requestId ?? 'stub-request-id',
+        ], 429)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'Retry-After' => (string) max(0, $retryAfter),
+        ]);
+    }
+
+    public function registrationNotAllowed(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 403,
+            code: 'REGISTRATION_NOT_ALLOWED',
+            message: 'Registration is not available for these details.',
+            requestId: $requestId,
+        );
+    }
+
+    public function serviceUnavailable(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 503,
+            code: 'SERVICE_UNAVAILABLE',
+            message: 'The service is temporarily unavailable.',
+            requestId: $requestId,
+        );
+    }
+
     public function fromAuthTokenException(AuthTokenException $exception, ?string $requestId = null): JsonResponse
     {
         return match ($exception->errorCode()) {
