@@ -565,9 +565,9 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Registro dispara token e-mail + Mail::fake assert
-- [ ] OpenAPI examples `INVALID_VERIFICATION_TOKEN`, `EMAIL_ALREADY_VERIFIED`
-- [ ] `make lint && make test-backend` verde
+- [x] Registro dispara token e-mail + Mail::fake assert
+- [x] OpenAPI examples `INVALID_VERIFICATION_TOKEN`, `EMAIL_ALREADY_VERIFIED`
+- [x] `make lint && make test-backend` verde
 - [ ] Verifier sub-agent pós-T18
 
 **Tests**: feature (regressão)  

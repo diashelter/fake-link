@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Modules\Auth\Contracts\Repositories\AuthTokenRepository;
 use Modules\Auth\Contracts\Repositories\UserRepository;
 use Modules\Auth\Contracts\Services\InviteAllowlist;
@@ -25,15 +26,22 @@ use Modules\Auth\Exceptions\RegistrationNotAllowedException;
 use Modules\Auth\Infrastructure\Hashing\LaravelPasswordHasher;
 use Modules\Auth\Infrastructure\Hashing\Sha256TokenHasher;
 use Modules\Auth\Infrastructure\Identity\Uuid7AuthTokenIdGenerator;
+use Modules\Auth\Infrastructure\Identity\Uuid7EmailActionTokenIdGenerator;
 use Modules\Auth\Infrastructure\Identity\Uuid7UserIdGenerator;
+use Modules\Auth\Infrastructure\Jobs\SendEmailVerificationJob;
+use Modules\Auth\Infrastructure\Notifications\LaravelQueueEmailVerification;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\AuthTokenMapper;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\EmailActionTokenMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\EmailActionTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentEmailActionTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Auth\UseCases\IssueAuthToken;
+use Modules\Auth\UseCases\IssueEmailVerificationToken;
 use Modules\Auth\UseCases\RegisterUser;
 use Tests\TestCase;
 
@@ -202,6 +210,24 @@ describe('RegisterUser', function () {
             ->and($queue->dispatched)->toBe([$result->user->id()->value()]);
 
         Carbon::setTestNow();
+    });
+
+    it('creates an email_action_tokens row and queues mail when using the real queue adapter', function () {
+        Queue::fake();
+
+        $issue = new IssueEmailVerificationToken(
+            emailActionTokenRepository: new EloquentEmailActionTokenRepository(new EmailActionTokenMapper),
+            emailActionTokenIdGenerator: new Uuid7EmailActionTokenIdGenerator,
+            bearerTokenGenerator: new BearerTokenGenerator,
+            tokenHasher: new Sha256TokenHasher,
+        );
+        $registerUser = makeRegisterUser(queue: new LaravelQueueEmailVerification($issue));
+        $result = $registerUser->execute(validRegisterDto('invited@example.com'));
+
+        $emailTokens = EmailActionTokenModel::query()->where('user_id', $result->user->id()->value())->get();
+        expect($emailTokens->filter(fn ($token): bool => $token->used_at === null)->count())->toBe(1);
+        Queue::assertPushed(SendEmailVerificationJob::class, 1);
+        Queue::assertPushedOn('notifications', SendEmailVerificationJob::class);
     });
 
     it('rejects non-invited emails with RegistrationNotAllowedException', function () {

@@ -19,11 +19,14 @@
 
 ## Handoff
 
-- **Feature**: `auth/login` — **Execute + Verified ✅** (2026-07-27)
-- **Phase / Task**: T1–T13 complete; validation PASS
-- **Completed**: 13 commits (ac2527f…90ad3a3); gate 225 passed; sensor 6/6 killed
-- **In-progress**: none
-- **Next step**: Commit remaining docs (`design.md`, `validation.md`, STATE/README/spec) if desired; PR when ready
+
+- **Feature**: `auth/email-verification` — **Execute complete** (2026-07-27)
+- **Phase / Task**: T1–T18 committed; Verifier running
+- **Completed**: All 18 tasks (Batches 1–3 inline after sub-agent limit)
+- **In-progress**: Feature-level Verifier
+- **Next step**: Verifier PASS → mark validation.md; close handoff
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/login/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-login`
+- **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks}.md`
+- **Branch**: `feature/auth-email-verification`
+- **Gate**: `make lint && make test-backend` → 283 passed
+
