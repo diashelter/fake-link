@@ -540,8 +540,8 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Matrix P1/P2 da spec coberta
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Matrix P1/P2 da spec coberta
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: feature (E2E)  
 **Gate**: build
