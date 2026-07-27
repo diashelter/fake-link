@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/auth/login/design.md`  
 **Spec**: `.specs/features/auth/login/spec.md`  
-**Status**: Approved — ready for Execute
+**Status**: Implemented — pending Verifier
 
 > **Sub-agent note:** 13 tasks → 2 batches (~7 + ~6). Execute MUST offer batch sub-agents before implementation.
 
@@ -412,8 +412,8 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] `make lint && make test-backend` passa sem regressões Auth
-- [ ] Verifier sub-agent executado pós-T13 (automático pelo skill Execute)
+- [x] `make lint && make test-backend` passa sem regressões Auth
+- [ ] Verifier sub-agent executado pós-T13 (automático pelo skill Execute — orchestrator)
 
 **Tests**: none (gate only)  
 **Gate**: final
