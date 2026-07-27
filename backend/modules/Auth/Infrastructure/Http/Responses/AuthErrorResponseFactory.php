@@ -92,6 +92,26 @@ final class AuthErrorResponseFactory
         );
     }
 
+    public function invalidVerificationToken(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 403,
+            code: 'INVALID_VERIFICATION_TOKEN',
+            message: 'The verification token is invalid or has expired.',
+            requestId: $requestId,
+        );
+    }
+
+    public function emailAlreadyVerified(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 403,
+            code: 'EMAIL_ALREADY_VERIFIED',
+            message: 'The email address is already verified.',
+            requestId: $requestId,
+        );
+    }
+
     public function serviceUnavailable(?string $requestId = null): JsonResponse
     {
         return $this->errorResponse(
