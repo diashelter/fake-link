@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 24,
+  "next_id": 28,
   "lessons": [
     {
       "id": "L-001",
@@ -418,6 +418,78 @@
       ],
       "created": "2026-07-26T20:36:46Z",
       "last_seen": "2026-07-26T20:36:46Z"
+    },
+    {
+      "id": "L-024",
+      "key": "surviving_mutant::assert domain exception getmessage equals the openapi error string not only errorcode or sentinel absence",
+      "text": "Assert domain exception getMessage equals the OpenAPI error string, not only errorCode or sentinel absence",
+      "signal": "surviving_mutant",
+      "scope": "auth,exceptions",
+      "status": "candidate",
+      "features": [
+        "auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M5 InvalidVerificationTokenException.php:24 (auth,exceptions)"
+      ],
+      "created": "2026-07-27T17:58:29Z",
+      "last_seen": "2026-07-27T17:58:29Z"
+    },
+    {
+      "id": "L-025",
+      "key": "ac_gap::for every authenticated route in scope assert 401 unauthenticated token restricted and account on that exact path not only on a shared probe route",
+      "text": "For every authenticated route in scope, assert 401 UNAUTHENTICATED, TOKEN_RESTRICTED, and ACCOUNT_* on that exact path, not only on a shared probe route",
+      "signal": "ac_gap",
+      "scope": "auth,routes",
+      "status": "candidate",
+      "features": [
+        "auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-23 resend AC4-AC5 / EV-04 (auth,routes)"
+      ],
+      "created": "2026-07-27T17:58:29Z",
+      "last_seen": "2026-07-27T17:58:29Z"
+    },
+    {
+      "id": "L-026",
+      "key": "spec_precision_gap::when an ac requires infrastructure behavior outside the app test suite mark it explicitly as ops verified or add a contract testable seam in repo",
+      "text": "When an AC requires infrastructure behavior outside the app test suite, mark it explicitly as ops-verified or add a contract testable seam in-repo",
+      "signal": "spec_precision_gap",
+      "scope": "security,observability",
+      "status": "candidate",
+      "features": [
+        "auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-25 AC2 access-log redaction (security,observability)"
+      ],
+      "created": "2026-07-27T17:58:29Z",
+      "last_seen": "2026-07-27T17:58:29Z"
+    },
+    {
+      "id": "L-027",
+      "key": "spec_precision_gap::when the spec requires queue retry or permanent failure side effects assert tries backoff or that failure leaves domain state unchanged",
+      "text": "When the spec requires queue retry or permanent-failure side effects, assert tries/backoff or that failure leaves domain state unchanged",
+      "signal": "spec_precision_gap",
+      "scope": "auth,jobs",
+      "status": "candidate",
+      "features": [
+        "auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "AUTH-20 AC4 job retry (auth,jobs)"
+      ],
+      "created": "2026-07-27T17:58:29Z",
+      "last_seen": "2026-07-27T17:58:29Z"
     }
   ]
 }

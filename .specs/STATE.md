@@ -19,14 +19,13 @@
 
 ## Handoff
 
-
-- **Feature**: `auth/email-verification` — **Execute complete** (2026-07-27)
-- **Phase / Task**: T1–T18 committed; Verifier running
-- **Completed**: All 18 tasks (Batches 1–3 inline after sub-agent limit)
-- **In-progress**: Feature-level Verifier
-- **Next step**: Verifier PASS → mark validation.md; close handoff
+- **Feature**: `auth/email-verification` — **Fix→re-verify #1** (2026-07-27)
+- **Phase / Task**: Fix 1–2 applied (`b67d4f4`); re-verify dispatched
+- **Completed**: T1–T18 + resend auth E2E + exception/OpenAPI message binding; gate 285 passed
+- **In-progress**: Verifier re-run (iteration 1/3)
+- **Next step**: Await Verifier PASS; if FAIL, next fix iteration
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks}.md`
+- **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks,validation}.md`
 - **Branch**: `feature/auth-email-verification`
-- **Gate**: `make lint && make test-backend` → 283 passed
+- **Gate**: `make lint && make test-backend` → 285 passed
 

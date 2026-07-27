@@ -152,6 +152,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: Edge: missing Content-Type → 400 — RejectMalformedJson.php:24-26 | validation.md (auth,routes,http)
 - last seen: 2026-07-26T20:36:46Z
 
+### L-024 — Assert domain exception getMessage equals the OpenAPI error string, not only errorCode or sentinel absence
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `auth,exceptions` · harmful: 0
+- features: auth/email-verification
+- evidence: M5 InvalidVerificationTokenException.php:24 (auth,exceptions)
+- last seen: 2026-07-27T17:58:29Z
+
+### L-025 — For every authenticated route in scope, assert 401 UNAUTHENTICATED, TOKEN_RESTRICTED, and ACCOUNT_* on that exact path, not only on a shared probe route
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth,routes` · harmful: 0
+- features: auth/email-verification
+- evidence: AUTH-23 resend AC4-AC5 / EV-04 (auth,routes)
+- last seen: 2026-07-27T17:58:29Z
+
+### L-026 — When an AC requires infrastructure behavior outside the app test suite, mark it explicitly as ops-verified or add a contract testable seam in-repo
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `security,observability` · harmful: 0
+- features: auth/email-verification
+- evidence: AUTH-25 AC2 access-log redaction (security,observability)
+- last seen: 2026-07-27T17:58:29Z
+
+### L-027 — When the spec requires queue retry or permanent-failure side effects, assert tries/backoff or that failure leaves domain state unchanged
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth,jobs` · harmful: 0
+- features: auth/email-verification
+- evidence: AUTH-20 AC4 job retry (auth,jobs)
+- last seen: 2026-07-27T17:58:29Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
