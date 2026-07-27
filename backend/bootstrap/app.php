@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Modules\Auth\Infrastructure\Http\Middleware\AuthenticateBearer;
 use Modules\Auth\Infrastructure\Http\Middleware\RequireTokenKind;
+use Modules\Auth\Infrastructure\Http\Middleware\ThrottleLogin;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleRegistration;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.bearer' => AuthenticateBearer::class,
             'token.kind' => RequireTokenKind::class,
             'throttle.registration' => ThrottleRegistration::class,
+            'throttle.login' => ThrottleLogin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

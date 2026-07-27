@@ -206,10 +206,10 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Exceder email+IP (6º) ou IP (31º) → `429` + `Retry-After`
-- [ ] Contabiliza tentativa antes de autenticação (middleware pre-controller)
-- [ ] Unit tests `ThrottleLoginTest.php` com `RateLimiter` fake/clear
-- [ ] Gate check passes: `make test-backend`
+- [x] Exceder email+IP (6º) ou IP (31º) → `429` + `Retry-After`
+- [x] Contabiliza tentativa antes de autenticação (middleware pre-controller)
+- [x] Unit tests `ThrottleLoginTest.php` com `RateLimiter` fake/clear
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
