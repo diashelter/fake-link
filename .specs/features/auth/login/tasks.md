@@ -154,9 +154,9 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Config expõe `auth.rate_limits.login.email_ip`, `.ip`, `auth.dummy_password_hash`
-- [ ] Hash dummy é Argon2id válido verificável por `PasswordHasher::verify` (qualquer senha → false, sem exception)
-- [ ] Gate check passes: `make test-backend` (suite existente verde)
+- [x] Config expõe `auth.rate_limits.login.email_ip`, `.ip`, `auth.dummy_password_hash`
+- [x] Hash dummy é Argon2id válido verificável por `PasswordHasher::verify` (qualquer senha → false, sem exception)
+- [x] Gate check passes: `make test-backend` (suite existente verde)
 
 **Tests**: none  
 **Gate**: quick

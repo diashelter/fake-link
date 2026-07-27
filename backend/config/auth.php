@@ -145,8 +145,33 @@ return [
             'max_attempts' => 5,
             'decay_seconds' => 3600,
         ],
+        'login' => [
+            'email_ip' => [
+                'max_attempts' => 5,
+                'decay_seconds' => 60,
+            ],
+            'ip' => [
+                'max_attempts' => 30,
+                'decay_seconds' => 60,
+            ],
+        ],
     ],
 
     'rate_limit_hmac_key' => env('AUTH_RATE_LIMIT_HMAC_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dummy password hash (timing mitigation for missing users)
+    |--------------------------------------------------------------------------
+    |
+    | Precomputed Argon2id hash that never matches a real login password.
+    | Used so PasswordHasher::verify always runs when the user is absent.
+    |
+    */
+
+    'dummy_password_hash' => env(
+        'AUTH_DUMMY_PASSWORD_HASH',
+        '$argon2id$v=19$m=65536,t=4,p=1$dW1hLjZzYkNaNFIyTWp1TQ$8TR1CU+8gjJX9mVCTV9Z+l4qRNOuqxQzZQhXRvLH2q4',
+    ),
 
 ];
