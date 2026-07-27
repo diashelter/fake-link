@@ -19,12 +19,11 @@
 
 ## Handoff
 
-- **Feature**: `auth/registration` — **Verified ✅** (2026-07-26)
-- **Phase / Task**: Execute + Verifier complete (PASS after Fix loop 2)
-- **Completed**: T1–T15; Fix loops 1–2; AUTH-01…05 + REG-01…10 Verified; gate 190; sensor 6/6
+- **Feature**: `auth/login` — **Execute + Verified ✅** (2026-07-27)
+- **Phase / Task**: T1–T13 complete; validation PASS
+- **Completed**: 13 commits (ac2527f…90ad3a3); gate 225 passed; sensor 6/6 killed
 - **In-progress**: none
-- **Next step**: Próxima fatia Auth (`login`) ou commit dos artefatos `.specs/` (design/validation/README) se desejado
+- **Next step**: Commit remaining docs (`design.md`, `validation.md`, STATE/README/spec) if desired; PR when ready
 - **Blockers**: none
-- **Report**: `.specs/features/auth/registration/validation.md`
-- **Branch**: `auth/registration`
-- **Uncommitted docs**: `design.md`, `validation.md`, README/STATE/spec status, lessons (L-023 da iteração anterior)
+- **Artifacts**: `.specs/features/auth/login/{spec,design,tasks,validation}.md`
+- **Branch**: `feature/auth-login`

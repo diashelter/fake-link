@@ -31,6 +31,7 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use Modules\Auth\UseCases\IssueAuthToken;
+use Modules\Auth\UseCases\LoginUser;
 use Modules\Auth\UseCases\RegisterUser;
 use Modules\Auth\UseCases\RevokeAllUserTokens;
 use Modules\Auth\UseCases\RevokeAuthToken;
@@ -65,6 +66,7 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(RevokeAuthToken::class);
         $this->app->singleton(RevokeAllUserTokens::class);
         $this->app->singleton(RegisterUser::class);
+        $this->app->singleton(LoginUser::class);
     }
 
     public function boot(): void

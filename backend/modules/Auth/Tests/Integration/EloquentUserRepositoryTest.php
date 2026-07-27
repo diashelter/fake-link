@@ -124,4 +124,31 @@ describe('EloquentUserRepository', function () {
                 UserId::fromString('018e8b8a-7b6a-7000-8000-999999999999')
             ))->toBeNull();
     });
+
+    it('finds a user by email and returns null when missing', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'find-by-email@example.com');
+
+        $repository->save($user);
+
+        $found = $repository->findByEmail(EmailAddress::fromString('find-by-email@example.com'));
+
+        expect($found)->not->toBeNull()
+            ->and($found->id()->value())->toBe($user->id()->value())
+            ->and($found->email()->value())->toBe('find-by-email@example.com')
+            ->and($repository->findByEmail(EmailAddress::fromString('missing@example.com')))->toBeNull();
+    });
+
+    it('finds a user by email using normalized case-insensitive match', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'Case.User@Example.COM');
+
+        $repository->save($user);
+
+        $found = $repository->findByEmail(EmailAddress::fromString('  CASE.USER@example.com  '));
+
+        expect($found)->not->toBeNull()
+            ->and($found->id()->value())->toBe($user->id()->value())
+            ->and($found->email()->value())->toBe('case.user@example.com');
+    });
 });

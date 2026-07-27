@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Modules\Auth\Exceptions\AuthTokenException;
+use Modules\Auth\Exceptions\InvalidCredentialsException;
 use Modules\Auth\Exceptions\ResourceNotFoundException;
 use Modules\Auth\Infrastructure\Http\Responses\AuthErrorResponseFactory;
 use Tests\TestCase;
@@ -71,6 +72,24 @@ describe('AuthErrorResponseFactory', function () {
             ->and($response->headers->get('Cache-Control'))->toContain('no-store')
             ->and($response->getData(true))->not->toHaveKey('data')
             ->and($response->getData(true))->not->toHaveKey('token');
+    });
+
+    it('builds invalid credentials responses matching OpenAPI example fields', function () {
+        expect(InvalidCredentialsException::invalid()->errorCode())
+            ->toBe(InvalidCredentialsException::INVALID_CREDENTIALS);
+
+        $response = (new AuthErrorResponseFactory)->invalidCredentials('01K0C2Y7Q3R4S5T6V7W8X9Y0Z1');
+
+        expect($response->getStatusCode())->toBe(401)
+            ->and($response->getData(true))->toBe([
+                'code' => InvalidCredentialsException::INVALID_CREDENTIALS,
+                'message' => 'The provided credentials are invalid.',
+                'request_id' => '01K0C2Y7Q3R4S5T6V7W8X9Y0Z1',
+            ])
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->getData(true))->not->toHaveKey('data')
+            ->and($response->getData(true))->not->toHaveKey('token')
+            ->and($response->getData(true))->not->toHaveKey('user');
     });
 
     it('builds service unavailable responses matching OpenAPI example fields', function () {
