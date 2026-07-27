@@ -284,7 +284,7 @@ T11 → T12 → T13
 **Done when**:
 
 - [x] `toDto()` retorna `LoginUserDto`
-- [ ] Validação coberta em Feature tests (T12) — task verificada quando T12 passa
+- [x] Validação coberta em Feature tests (T12) — task verificada quando T12 passa
 - [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (via T12)  
@@ -386,9 +386,9 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Matrix: active session, pending verification, invalid credentials uniformes (3 cenários), blocked statuses, validation 422/400, dual rate limit 429, headers 200, multi-session token count, no queue on pending login
-- [ ] `make test-backend` descobre e executa `LoginTest.php`
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Matrix: active session, pending verification, invalid credentials uniformes (3 cenários), blocked statuses, validation 422/400, dual rate limit 429, headers 200, multi-session token count, no queue on pending login
+- [x] `make test-backend` descobre e executa `LoginTest.php`
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: feature  
 **Gate**: build
