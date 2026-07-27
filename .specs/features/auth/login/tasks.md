@@ -180,9 +180,9 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Digest estável para mesmas entradas; IP/e-mail bruto ausentes do digest exposto
-- [ ] Unit tests em `HmacRateLimitKeyFactoryTest` cobrem login keys + sentinel `_invalid_`
-- [ ] Gate check passes: `make test-backend`
+- [x] Digest estável para mesmas entradas; IP/e-mail bruto ausentes do digest exposto
+- [x] Unit tests em `HmacRateLimitKeyFactoryTest` cobrem login keys + sentinel `_invalid_`
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
