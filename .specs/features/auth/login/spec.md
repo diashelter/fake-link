@@ -1,6 +1,6 @@
 # Auth — Login
 
-**Status:** Implemented — pending Verifier — 2026-07-27  
+**Status:** Verified — 2026-07-27  
 **Fatia:** 4 de 7 — ver [índice](../README.md)  
 **Requirement IDs (catálogo):** AUTH-09 … AUTH-11  
 **Requirement IDs (fatia):** LOG-01 … LOG-12  
@@ -222,21 +222,21 @@ Decisões confirmadas em revisão (2026-07-27).
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| AUTH-09 | P1: Credenciais inválidas / Login bem-sucedido | Tasks | Implemented |
-| AUTH-10 | P1: Login bem-sucedido | Tasks | Implemented |
-| AUTH-11 | P1: Bloqueio por status | Tasks | Implemented |
-| LOG-01 | P1: Login bem-sucedido | Tasks | Implemented |
-| LOG-02 | P1: Login bem-sucedido | Tasks | Implemented |
-| LOG-03 | P1: Login bem-sucedido | Tasks | Implemented |
-| LOG-04 | P1: Credenciais inválidas | Tasks | Implemented |
-| LOG-05 | P1: Credenciais inválidas | Tasks | Implemented |
-| LOG-06 | P1: Bloqueio por status | Tasks | Implemented |
-| LOG-07 | P1: Validação HTTP | Tasks | Implemented |
-| LOG-08 | P1: Rate limiting | Tasks | Implemented |
-| LOG-09 | P1: Rate limiting | Tasks | Implemented |
-| LOG-10 | P2: Contrato HTTP | Tasks | Implemented |
-| LOG-11 | P2: Test discovery | Tasks | Implemented |
-| LOG-12 | P1: Credenciais inválidas (conta bloqueada + senha errada) | Tasks | Implemented |
+| AUTH-09 | P1: Credenciais inválidas / Login bem-sucedido | Tasks | ✅ Verified |
+| AUTH-10 | P1: Login bem-sucedido | Tasks | ✅ Verified |
+| AUTH-11 | P1: Bloqueio por status | Tasks | ✅ Verified |
+| LOG-01 | P1: Login bem-sucedido | Tasks | ✅ Verified |
+| LOG-02 | P1: Login bem-sucedido | Tasks | ✅ Verified |
+| LOG-03 | P1: Login bem-sucedido | Tasks | ✅ Verified |
+| LOG-04 | P1: Credenciais inválidas | Tasks | ✅ Verified |
+| LOG-05 | P1: Credenciais inválidas | Tasks | ✅ Verified |
+| LOG-06 | P1: Bloqueio por status | Tasks | ✅ Verified |
+| LOG-07 | P1: Validação HTTP | Tasks | ✅ Verified |
+| LOG-08 | P1: Rate limiting | Tasks | ✅ Verified |
+| LOG-09 | P1: Rate limiting | Tasks | ✅ Verified |
+| LOG-10 | P2: Contrato HTTP | Tasks | ✅ Verified |
+| LOG-11 | P2: Test discovery | Tasks | ✅ Verified |
+| LOG-12 | P1: Credenciais inválidas (conta bloqueada + senha errada) | Tasks | ✅ Verified |
 
 **Coverage:** 15 total, 15 mapped ✅
 
