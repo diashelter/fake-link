@@ -413,8 +413,8 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Integration: success enqueues; invalidate previous; active → exception
-- [ ] Gate check passes: `make test-backend`
+- [x] Integration: success enqueues; invalidate previous; active → exception
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
