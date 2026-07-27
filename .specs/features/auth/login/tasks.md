@@ -258,8 +258,8 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] Integration `LoginUserTest.php` cobre: active→session, pending→verification, invalid email/password, wrong password on suspended→401, suspended+correct→403, deletion_pending+correct→403, dummy verify when user missing (mock spy), multi-token (no revoke), no QueueEmailVerification
-- [ ] Gate check passes: `make test-backend`
+- [x] Integration `LoginUserTest.php` cobre: active→session, pending→verification, invalid email/password, wrong password on suspended→401, suspended+correct→403, deletion_pending+correct→403, dummy verify when user missing (mock spy), multi-token (no revoke), no QueueEmailVerification
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
