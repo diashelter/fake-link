@@ -82,6 +82,16 @@ final class AuthErrorResponseFactory
         );
     }
 
+    public function invalidCredentials(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 401,
+            code: 'INVALID_CREDENTIALS',
+            message: 'The provided credentials are invalid.',
+            requestId: $requestId,
+        );
+    }
+
     public function serviceUnavailable(?string $requestId = null): JsonResponse
     {
         return $this->errorResponse(

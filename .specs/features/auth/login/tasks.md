@@ -127,10 +127,10 @@ T11 → T12 → T13
 
 **Done when**:
 
-- [ ] `errorCode()` retorna `INVALID_CREDENTIALS`
-- [ ] Factory retorna `401` + message OpenAPI exata
-- [ ] Unit tests estendem `AuthErrorResponseFactoryTest`
-- [ ] Gate check passes: `make test-backend`
+- [x] `errorCode()` retorna `INVALID_CREDENTIALS`
+- [x] Factory retorna `401` + message OpenAPI exata
+- [x] Unit tests estendem `AuthErrorResponseFactoryTest`
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
