@@ -119,6 +119,11 @@ final class RaceUserRepository implements UserRepository
         return false;
     }
 
+    public function findByEmail(EmailAddress $email): ?User
+    {
+        return null;
+    }
+
     public function findById(UserId $id): ?User
     {
         return null;
