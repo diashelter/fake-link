@@ -438,10 +438,10 @@ T17 → T18
 
 **Done when**:
 
-- [ ] 4º resend / 6º verify → 429 + Retry-After
-- [ ] Middleware lê `AuthenticatedPrincipal` do container
-- [ ] Unit tests throttle + factory
-- [ ] Gate check passes: `make test-backend`
+- [x] 4º resend / 6º verify → 429 + Retry-After
+- [x] Middleware lê `AuthenticatedPrincipal` do container
+- [x] Unit tests throttle + factory
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick

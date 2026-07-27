@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Tests\TestCase;
 
@@ -85,5 +86,34 @@ describe('HmacRateLimitKeyFactory', function () {
             ->and($first)->not->toContain($ip)
             ->and($first)->not->toBe($factory->forRegistrationIp($ip))
             ->and($first)->not->toBe($factory->forLoginEmailIp($ip, 'user@example.com'));
+    });
+
+    it('returns a stable email verification resend digest without raw user id', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $userId = UserId::fromString('01901234-5678-7abc-89ab-cdef01234567');
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forEmailVerificationResend($userId);
+        $second = $factory->forEmailVerificationResend($userId);
+        $expected = hash_hmac('sha256', 'email-verification:resend:'.$userId->value(), $hmacKey);
+
+        expect($first)->toBe($second)
+            ->and($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($userId->value())
+            ->and($first)->not->toBe($factory->forEmailVerificationVerify($userId));
+    });
+
+    it('returns a stable email verification verify digest without raw user id', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $userId = UserId::fromString('01901234-5678-7abc-89ab-cdef01234568');
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forEmailVerificationVerify($userId);
+        $expected = hash_hmac('sha256', 'email-verification:verify:'.$userId->value(), $hmacKey);
+
+        expect($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($userId->value());
     });
 });
