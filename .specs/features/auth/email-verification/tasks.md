@@ -387,9 +387,9 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Integration matrix: happy path, invalid, expired, used, already active, wrong user token
-- [ ] Bearer revogado; user `active`; sem emissão session
-- [ ] Gate check passes: `make test-backend`
+- [x] Integration matrix: happy path, invalid, expired, used, already active, wrong user token
+- [x] Bearer revogado; user `active`; sem emissão session
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
