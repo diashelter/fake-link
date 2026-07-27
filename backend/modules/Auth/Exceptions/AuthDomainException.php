@@ -16,6 +16,8 @@ final class AuthDomainException extends DomainException
 
     public const INVALID_AUTH_TOKEN_ID = 'INVALID_AUTH_TOKEN_ID';
 
+    public const INVALID_EMAIL_ACTION_TOKEN_ID = 'INVALID_EMAIL_ACTION_TOKEN_ID';
+
     private function __construct(
         private readonly string $errorCode,
         string $message,
@@ -52,6 +54,14 @@ final class AuthDomainException extends DomainException
         return new self(
             errorCode: self::INVALID_AUTH_TOKEN_ID,
             message: 'The provided auth token identifier is invalid.',
+        );
+    }
+
+    public static function invalidEmailActionTokenId(string $raw): self
+    {
+        return new self(
+            errorCode: self::INVALID_EMAIL_ACTION_TOKEN_ID,
+            message: 'The provided email action token identifier is invalid.',
         );
     }
 
