@@ -335,9 +335,9 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Job constructor recebe `userId` + `encryptedToken` (sem plaintext serializado)
-- [ ] Unit test `Mail::fake()` assert destinatário; URL base correta; token ausente de logs
-- [ ] Gate check passes: `make test-backend`
+- [x] Job constructor recebe `userId` + `encryptedToken` (sem plaintext serializado)
+- [x] Unit test `Mail::fake()` assert destinatário; URL base correta; token ausente de logs
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
