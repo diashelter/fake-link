@@ -39,9 +39,11 @@ use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\IssueEmailVerificationToken;
 use Modules\Auth\UseCases\LoginUser;
 use Modules\Auth\UseCases\RegisterUser;
+use Modules\Auth\UseCases\ResendEmailVerification;
 use Modules\Auth\UseCases\RevokeAllUserTokens;
 use Modules\Auth\UseCases\RevokeAuthToken;
 use Modules\Auth\UseCases\ValidateAuthToken;
+use Modules\Auth\UseCases\VerifyUserEmail;
 
 final class AuthServiceProvider extends ServiceProvider
 {
@@ -72,6 +74,8 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(InviteAllowlist::class, fn (): InviteAllowlist => new JsonFileInviteAllowlist);
         $this->app->singleton(IssueAuthToken::class);
         $this->app->singleton(IssueEmailVerificationToken::class);
+        $this->app->singleton(VerifyUserEmail::class);
+        $this->app->singleton(ResendEmailVerification::class);
         $this->app->singleton(ValidateAuthToken::class);
         $this->app->singleton(RevokeAuthToken::class);
         $this->app->singleton(RevokeAllUserTokens::class);

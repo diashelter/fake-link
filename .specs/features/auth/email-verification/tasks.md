@@ -515,8 +515,8 @@ T17 → T18
 
 **Done when**:
 
-- [ ] Container resolve todos ports/use cases novos
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Container resolve todos ports/use cases novos
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: none  
 **Gate**: build
