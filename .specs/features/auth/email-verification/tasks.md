@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/auth/email-verification/design.md`  
 **Spec**: `.specs/features/auth/email-verification/spec.md`  
-**Status**: Execute in progress — Batch 1 (T1–T8)
+**Status**: Execute + Verifier PASS ✅ (2026-07-27)
 
 > **Sub-agent note:** 18 tasks → ~3 batches (~6 + ~6 + ~6). Execute MUST offer batch sub-agents before implementation.
 
@@ -568,7 +568,7 @@ T17 → T18
 - [x] Registro dispara token e-mail + Mail::fake assert
 - [x] OpenAPI examples `INVALID_VERIFICATION_TOKEN`, `EMAIL_ALREADY_VERIFIED`
 - [x] `make lint && make test-backend` verde
-- [ ] Verifier sub-agent pós-T18
+- [x] Verifier sub-agent pós-T18
 
 **Tests**: feature (regressão)  
 **Gate**: final

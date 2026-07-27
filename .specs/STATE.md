@@ -19,11 +19,11 @@
 
 ## Handoff
 
-- **Feature**: `auth/email-verification` — **Fix→re-verify #1** (2026-07-27)
-- **Phase / Task**: Fix 1–2 applied (`b67d4f4`); re-verify dispatched
-- **Completed**: T1–T18 + resend auth E2E + exception/OpenAPI message binding; gate 285 passed
-- **In-progress**: Verifier re-run (iteration 1/3)
-- **Next step**: Await Verifier PASS; if FAIL, next fix iteration
+- **Feature**: `auth/email-verification` — **PASS** (re-verify 1/3, 2026-07-27)
+- **Phase / Task**: Execute complete; Verifier PASS after Fix 1–2 (`b67d4f4`)
+- **Completed**: T1–T18; resend auth/account E2E; exception↔OpenAPI message binding; sensor 6/6 killed (M5 included); gate 285 passed
+- **In-progress**: none
+- **Next step**: Proceed to next Auth slice / merge prep as planned
 - **Blockers**: none
 - **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks,validation}.md`
 - **Branch**: `feature/auth-email-verification`
