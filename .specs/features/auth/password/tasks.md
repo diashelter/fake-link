@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Design**: `.specs/features/auth/password/design.md`  
 **Spec**: `.specs/features/auth/password/spec.md`  
 **Context**: `.specs/features/auth/password/context.md`  
-**Status**: Draft — awaiting approval (Tasks)
+**Status**: ✅ Verified (Execute + Verifier PASS)
 
 > **Sub-agent note:** 18 tasks → ~3 batches (~6 + ~6 + ~6). Execute MUST offer batch sub-agents before implementation.
 

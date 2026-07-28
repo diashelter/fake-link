@@ -19,13 +19,16 @@
 
 ## Handoff
 
-- **Feature**: `auth/email-verification` — **PASS** (re-verify 1/3, 2026-07-27)
-- **Phase / Task**: Execute complete; Verifier PASS after Fix 1–2 (`b67d4f4`)
-- **Completed**: T1–T18; resend auth/account E2E; exception↔OpenAPI message binding; sensor 6/6 killed (M5 included); gate 285 passed
+- **Feature**: `auth/password` — ✅ Complete (Verifier PASS)
+- **Phase / Task**: Execute + re-verify done
+- **Completed**: T1–T18; fix `3184620`; re-verify PASS (sensor 6/6 killed)
 - **In-progress**: none
-- **Next step**: Proceed to next Auth slice / merge prep as planned
+- **Next step**: none for this feature (ready for PR when requested)
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-email-verification`
-- **Gate**: `make lint && make test-backend` → 285 passed
+- **Artifacts**: `.specs/features/auth/password/{spec,context,design,tasks,validation}.md`
+- **Branch**: `feature/auth-password`
+- **Gate**: lint OK, 350 passed
+- **Commits**: T1 e6dccec … T18 8b86955; fix 3184620
+- **Validation**: `.specs/features/auth/password/validation.md` — PASS (re-verify 1)
+
 
