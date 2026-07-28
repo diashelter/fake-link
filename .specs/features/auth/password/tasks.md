@@ -136,10 +136,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `PasswordReset->value === 'password_reset'`
-- [ ] `absoluteTtlSeconds() === 1800`
-- [ ] Unit tests passam
-- [ ] Gate check passes: `make test-backend`
+- [x] `PasswordReset->value === 'password_reset'`
+- [x] `absoluteTtlSeconds() === 1800`
+- [x] Unit tests passam
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
