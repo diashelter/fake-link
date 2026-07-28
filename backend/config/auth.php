@@ -163,6 +163,18 @@ return [
             'max_attempts' => 5,
             'decay_seconds' => 3600,
         ],
+        'password_reset_request' => [
+            'max_attempts' => 3,
+            'decay_seconds' => 3600,
+        ],
+        'password_reset_complete' => [
+            'max_attempts' => 5,
+            'decay_seconds' => 3600,
+        ],
+        'private_auth_write' => [
+            'max_attempts' => 120,
+            'decay_seconds' => 60,
+        ],
     ],
 
     'rate_limit_hmac_key' => env('AUTH_RATE_LIMIT_HMAC_KEY'),
@@ -177,6 +189,18 @@ return [
         'frontend_base_url' => env('APP_URL', 'https://app.localhost'),
         'path' => '/verify-email',
         'token_ttl_seconds' => 3600,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password reset
+    |--------------------------------------------------------------------------
+    */
+
+    'password_reset' => [
+        'frontend_base_url' => env('APP_URL', 'https://app.localhost'),
+        'frontend_path' => '/reset-password',
+        'absolute_ttl_seconds' => 1800,
     ],
 
     /*

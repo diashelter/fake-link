@@ -163,8 +163,8 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Keys `auth.password_reset.*` e `auth.rate_limits.password_reset_*` / `private_auth_write` presentes
-- [ ] Gate check passes: `make test-backend`
+- [x] Keys `auth.password_reset.*` e `auth.rate_limits.password_reset_*` / `private_auth_write` presentes
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none  
 **Gate**: quick
