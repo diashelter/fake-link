@@ -512,10 +512,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Happy path request→mail→reset→login nova senha
-- [ ] Anti-enum 202; token inválido 422; PW-17; 429; GET sem efeito
-- [ ] Headers `Cache-Control` / request id
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Happy path request→mail→reset→login nova senha
+- [x] Anti-enum 202; token inválido 422; PW-17; 429; GET sem efeito
+- [x] Headers `Cache-Control` / request id
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: feature (E2E)  
 **Gate**: final
