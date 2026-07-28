@@ -215,9 +215,9 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Adapter chama Issue + enfileira job com ciphertext
-- [ ] Registrado no `AuthServiceProvider`
-- [ ] Gate check passes: `make test-backend`
+- [x] Adapter chama Issue + enfileira job com ciphertext
+- [x] Registrado no `AuthServiceProvider`
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none  
 **Gate**: quick
