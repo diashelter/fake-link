@@ -188,10 +188,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] TTL 1800; hash ≠ plaintext no DB
-- [ ] Segundo issue invalida o primeiro unused
-- [ ] Integration tests ≥4 casos
-- [ ] Gate check passes: `make test-backend`
+- [x] TTL 1800; hash ≠ plaintext no DB
+- [x] Segundo issue invalida o primeiro unused
+- [x] Integration tests ≥4 casos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
