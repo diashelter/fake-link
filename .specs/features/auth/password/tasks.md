@@ -350,11 +350,11 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Happy path: hash novo; todos bearers revogados
-- [ ] Current errada → InvalidCredentialsException; tokens intactos
-- [ ] Senha = atual → PasswordReusedException; tokens intactos
-- [ ] Integration tests ≥5 casos
-- [ ] Gate check passes: `make test-backend`
+- [x] Happy path: hash novo; todos bearers revogados
+- [x] Current errada → InvalidCredentialsException; tokens intactos
+- [x] Senha = atual → PasswordReusedException; tokens intactos
+- [x] Integration tests ≥5 casos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
