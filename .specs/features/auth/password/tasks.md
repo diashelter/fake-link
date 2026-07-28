@@ -295,9 +295,9 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Novo hash refletido; status/`emailVerifiedAt`/terms inalterados
-- [ ] Unit tests passam
-- [ ] Gate check passes: `make test-backend`
+- [x] Novo hash refletido; status/`emailVerifiedAt`/terms inalterados
+- [x] Unit tests passam
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
