@@ -19,11 +19,13 @@
 
 ## Handoff
 
-- **Feature**: `auth/login` — **Execute + Verified ✅** (2026-07-27)
-- **Phase / Task**: T1–T13 complete; validation PASS
-- **Completed**: 13 commits (ac2527f…90ad3a3); gate 225 passed; sensor 6/6 killed
+- **Feature**: `auth/email-verification` — **PASS** (re-verify 1/3, 2026-07-27)
+- **Phase / Task**: Execute complete; Verifier PASS after Fix 1–2 (`b67d4f4`)
+- **Completed**: T1–T18; resend auth/account E2E; exception↔OpenAPI message binding; sensor 6/6 killed (M5 included); gate 285 passed
 - **In-progress**: none
-- **Next step**: Commit remaining docs (`design.md`, `validation.md`, STATE/README/spec) if desired; PR when ready
+- **Next step**: Proceed to next Auth slice / merge prep as planned
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/login/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-login`
+- **Artifacts**: `.specs/features/auth/email-verification/{spec,design,tasks,validation}.md`
+- **Branch**: `feature/auth-email-verification`
+- **Gate**: `make lint && make test-backend` → 285 passed
+

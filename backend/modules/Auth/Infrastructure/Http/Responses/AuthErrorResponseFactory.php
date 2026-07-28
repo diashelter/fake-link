@@ -6,6 +6,8 @@ namespace Modules\Auth\Infrastructure\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
 use Modules\Auth\Exceptions\AuthTokenException;
+use Modules\Auth\Exceptions\EmailAlreadyVerifiedException;
+use Modules\Auth\Exceptions\InvalidVerificationTokenException;
 use Modules\Auth\Exceptions\ResourceNotFoundException;
 
 final class AuthErrorResponseFactory
@@ -88,6 +90,30 @@ final class AuthErrorResponseFactory
             status: 401,
             code: 'INVALID_CREDENTIALS',
             message: 'The provided credentials are invalid.',
+            requestId: $requestId,
+        );
+    }
+
+    public function invalidVerificationToken(?string $requestId = null): JsonResponse
+    {
+        $exception = InvalidVerificationTokenException::invalid();
+
+        return $this->errorResponse(
+            status: 403,
+            code: $exception->errorCode(),
+            message: $exception->getMessage(),
+            requestId: $requestId,
+        );
+    }
+
+    public function emailAlreadyVerified(?string $requestId = null): JsonResponse
+    {
+        $exception = EmailAlreadyVerifiedException::alreadyVerified();
+
+        return $this->errorResponse(
+            status: 403,
+            code: $exception->errorCode(),
+            message: $exception->getMessage(),
             requestId: $requestId,
         );
     }

@@ -1154,6 +1154,16 @@ components:
                 code: ACCOUNT_PENDING_DELETION
                 message: The account is pending deletion.
                 request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            invalidVerificationToken:
+              value:
+                code: INVALID_VERIFICATION_TOKEN
+                message: The verification token is invalid or has expired.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            emailAlreadyVerified:
+              value:
+                code: EMAIL_ALREADY_VERIFIED
+                message: The email address is already verified.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
     NotFound:
       description: Recurso ausente ou pertencente a outro usuário.
       headers:

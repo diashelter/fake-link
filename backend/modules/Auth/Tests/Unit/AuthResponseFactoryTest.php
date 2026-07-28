@@ -118,4 +118,24 @@ describe('AuthResponseFactory', function () {
         expect($factory->issued(makeRegisteredUserDto())->getStatusCode())->toBe(201)
             ->and($factory->authenticated(makeLoggedInUserDto())->getStatusCode())->toBe(200);
     });
+
+    it('builds 202 Accepted with private no-store headers and empty body', function () {
+        $response = (new AuthResponseFactory)->accepted('req-202');
+
+        expect($response->getStatusCode())->toBe(202)
+            ->and($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->headers->get('X-Request-ID'))->toBe('req-202')
+            ->and($response->getContent())->toBe('');
+    });
+
+    it('builds 204 No Content with private no-store headers and empty body', function () {
+        $response = (new AuthResponseFactory)->noContent('req-204');
+
+        expect($response->getStatusCode())->toBe(204)
+            ->and($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->headers->get('X-Request-ID'))->toBe('req-204')
+            ->and($response->getContent())->toBe('');
+    });
 });

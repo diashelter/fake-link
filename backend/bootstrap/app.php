@@ -8,6 +8,8 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Modules\Auth\Infrastructure\Http\Middleware\AuthenticateBearer;
 use Modules\Auth\Infrastructure\Http\Middleware\RequireTokenKind;
+use Modules\Auth\Infrastructure\Http\Middleware\ThrottleEmailVerificationResend;
+use Modules\Auth\Infrastructure\Http\Middleware\ThrottleEmailVerificationVerify;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleLogin;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleRegistration;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -28,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'token.kind' => RequireTokenKind::class,
             'throttle.registration' => ThrottleRegistration::class,
             'throttle.login' => ThrottleLogin::class,
+            'throttle.email_verification.resend' => ThrottleEmailVerificationResend::class,
+            'throttle.email_verification.verify' => ThrottleEmailVerificationVerify::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -14,6 +14,7 @@ use Modules\Auth\Domain\ValueObjects\EmailAddress;
 use Modules\Auth\Exceptions\InviteAllowlistUnavailableException;
 use Modules\Auth\Infrastructure\Jobs\SendEmailVerificationJob;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\EmailActionTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
@@ -89,6 +90,8 @@ describe('POST /api/v1/auth/register', function () {
 
         Queue::assertPushed(SendEmailVerificationJob::class, 1);
         Queue::assertPushedOn('notifications', SendEmailVerificationJob::class);
+        $emailTokens = EmailActionTokenModel::query()->where('user_id', $user?->id)->get();
+        expect($emailTokens->filter(fn ($token): bool => $token->used_at === null)->count())->toBe(1);
 
         Carbon::setTestNow();
     });

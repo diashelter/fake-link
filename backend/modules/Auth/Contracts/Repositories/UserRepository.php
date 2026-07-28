@@ -19,4 +19,6 @@ interface UserRepository
     public function findById(UserId $id): ?User;
 
     public function save(User $user): void;
+
+    public function update(User $user): void;
 }

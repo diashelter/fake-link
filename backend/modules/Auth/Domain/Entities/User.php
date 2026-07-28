@@ -83,4 +83,18 @@ final class User
     {
         return $this->termsAcceptedAt;
     }
+
+    public function markEmailVerified(DateTimeImmutable $at): self
+    {
+        return new self(
+            id: $this->id,
+            name: $this->name,
+            email: $this->email,
+            passwordHash: $this->passwordHash,
+            status: UserStatus::Active,
+            emailVerifiedAt: $at,
+            termsVersion: $this->termsVersion,
+            termsAcceptedAt: $this->termsAcceptedAt,
+        );
+    }
 }

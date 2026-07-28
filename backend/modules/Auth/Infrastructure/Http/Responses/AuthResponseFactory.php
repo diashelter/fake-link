@@ -51,4 +51,24 @@ final class AuthResponseFactory
             'X-Request-ID' => $resolvedRequestId,
         ]);
     }
+
+    public function accepted(?string $requestId = null): Response
+    {
+        $resolvedRequestId = $requestId ?? 'stub-request-id';
+
+        return response('', Response::HTTP_ACCEPTED)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'X-Request-ID' => $resolvedRequestId,
+        ]);
+    }
+
+    public function noContent(?string $requestId = null): Response
+    {
+        $resolvedRequestId = $requestId ?? 'stub-request-id';
+
+        return response('', Response::HTTP_NO_CONTENT)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'X-Request-ID' => $resolvedRequestId,
+        ]);
+    }
 }
