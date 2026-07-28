@@ -241,10 +241,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] URL `{base}/reset-password?token=…`; token só no corpo
-- [ ] Payload cifrado; sentinela ausente de exceptions/logs
-- [ ] Unit tests passam
-- [ ] Gate check passes: `make test-backend`
+- [x] URL `{base}/reset-password?token=…`; token só no corpo
+- [x] Payload cifrado; sentinela ausente de exceptions/logs
+- [x] Unit tests passam
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
