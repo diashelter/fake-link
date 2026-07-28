@@ -268,10 +268,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Active → 1 token + 1 job; missing/pending/suspended/deletion_pending → 0 token/job
-- [ ] `PasswordHasher::verify` chamado em todos os caminhos
-- [ ] Integration tests ≥5 casos
-- [ ] Gate check passes: `make test-backend`
+- [x] Active → 1 token + 1 job; missing/pending/suspended/deletion_pending → 0 token/job
+- [x] `PasswordHasher::verify` chamado em todos os caminhos
+- [x] Integration tests ≥5 casos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
