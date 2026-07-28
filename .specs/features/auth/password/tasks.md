@@ -539,9 +539,9 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Happy path change → bearer antigo 401; login nova senha 200
-- [ ] Current errada 401; verification bearer 403; PW-17 422
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Happy path change → bearer antigo 401; login nova senha 200
+- [x] Current errada 401; verification bearer 403; PW-17 422
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: feature (E2E)  
 **Gate**: final
