@@ -405,11 +405,11 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Token: 422 + `errors.token[0].message` exata da spec
-- [ ] Reused: 422 + `errors.password[0].code === PASSWORD_REUSED` + message exata
-- [ ] Headers `Cache-Control` / request id se padrão do projeto exigir
-- [ ] Unit tests passam
-- [ ] Gate check passes: `make test-backend`
+- [x] Token: 422 + `errors.token[0].message` exata da spec
+- [x] Reused: 422 + `errors.password[0].code === PASSWORD_REUSED` + message exata
+- [x] Headers `Cache-Control` / request id se padrão do projeto exigir
+- [x] Unit tests passam
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
