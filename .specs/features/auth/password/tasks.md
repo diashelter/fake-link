@@ -458,10 +458,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Rotas registradas sob `/api/v1/auth/password/*`
-- [ ] Exceções mapeadas para factories corretas
-- [ ] Sucesso `202` / `204`
-- [ ] Gate check passes: `make lint && make test-backend`
+- [x] Rotas registradas sob `/api/v1/auth/password/*`
+- [x] Exceções mapeadas para factories corretas
+- [x] Sucesso `202` / `204`
+- [x] Gate check passes: `make lint && make test-backend`
 
 **Tests**: none (E2E em T16–T17)  
 **Gate**: build  
