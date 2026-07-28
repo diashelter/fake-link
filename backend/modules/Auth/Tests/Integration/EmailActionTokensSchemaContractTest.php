@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Tests\TestCase;
 
@@ -49,6 +51,45 @@ describe('Email action tokens schema contract', function () {
         );
 
         expect(collect($constraints)->pluck('conname')->all())->toContain('email_action_tokens_purpose_check');
+
+        $checkDefinition = DB::selectOne(
+            "SELECT pg_get_constraintdef(oid) AS definition
+             FROM pg_constraint
+             WHERE conrelid = 'public.email_action_tokens'::regclass
+               AND conname = 'email_action_tokens_purpose_check'"
+        );
+
+        expect($checkDefinition->definition)
+            ->toContain('email_verification')
+            ->toContain('password_reset');
+
+        $user = UserModel::factory()->active()->create();
+
+        foreach (['email_verification', 'password_reset'] as $purpose) {
+            DB::table('email_action_tokens')->insert([
+                'id' => $purpose === 'email_verification'
+                    ? '018f0000-0000-7000-8000-000000000011'
+                    : '018f0000-0000-7000-8000-000000000012',
+                'user_id' => $user->id,
+                'token_hash' => str_repeat($purpose === 'email_verification' ? 'a' : 'b', 64),
+                'purpose' => $purpose,
+                'expires_at' => now()->addHour(),
+                'used_at' => null,
+                'created_at' => now(),
+            ]);
+        }
+
+        expect(DB::table('email_action_tokens')->where('user_id', $user->id)->count())->toBe(2);
+
+        expect(fn () => DB::table('email_action_tokens')->insert([
+            'id' => '018f0000-0000-7000-8000-000000000013',
+            'user_id' => $user->id,
+            'token_hash' => str_repeat('c', 64),
+            'purpose' => 'unknown_purpose',
+            'expires_at' => now()->addHour(),
+            'used_at' => null,
+            'created_at' => now(),
+        ]))->toThrow(QueryException::class);
     });
 
     it('enforces unique token_hash, user_id index, and foreign key to users', function () {
