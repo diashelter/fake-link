@@ -433,8 +433,8 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] `additionalProperties` rejeitados; schemas batem OpenAPI
-- [ ] Gate check passes: `make test-backend`
+- [x] `additionalProperties` rejeitados; schemas batem OpenAPI
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: none  
 **Gate**: quick
