@@ -378,10 +378,10 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] 4º reset-request / 6º reset / 121ª write → 429 + Retry-After
-- [ ] Conta todas as tentativas antes do use case
-- [ ] Unit tests passam
-- [ ] Gate check passes: `make test-backend`
+- [x] 4º reset-request / 6º reset / 121ª write → 429 + Retry-After
+- [x] Conta todas as tentativas antes do use case
+- [x] Unit tests passam
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: unit  
 **Gate**: quick
