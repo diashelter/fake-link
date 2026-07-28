@@ -321,12 +321,12 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Happy path: used_at set; hash novo; zero auth_tokens; status intacto
-- [ ] Token inválido / email mismatch / purpose errado → InvalidPasswordResetTokenException
-- [ ] Senha = atual → PasswordReusedException; token unused
-- [ ] Concorrência: 1 sucesso
-- [ ] Integration tests ≥8 casos
-- [ ] Gate check passes: `make test-backend`
+- [x] Happy path: used_at set; hash novo; zero auth_tokens; status intacto
+- [x] Token inválido / email mismatch / purpose errado → InvalidPasswordResetTokenException
+- [x] Senha = atual → PasswordReusedException; token unused
+- [x] Concorrência: 1 sucesso
+- [x] Integration tests ≥8 casos
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
