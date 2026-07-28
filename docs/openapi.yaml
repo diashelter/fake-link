@@ -1242,14 +1242,37 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationErrorResponse'
-          example:
-            code: VALIDATION_FAILED
-            message: The given data was invalid.
-            request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
-            errors:
-              cursor:
-                - code: INVALID_CURSOR
-                  message: The cursor is invalid or has expired.
+          examples:
+            invalidCursor:
+              summary: Cursor inválido
+              value:
+                code: VALIDATION_FAILED
+                message: The given data was invalid.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+                errors:
+                  cursor:
+                    - code: INVALID_CURSOR
+                      message: The cursor is invalid or has expired.
+            passwordReused:
+              summary: Nova senha igual à atual (PASSWORD_REUSED)
+              value:
+                code: VALIDATION_FAILED
+                message: The given data was invalid.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+                errors:
+                  password:
+                    - code: PASSWORD_REUSED
+                      message: The new password must be different from the current password.
+            invalidPasswordResetToken:
+              summary: Token de recuperação inválido ou expirado
+              value:
+                code: VALIDATION_FAILED
+                message: The given data was invalid.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+                errors:
+                  token:
+                    - code: INVALID
+                      message: The password reset token is invalid or has expired.
     PreconditionRequired:
       description: A atualização exige `If-Match`.
       headers:

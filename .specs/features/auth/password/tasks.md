@@ -565,9 +565,9 @@ T16 → T17 → T18
 
 **Done when**:
 
-- [ ] Exemplo `PASSWORD_REUSED` presente no OpenAPI
-- [ ] `make lint && make test-backend` verde sem regressão
-- [ ] Spec success criteria checáveis cobertos
+- [x] Exemplo `PASSWORD_REUSED` presente no OpenAPI
+- [x] `make lint && make test-backend` verde sem regressão
+- [x] Spec success criteria checáveis cobertos
 
 **Tests**: none  
 **Gate**: final
