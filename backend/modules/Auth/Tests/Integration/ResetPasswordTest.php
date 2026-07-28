@@ -183,6 +183,24 @@ describe('ResetPassword', function () {
         )))->toThrow(InvalidPasswordResetTokenException::class);
     });
 
+    it('rejects a used token as invalid even when the password matches the current hash', function () {
+        $fixture = activeUserWithPasswordResetToken();
+        $newPassword = 'BrandNewPass1!x';
+
+        makeResetPasswordUseCase()->execute(new ResetPasswordDto(
+            email: 'reset.user@example.com',
+            plainTextToken: $fixture['plainToken'],
+            plainTextPassword: $newPassword,
+        ));
+
+        // Discriminates early isUsed(): without it, reused-password would win over invalid-token.
+        expect(fn () => makeResetPasswordUseCase()->execute(new ResetPasswordDto(
+            email: 'reset.user@example.com',
+            plainTextToken: $fixture['plainToken'],
+            plainTextPassword: $newPassword,
+        )))->toThrow(InvalidPasswordResetTokenException::class, InvalidPasswordResetTokenException::MESSAGE);
+    });
+
     it('rejects when email does not match the token owner', function () {
         $fixture = activeUserWithPasswordResetToken();
         $hasher = new LaravelPasswordHasher;

@@ -19,6 +19,7 @@ use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\IssueEmailVerificationToken;
+use Modules\Auth\UseCases\IssuePasswordResetToken;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -111,6 +112,27 @@ describe('POST /api/v1/auth/email/verify', function () {
             ->assertJsonPath('message', 'The verification token is invalid or has expired.');
 
         expect($response->headers->get('Cache-Control'))->toContain('no-store');
+    });
+
+    it('returns 403 INVALID_VERIFICATION_TOKEN when a password_reset token is submitted', function () {
+        $user = UserModel::factory()->create();
+        $bearer = issueVerificationBearer($user);
+        $passwordResetToken = app(IssuePasswordResetToken::class)
+            ->execute(UserId::fromString($user->id))
+            ->plainTextToken;
+        clearEmailVerificationRateLimits(UserId::fromString($user->id));
+
+        $this->postJson('/api/v1/auth/email/verify', [
+            'token' => $passwordResetToken,
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertForbidden()
+            ->assertJsonPath('code', 'INVALID_VERIFICATION_TOKEN')
+            ->assertJsonPath('message', 'The verification token is invalid or has expired.');
+
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->where('purpose', 'password_reset')->value('used_at'))
+            ->toBeNull();
     });
 
     it('returns 403 EMAIL_ALREADY_VERIFIED when the user is already active', function () {

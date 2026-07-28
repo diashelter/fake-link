@@ -276,6 +276,160 @@ describe('POST /api/v1/auth/password/reset', function () {
         expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))->toBeNull();
     });
 
+    it('returns 422 for a weak password without consuming the token', function () {
+        Queue::fake();
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'reset.weak@example.com',
+        ]);
+        clearPasswordResetRequestLimit($this->clientIp, 'reset.weak@example.com');
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset-request', [
+                'email' => 'reset.weak@example.com',
+            ])
+            ->assertAccepted();
+
+        $job = null;
+        Queue::assertPushed(SendPasswordResetJob::class, function (SendPasswordResetJob $pushed) use (&$job): bool {
+            $job = $pushed;
+
+            return true;
+        });
+        $plainToken = Crypt::decryptString($job->encryptedToken);
+        clearPasswordResetCompleteLimit($this->clientIp, $plainToken);
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset', [
+                'email' => 'reset.weak@example.com',
+                'token' => $plainToken,
+                'password' => 'short',
+                'password_confirmation' => 'short',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))->toBeNull()
+            ->and(UserModel::query()->find($user->id)?->password)->toBe($user->password);
+    });
+
+    it('returns 422 when password confirmation does not match without consuming the token', function () {
+        Queue::fake();
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'reset.mismatch@example.com',
+        ]);
+        clearPasswordResetRequestLimit($this->clientIp, 'reset.mismatch@example.com');
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset-request', [
+                'email' => 'reset.mismatch@example.com',
+            ])
+            ->assertAccepted();
+
+        $job = null;
+        Queue::assertPushed(SendPasswordResetJob::class, function (SendPasswordResetJob $pushed) use (&$job): bool {
+            $job = $pushed;
+
+            return true;
+        });
+        $plainToken = Crypt::decryptString($job->encryptedToken);
+        clearPasswordResetCompleteLimit($this->clientIp, $plainToken);
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset', [
+                'email' => 'reset.mismatch@example.com',
+                'token' => $plainToken,
+                'password' => $this->newPassword,
+                'password_confirmation' => 'DifferentPass1!x',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))->toBeNull()
+            ->and(UserModel::query()->find($user->id)?->password)->toBe($user->password);
+    });
+
+    it('rejects a used reset token as invalid even when the password matches the current hash', function () {
+        Queue::fake();
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'reset.used.same@example.com',
+        ]);
+        clearPasswordResetRequestLimit($this->clientIp, 'reset.used.same@example.com');
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset-request', [
+                'email' => 'reset.used.same@example.com',
+            ])
+            ->assertAccepted();
+
+        $job = null;
+        Queue::assertPushed(SendPasswordResetJob::class, function (SendPasswordResetJob $pushed) use (&$job): bool {
+            $job = $pushed;
+
+            return true;
+        });
+        $plainToken = Crypt::decryptString($job->encryptedToken);
+        clearPasswordResetCompleteLimit($this->clientIp, $plainToken);
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset', [
+                'email' => 'reset.used.same@example.com',
+                'token' => $plainToken,
+                'password' => $this->newPassword,
+                'password_confirmation' => $this->newPassword,
+            ])
+            ->assertNoContent();
+
+        clearPasswordResetCompleteLimit($this->clientIp, $plainToken);
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset', [
+                'email' => 'reset.used.same@example.com',
+                'token' => $plainToken,
+                'password' => $this->newPassword,
+                'password_confirmation' => $this->newPassword,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.token.0.message', InvalidPasswordResetTokenException::MESSAGE)
+            ->assertJsonPath('errors.token.0.code', 'INVALID');
+    });
+
+    it('returns 422 on the token field when the plaintext token has trailing whitespace', function () {
+        Queue::fake();
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'reset.whitespace@example.com',
+        ]);
+        clearPasswordResetRequestLimit($this->clientIp, 'reset.whitespace@example.com');
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset-request', [
+                'email' => 'reset.whitespace@example.com',
+            ])
+            ->assertAccepted();
+
+        $job = null;
+        Queue::assertPushed(SendPasswordResetJob::class, function (SendPasswordResetJob $pushed) use (&$job): bool {
+            $job = $pushed;
+
+            return true;
+        });
+        $plainToken = Crypt::decryptString($job->encryptedToken);
+        $tokenWithWhitespace = $plainToken.' ';
+        clearPasswordResetCompleteLimit($this->clientIp, $tokenWithWhitespace);
+
+        $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/password/reset', [
+                'email' => 'reset.whitespace@example.com',
+                'token' => $tokenWithWhitespace,
+                'password' => $this->newPassword,
+                'password_confirmation' => $this->newPassword,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.token.0.message', InvalidPasswordResetTokenException::MESSAGE)
+            ->assertJsonPath('errors.token.0.code', 'INVALID');
+
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))->toBeNull();
+    });
+
     it('does not mutate state when reset is attempted via GET', function () {
         Queue::fake();
         $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([

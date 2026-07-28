@@ -77,6 +77,29 @@ describe('ThrottlePasswordResetRequest', function () {
                 'message' => 'Too many requests.',
             ]);
     });
+
+    it('increments the rate limit even when the next handler returns 422', function () {
+        $request = Request::create(
+            '/api/v1/auth/password/reset-request',
+            'POST',
+            ['email' => $this->email],
+            server: ['REMOTE_ADDR' => $this->ip],
+        );
+        $next = static fn (Request $request): JsonResponse => new JsonResponse(['code' => 'VALIDATION_FAILED'], 422);
+
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            expect($this->middleware->handle($request, $next)->getStatusCode())->toBe(422);
+        }
+
+        $limited = $this->middleware->handle($request, $next);
+
+        expect($limited->getStatusCode())->toBe(429)
+            ->and($limited->headers->get('Retry-After'))->not->toBeNull()
+            ->and($limited->getData(true))->toMatchArray([
+                'code' => 'RATE_LIMIT_EXCEEDED',
+                'message' => 'Too many requests.',
+            ]);
+    });
 });
 
 describe('ThrottlePasswordReset', function () {

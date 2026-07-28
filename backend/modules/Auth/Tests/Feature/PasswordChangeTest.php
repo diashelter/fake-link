@@ -154,6 +154,56 @@ describe('POST /api/v1/auth/password/change', function () {
             ->and(UserModel::query()->find($user->id)?->status)->toBe(UserStatus::Active->value);
     });
 
+    it('returns 422 for a weak password without revoking tokens or changing the hash', function () {
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'change.weak@example.com',
+        ]);
+        $bearer = issueSessionBearer($user);
+        clearPrivateAuthWriteLimit(UserId::fromString($user->id));
+        // @phpstan-ignore staticMethod.dynamicCall
+        $tokenCountBefore = AuthTokenModel::query()->where('user_id', $user->id)->count();
+        $passwordBefore = $user->password;
+
+        $this->postJson('/api/v1/auth/password/change', [
+            'current_password' => $this->knownPassword,
+            'password' => 'short',
+            'password_confirmation' => 'short',
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe($tokenCountBefore)
+            ->and(UserModel::query()->find($user->id)?->password)->toBe($passwordBefore);
+    });
+
+    it('returns 422 when password confirmation does not match without side effects', function () {
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'change.mismatch@example.com',
+        ]);
+        $bearer = issueSessionBearer($user);
+        clearPrivateAuthWriteLimit(UserId::fromString($user->id));
+        // @phpstan-ignore staticMethod.dynamicCall
+        $tokenCountBefore = AuthTokenModel::query()->where('user_id', $user->id)->count();
+        $passwordBefore = $user->password;
+
+        $this->postJson('/api/v1/auth/password/change', [
+            'current_password' => $this->knownPassword,
+            'password' => $this->newPassword,
+            'password_confirmation' => 'DifferentPass1!x',
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe($tokenCountBefore)
+            ->and(UserModel::query()->find($user->id)?->password)->toBe($passwordBefore);
+    });
+
     it('returns 401 UNAUTHENTICATED when the bearer is missing', function () {
         $this->postJson('/api/v1/auth/password/change', [
             'current_password' => $this->knownPassword,

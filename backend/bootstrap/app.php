@@ -28,6 +28,14 @@ return Application::configure(basePath: dirname(__DIR__))
             RejectMalformedJson::class,
         ]);
 
+        // Opaque auth tokens must not be trimmed — trailing/leading whitespace must fail validation.
+        $middleware->trimStrings(except: [
+            'current_password',
+            'password',
+            'password_confirmation',
+            'token',
+        ]);
+
         $middleware->alias([
             'auth.bearer' => AuthenticateBearer::class,
             'token.kind' => RequireTokenKind::class,

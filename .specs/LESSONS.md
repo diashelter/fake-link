@@ -176,6 +176,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: AUTH-20 AC4 job retry (auth,jobs)
 - last seen: 2026-07-27T17:58:29Z
 
+### L-028 — When a guard is duplicated by a later atomic consume/update, add a test that isolates the early guard or drop the redundant check so mutation of either path fails tests
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `auth/reset` · harmful: 0
+- features: auth/password
+- evidence: M5 ResetPassword.php isUsed early guard (auth/reset)
+- last seen: 2026-07-28T21:19:02Z
+
+### L-029 — For password reset and change routes, assert weak or mismatched password returns 422 with no token consume and no bearer revoke
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth/password` · harmful: 0
+- features: auth/password
+- evidence: Reset AC7 / PW-05 policy confirmation without consume (auth/password) (+1 more)
+- last seen: 2026-07-28T21:19:03Z
+
+### L-030 — When a rate-limit AC says count all attempts regardless of HTTP status, assert that validation failures increment the counter before proving 429
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth/rate-limit` · harmful: 0
+- features: auth/password
+- evidence: Reset-request AC8 / PW-01 PW-04 any-status rate limit (auth/rate-limit)
+- last seen: 2026-07-28T21:19:03Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
