@@ -52,4 +52,31 @@ final class HmacRateLimitKeyFactory
             (string) config('auth.rate_limit_hmac_key'),
         );
     }
+
+    public function forPasswordResetRequest(string $canonicalIp, string $normalizedOrSentinelEmail): string
+    {
+        return hash_hmac(
+            'sha256',
+            'password-reset:request:'.$canonicalIp.':'.$normalizedOrSentinelEmail,
+            (string) config('auth.rate_limit_hmac_key'),
+        );
+    }
+
+    public function forPasswordResetComplete(string $canonicalIp, string $tokenDigest): string
+    {
+        return hash_hmac(
+            'sha256',
+            'password-reset:complete:'.$canonicalIp.':'.$tokenDigest,
+            (string) config('auth.rate_limit_hmac_key'),
+        );
+    }
+
+    public function forPrivateAuthWrite(UserId $userId): string
+    {
+        return hash_hmac(
+            'sha256',
+            'private-auth:write:'.$userId->value(),
+            (string) config('auth.rate_limit_hmac_key'),
+        );
+    }
 }

@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 28,
+  "next_id": 31,
   "lessons": [
     {
       "id": "L-001",
@@ -490,6 +490,61 @@
       ],
       "created": "2026-07-27T17:58:29Z",
       "last_seen": "2026-07-27T17:58:29Z"
+    },
+    {
+      "id": "L-028",
+      "key": "surviving_mutant::when a guard is duplicated by a later atomic consume update add a test that isolates the early guard or drop the redundant check so mutation of either path fails tests",
+      "text": "When a guard is duplicated by a later atomic consume/update, add a test that isolates the early guard or drop the redundant check so mutation of either path fails tests",
+      "signal": "surviving_mutant",
+      "scope": "auth/reset",
+      "status": "candidate",
+      "features": [
+        "auth/password"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M5 ResetPassword.php isUsed early guard (auth/reset)"
+      ],
+      "created": "2026-07-28T21:19:02Z",
+      "last_seen": "2026-07-28T21:19:02Z"
+    },
+    {
+      "id": "L-029",
+      "key": "ac_gap::for password reset and change routes assert weak or mismatched password returns 422 with no token consume and no bearer revoke",
+      "text": "For password reset and change routes, assert weak or mismatched password returns 422 with no token consume and no bearer revoke",
+      "signal": "ac_gap",
+      "scope": "auth/password",
+      "status": "candidate",
+      "features": [
+        "auth/password"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Reset AC7 / PW-05 policy confirmation without consume (auth/password)",
+        "Change AC6 / PW-09 policy confirmation without side effects (auth/password)"
+      ],
+      "created": "2026-07-28T21:19:03Z",
+      "last_seen": "2026-07-28T21:19:03Z"
+    },
+    {
+      "id": "L-030",
+      "key": "spec_precision_gap::when a rate limit ac says count all attempts regardless of http status assert that validation failures increment the counter before proving 429",
+      "text": "When a rate-limit AC says count all attempts regardless of HTTP status, assert that validation failures increment the counter before proving 429",
+      "signal": "spec_precision_gap",
+      "scope": "auth/rate-limit",
+      "status": "candidate",
+      "features": [
+        "auth/password"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Reset-request AC8 / PW-01 PW-04 any-status rate limit (auth/rate-limit)"
+      ],
+      "created": "2026-07-28T21:19:03Z",
+      "last_seen": "2026-07-28T21:19:03Z"
     }
   ]
 }

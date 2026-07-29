@@ -116,4 +116,47 @@ describe('HmacRateLimitKeyFactory', function () {
             ->and($first)->toMatch('/^[a-f0-9]{64}$/')
             ->and($first)->not->toContain($userId->value());
     });
+
+    it('returns a stable password reset request digest without raw ip or email', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $ip = '203.0.113.40';
+        $email = 'reset@example.com';
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forPasswordResetRequest($ip, $email);
+        $expected = hash_hmac('sha256', 'password-reset:request:'.$ip.':'.$email, $hmacKey);
+
+        expect($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($ip)
+            ->and($first)->not->toContain($email);
+    });
+
+    it('returns a stable password reset complete digest without raw ip or token digest', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $ip = '203.0.113.41';
+        $tokenDigest = hash('sha256', 'presented-token');
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forPasswordResetComplete($ip, $tokenDigest);
+        $expected = hash_hmac('sha256', 'password-reset:complete:'.$ip.':'.$tokenDigest, $hmacKey);
+
+        expect($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($ip)
+            ->and($first)->not->toContain($tokenDigest);
+    });
+
+    it('returns a stable private auth write digest without raw user id', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $userId = UserId::fromString('01901234-5678-7abc-89ab-cdef01234569');
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forPrivateAuthWrite($userId);
+        $expected = hash_hmac('sha256', 'private-auth:write:'.$userId->value(), $hmacKey);
+
+        expect($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($userId->value());
+    });
 });

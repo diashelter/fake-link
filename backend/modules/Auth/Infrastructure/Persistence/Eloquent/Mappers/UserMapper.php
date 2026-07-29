@@ -55,6 +55,7 @@ final class UserMapper
     public function toPersistenceUpdate(User $user): array
     {
         return [
+            'password' => $user->passwordHash(),
             'status' => $user->status()->value,
             'email_verified_at' => $user->emailVerifiedAt() !== null
                 ? Carbon::instance($user->emailVerifiedAt())

@@ -97,4 +97,18 @@ final class User
             termsAcceptedAt: $this->termsAcceptedAt,
         );
     }
+
+    public function withPasswordHash(string $passwordHash): self
+    {
+        return new self(
+            id: $this->id,
+            name: $this->name,
+            email: $this->email,
+            passwordHash: $passwordHash,
+            status: $this->status,
+            emailVerifiedAt: $this->emailVerifiedAt,
+            termsVersion: $this->termsVersion,
+            termsAcceptedAt: $this->termsAcceptedAt,
+        );
+    }
 }

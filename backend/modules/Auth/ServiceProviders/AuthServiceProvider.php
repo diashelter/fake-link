@@ -14,6 +14,7 @@ use Modules\Auth\Contracts\Services\EmailActionTokenIdGenerator;
 use Modules\Auth\Contracts\Services\InviteAllowlist;
 use Modules\Auth\Contracts\Services\PasswordHasher;
 use Modules\Auth\Contracts\Services\QueueEmailVerification;
+use Modules\Auth\Contracts\Services\QueuePasswordReset;
 use Modules\Auth\Contracts\Services\TokenHasher;
 use Modules\Auth\Contracts\Services\UserIdGenerator;
 use Modules\Auth\Domain\Services\BearerTokenGenerator;
@@ -25,21 +26,27 @@ use Modules\Auth\Infrastructure\Http\Middleware\AuthenticateBearer;
 use Modules\Auth\Infrastructure\Http\Middleware\RequireTokenKind;
 use Modules\Auth\Infrastructure\Http\Responses\AuthErrorResponseFactory;
 use Modules\Auth\Infrastructure\Http\Responses\AuthResponseFactory;
+use Modules\Auth\Infrastructure\Http\Responses\AuthValidationResponseFactory;
 use Modules\Auth\Infrastructure\Identity\Uuid7AuthTokenIdGenerator;
 use Modules\Auth\Infrastructure\Identity\Uuid7EmailActionTokenIdGenerator;
 use Modules\Auth\Infrastructure\Identity\Uuid7UserIdGenerator;
 use Modules\Auth\Infrastructure\Notifications\LaravelQueueEmailVerification;
+use Modules\Auth\Infrastructure\Notifications\LaravelQueuePasswordReset;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\AuthTokenMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\EmailActionTokenMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentEmailActionTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
+use Modules\Auth\UseCases\ChangePassword;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\IssueEmailVerificationToken;
+use Modules\Auth\UseCases\IssuePasswordResetToken;
 use Modules\Auth\UseCases\LoginUser;
 use Modules\Auth\UseCases\RegisterUser;
+use Modules\Auth\UseCases\RequestPasswordReset;
 use Modules\Auth\UseCases\ResendEmailVerification;
+use Modules\Auth\UseCases\ResetPassword;
 use Modules\Auth\UseCases\RevokeAllUserTokens;
 use Modules\Auth\UseCases\RevokeAuthToken;
 use Modules\Auth\UseCases\ValidateAuthToken;
@@ -60,6 +67,7 @@ final class AuthServiceProvider extends ServiceProvider
         EmailActionTokenRepository::class => EloquentEmailActionTokenRepository::class,
         EmailActionTokenIdGenerator::class => Uuid7EmailActionTokenIdGenerator::class,
         QueueEmailVerification::class => LaravelQueueEmailVerification::class,
+        QueuePasswordReset::class => LaravelQueuePasswordReset::class,
     ];
 
     public function register(): void
@@ -71,11 +79,16 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(PasswordPolicy::class);
         $this->app->singleton(AuthErrorResponseFactory::class);
         $this->app->singleton(AuthResponseFactory::class);
+        $this->app->singleton(AuthValidationResponseFactory::class);
         $this->app->singleton(InviteAllowlist::class, fn (): InviteAllowlist => new JsonFileInviteAllowlist);
         $this->app->singleton(IssueAuthToken::class);
         $this->app->singleton(IssueEmailVerificationToken::class);
+        $this->app->singleton(IssuePasswordResetToken::class);
         $this->app->singleton(VerifyUserEmail::class);
         $this->app->singleton(ResendEmailVerification::class);
+        $this->app->singleton(RequestPasswordReset::class);
+        $this->app->singleton(ResetPassword::class);
+        $this->app->singleton(ChangePassword::class);
         $this->app->singleton(ValidateAuthToken::class);
         $this->app->singleton(RevokeAuthToken::class);
         $this->app->singleton(RevokeAllUserTokens::class);
