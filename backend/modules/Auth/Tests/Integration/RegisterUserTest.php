@@ -20,6 +20,7 @@ use Modules\Auth\Domain\ValueObjects\AuthTokenId;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Input\RegisterUserDto;
+use Modules\Auth\DTOs\Output\UserProfileDto;
 use Modules\Auth\Exceptions\AuthDomainException;
 use Modules\Auth\Exceptions\InviteAllowlistUnavailableException;
 use Modules\Auth\Exceptions\RegistrationNotAllowedException;
@@ -137,12 +138,17 @@ final class RaceUserRepository implements UserRepository
         return null;
     }
 
+    public function findProfileById(UserId $id): ?UserProfileDto
+    {
+        return null;
+    }
+
     public function save(User $user): void
     {
         throw AuthDomainException::emailAlreadyInUse();
     }
 
-    public function update(User $user): void
+    public function update(User $user, ?DateTimeImmutable $updatedAt = null): void
     {
         // Intentionally unused — race fixture only exercises create conflicts.
     }
