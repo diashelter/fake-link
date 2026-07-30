@@ -161,4 +161,52 @@ describe('POST /api/v1/auth/logout-all', function () {
             ->assertUnauthorized()
             ->assertJsonPath('code', 'UNAUTHENTICATED');
     });
+
+    it('returns 422 VALIDATION_FAILED when current_password exceeds maxLength 128', function () {
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'logout.all.max@example.com',
+        ]);
+        $bearer = issueSessionBearerForLogoutAll($user);
+        clearPrivateAuthWriteLimitForLogoutAll(UserId::fromString($user->id));
+
+        $this->postJson('/api/v1/auth/logout-all', [
+            'current_password' => str_repeat('a', 129),
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        $this->getJson('/api/v1/_test/auth/probe', [
+            'Authorization' => 'Bearer '.$bearer,
+        ])->assertOk();
+    });
+
+    it('returns 429 RATE_LIMIT_EXCEEDED when private write throttle is exceeded', function () {
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'logout.all.throttle@example.com',
+        ]);
+        $bearer = issueSessionBearerForLogoutAll($user);
+        clearPrivateAuthWriteLimitForLogoutAll(UserId::fromString($user->id));
+        config(['auth.rate_limits.private_auth_write.max_attempts' => 1]);
+
+        $this->postJson('/api/v1/auth/logout-all', [
+            'current_password' => $this->knownPassword,
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])->assertNoContent();
+
+        $again = issueSessionBearerForLogoutAll($user);
+        $limited = $this->postJson('/api/v1/auth/logout-all', [
+            'current_password' => $this->knownPassword,
+        ], [
+            'Authorization' => 'Bearer '.$again,
+        ]);
+
+        $limited->assertStatus(429)
+            ->assertJsonPath('code', 'RATE_LIMIT_EXCEEDED');
+        expect($limited->headers->get('Retry-After'))->not->toBeNull()
+            ->and($limited->headers->get('Cache-Control'))->toContain('private')
+            ->and($limited->headers->get('Cache-Control'))->toContain('no-store');
+    });
 });

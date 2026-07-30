@@ -73,12 +73,16 @@ describe('UpdateCurrentUser', function () {
     });
 
     it('returns the same profile without writing when the name is unchanged', function () {
+        Carbon::setTestNow('2026-07-30 12:00:00');
+
         $user = UserModel::factory()->active()->create([
             'name' => 'Same Name',
             'email' => 'noop.me@example.com',
         ]);
         $before = $user->fresh();
         $updatedAtBefore = $before->updated_at->toIso8601String();
+
+        Carbon::setTestNow('2026-07-30 12:00:30');
 
         $principal = new AuthenticatedPrincipalRecord(
             userId: UserId::fromString($user->id),
@@ -101,6 +105,8 @@ describe('UpdateCurrentUser', function () {
             ->and($profile->updatedAt->format('Y-m-d\TH:i:sP'))->toBe(
                 DateTimeImmutable::createFromInterface($before->updated_at)->format('Y-m-d\TH:i:sP')
             );
+
+        Carbon::setTestNow();
     });
 
     it('never changes the email when renaming', function () {

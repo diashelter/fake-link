@@ -100,13 +100,17 @@ describe('POST /api/v1/auth/logout', function () {
         $bearer = issueSessionBearerForLogout($user);
         clearPrivateAuthWriteLimitForLogout(UserId::fromString($user->id));
 
-        $this->postJson('/api/v1/auth/logout', [
+        $response = $this->postJson('/api/v1/auth/logout', [
             'extra' => 'nope',
         ], [
             'Authorization' => 'Bearer '.$bearer,
-        ])
-            ->assertUnprocessable()
+        ]);
+
+        $response->assertUnprocessable()
             ->assertJsonPath('code', 'VALIDATION_FAILED');
+        expect($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->json('request_id'))->not->toBeNull();
 
         $this->getJson('/api/v1/_test/auth/probe', [
             'Authorization' => 'Bearer '.$bearer,

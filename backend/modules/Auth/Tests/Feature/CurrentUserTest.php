@@ -204,6 +204,7 @@ describe('PATCH /api/v1/me', function () {
     });
 
     it('returns 200 without bumping updated_at on a no-op rename', function () {
+        Carbon::setTestNow('2026-07-30 12:00:00');
         $user = UserModel::factory()->active()->create([
             'name' => 'Same Name',
             'email' => 'me.noop@example.com',
@@ -212,6 +213,8 @@ describe('PATCH /api/v1/me', function () {
         $updatedAtBefore = $before->updated_at->toIso8601String();
         $bearer = issueSessionBearerForMe($user);
         clearPrivateAuthWriteLimitForMe(UserId::fromString($user->id));
+
+        Carbon::setTestNow('2026-07-30 12:00:30');
 
         $this->patchJson('/api/v1/me', [
             'name' => 'Same Name',
@@ -222,6 +225,8 @@ describe('PATCH /api/v1/me', function () {
             ->assertJsonPath('data.name', 'Same Name');
 
         expect(UserModel::query()->find($user->id)?->updated_at?->toIso8601String())->toBe($updatedAtBefore);
+
+        Carbon::setTestNow();
     });
 
     it('returns 403 TOKEN_RESTRICTED for a verification bearer without changing name', function () {
@@ -282,5 +287,59 @@ describe('PATCH /api/v1/me', function () {
             ->assertJsonPath('code', 'VALIDATION_FAILED');
 
         expect(UserModel::query()->find($user->id)?->name)->toBe('Keep');
+    });
+
+    it('returns 422 when name is absent or exceeds 120 characters', function () {
+        $user = UserModel::factory()->active()->create([
+            'name' => 'Keep',
+            'email' => 'me.bounds@example.com',
+        ]);
+        $bearer = issueSessionBearerForMe($user);
+        clearPrivateAuthWriteLimitForMe(UserId::fromString($user->id));
+
+        $this->patchJson('/api/v1/me', [], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        $this->patchJson('/api/v1/me', [
+            'name' => str_repeat('n', 121),
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED');
+
+        expect(UserModel::query()->find($user->id)?->name)->toBe('Keep');
+    });
+
+    it('returns 429 RATE_LIMIT_EXCEEDED when private write throttle is exceeded on PATCH', function () {
+        $user = UserModel::factory()->active()->create([
+            'name' => 'Throttle Name',
+            'email' => 'me.write.throttle@example.com',
+        ]);
+        $bearer = issueSessionBearerForMe($user);
+        clearPrivateAuthWriteLimitForMe(UserId::fromString($user->id));
+        config(['auth.rate_limits.private_auth_write.max_attempts' => 1]);
+
+        $this->patchJson('/api/v1/me', [
+            'name' => 'First',
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])->assertOk();
+
+        $limited = $this->patchJson('/api/v1/me', [
+            'name' => 'Second',
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ]);
+
+        $limited->assertStatus(429)
+            ->assertJsonPath('code', 'RATE_LIMIT_EXCEEDED');
+        expect($limited->headers->get('Retry-After'))->not->toBeNull()
+            ->and($limited->headers->get('Cache-Control'))->toContain('private')
+            ->and($limited->headers->get('Cache-Control'))->toContain('no-store')
+            ->and(UserModel::query()->find($user->id)?->name)->toBe('First');
     });
 });
