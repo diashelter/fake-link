@@ -10,6 +10,7 @@ use Modules\Auth\Domain\Enums\UserStatus;
 use Modules\Auth\Domain\ValueObjects\AuthTokenId;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Input\IssueAuthTokenDto;
+use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
@@ -45,7 +46,7 @@ function clearPrivateAuthWriteLimitForMe(UserId $userId): void
 function clearPrivateAuthReadLimitForToken(string $plainTextToken): void
 {
     $hash = hash('sha256', $plainTextToken);
-    $row = \Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel::query()
+    $row = AuthTokenModel::query()
         ->where('token_hash', $hash)
         ->firstOrFail();
 

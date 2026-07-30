@@ -102,6 +102,7 @@ describe('LogoutAllSessions', function () {
 
         $after = UserModel::query()->find($fixture['user']->id);
 
+        // @phpstan-ignore staticMethod.dynamicCall
         expect(AuthTokenModel::query()->where('user_id', $fixture['user']->id)->count())->toBe(0)
             ->and($after?->status)->toBe($before?->status)
             ->and($after?->name)->toBe($before?->name)
@@ -122,6 +123,7 @@ describe('LogoutAllSessions', function () {
             expect(false)->toBeTrue('Expected InvalidCredentialsException');
         } catch (InvalidCredentialsException $exception) {
             expect($exception->getMessage())->not->toContain($sentinel)
+                // @phpstan-ignore staticMethod.dynamicCall
                 ->and(AuthTokenModel::query()->where('user_id', $fixture['user']->id)->count())->toBe(2);
         }
     });

@@ -19,16 +19,17 @@
 
 ## Handoff
 
-- **Feature**: `auth/password` — ✅ Complete (Verifier PASS)
-- **Phase / Task**: Execute + re-verify done
-- **Completed**: T1–T18; fix `3184620`; re-verify PASS (sensor 6/6 killed)
-- **In-progress**: none
-- **Next step**: none for this feature (ready for PR when requested)
+- **Feature**: `auth/session-and-profile` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ⏳
+- **Phase / Task**: T1–T14 complete; Verifier pending
+- **Completed**: T1–T14 implemented and committed; lint + 388 tests + Auth coverage 93.89%/86.44%
+- **In-progress**: Feature-level Verifier
+- **Next step**: Verifier writes `validation.md`; address gaps if any
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/password/{spec,context,design,tasks,validation}.md`
-- **Branch**: `feature/auth-password`
-- **Gate**: lint OK, 350 passed
-- **Commits**: T1 e6dccec … T18 8b86955; fix 3184620
-- **Validation**: `.specs/features/auth/password/validation.md` — PASS (re-verify 1)
+- **Artifacts**: `.specs/features/auth/session-and-profile/{spec,context,design,tasks}.md`
+- **Branch**: `feature/auth-session-profile`
+- **Commit range**: `8b9d0b0`…`4758238` (+ T14 gate commit)
+- **Gate**: `make lint` ✅ · `make test-backend` ✅ (388) · Auth coverage ✅
+- **Validation**: pending Verifier
+- **Batches**: inline Execute (user chose option 2)
 
 

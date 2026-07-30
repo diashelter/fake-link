@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Modules\Auth\Domain\Enums\TokenKind;
 use Modules\Auth\Domain\Enums\UserStatus;
 use Modules\Auth\Domain\ValueObjects\AuthTokenId;
@@ -35,7 +36,7 @@ function makeUpdateCurrentUserUseCase(): UpdateCurrentUser
 
 describe('UpdateCurrentUser', function () {
     it('persists a renamed name and advances updated_at', function () {
-        Illuminate\Support\Carbon::setTestNow('2026-07-30 12:00:00');
+        Carbon::setTestNow('2026-07-30 12:00:00');
 
         $user = UserModel::factory()->active()->create([
             'name' => 'Old Name',
@@ -43,7 +44,7 @@ describe('UpdateCurrentUser', function () {
         ]);
         $before = $user->fresh();
 
-        Illuminate\Support\Carbon::setTestNow('2026-07-30 12:00:05');
+        Carbon::setTestNow('2026-07-30 12:00:05');
 
         $principal = new AuthenticatedPrincipalRecord(
             userId: UserId::fromString($user->id),
@@ -68,7 +69,7 @@ describe('UpdateCurrentUser', function () {
                 DateTimeImmutable::createFromInterface($after->updated_at)->format('Y-m-d\TH:i:sP')
             );
 
-        Illuminate\Support\Carbon::setTestNow();
+        Carbon::setTestNow();
     });
 
     it('returns the same profile without writing when the name is unchanged', function () {

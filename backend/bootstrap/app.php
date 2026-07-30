@@ -13,8 +13,8 @@ use Modules\Auth\Infrastructure\Http\Middleware\ThrottleEmailVerificationVerify;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleLogin;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePasswordReset;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePasswordResetRequest;
-use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePrivateAuthWrite;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePrivateAuthRead;
+use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePrivateAuthWrite;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleRegistration;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
