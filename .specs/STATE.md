@@ -19,17 +19,17 @@
 
 ## Handoff
 
-- **Feature**: `auth/session-and-profile` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ⏳
-- **Phase / Task**: T1–T14 complete; Verifier pending
-- **Completed**: T1–T14 implemented and committed; lint + 388 tests + Auth coverage 93.89%/86.44%
-- **In-progress**: Feature-level Verifier
-- **Next step**: Verifier writes `validation.md`; address gaps if any
+- **Feature**: `auth/session-and-profile` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅
+- **Phase / Task**: Complete
+- **Completed**: T1–T14 + Verifier PASS (fix→re-verify iteration 1)
+- **In-progress**: none
+- **Next step**: User review / PR; commit remaining docs (`context.md`, `design.md`, `validation.md`, README/spec status) if desired
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/session-and-profile/{spec,context,design,tasks}.md`
+- **Artifacts**: `.specs/features/auth/session-and-profile/{spec,context,design,tasks,validation}.md`
 - **Branch**: `feature/auth-session-profile`
-- **Commit range**: `8b9d0b0`…`4758238` (+ T14 gate commit)
-- **Gate**: `make lint` ✅ · `make test-backend` ✅ (388) · Auth coverage ✅
-- **Validation**: pending Verifier
+- **Commit range**: `8b9d0b0`…`29046cd`
+- **Gate**: `make lint` ✅ · Pest **392 passed** · Auth coverage ≥80% ✅
+- **Validation**: PASS — report in `validation.md`
 - **Batches**: inline Execute (user chose option 2)
 
 

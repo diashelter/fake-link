@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 31,
+  "next_id": 36,
   "lessons": [
     {
       "id": "L-001",
@@ -545,6 +545,96 @@
       ],
       "created": "2026-07-28T21:19:03Z",
       "last_seen": "2026-07-28T21:19:03Z"
+    },
+    {
+      "id": "L-031",
+      "key": "surviving_mutant::when asserting no op updates do not bump updated at freeze and advance time around the call so same second writes cannot mask a skipped no op guard",
+      "text": "When asserting no-op updates do not bump updated_at, freeze and advance time around the call so same-second writes cannot mask a skipped no-op guard",
+      "signal": "surviving_mutant",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "auth/session-and-profile"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md Mutation 2 / UpdateCurrentUser.php:29 no-op === flip (auth)"
+      ],
+      "created": "2026-07-30T13:04:31Z",
+      "last_seen": "2026-07-30T13:04:31Z"
+    },
+    {
+      "id": "L-032",
+      "key": "ac_gap::when the same rate limit middleware is shared across routes assert 429 on each route named by the acceptance criteria not only on one sibling endpoint",
+      "text": "When the same rate-limit middleware is shared across routes, assert 429 on each route named by the acceptance criteria, not only on one sibling endpoint",
+      "signal": "ac_gap",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "auth/session-and-profile"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec logout-all AC7 / PATCH AC7 write throttle 429 (auth)"
+      ],
+      "created": "2026-07-30T13:04:31Z",
+      "last_seen": "2026-07-30T13:04:31Z"
+    },
+    {
+      "id": "L-033",
+      "key": "ac_gap::for compound validation acs joined by or cover every branch missing empty after normalize maxlength extras with its own assertion",
+      "text": "For compound validation ACs joined by OR, cover every branch (missing, empty-after-normalize, maxLength, extras) with its own assertion",
+      "signal": "ac_gap",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "auth/session-and-profile"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec PATCH AC5 absent/>120; logout-all AC6 maxLength (auth)"
+      ],
+      "created": "2026-07-30T13:04:31Z",
+      "last_seen": "2026-07-30T13:04:31Z"
+    },
+    {
+      "id": "L-034",
+      "key": "ac_gap::when headers are required on success and error responses assert cache control and request id on at least one representative error path",
+      "text": "When headers are required on success and error responses, assert Cache-Control and request id on at least one representative error path",
+      "signal": "ac_gap",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "auth/session-and-profile"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec SP-13 error-path headers (auth)"
+      ],
+      "created": "2026-07-30T13:04:31Z",
+      "last_seen": "2026-07-30T13:04:31Z"
+    },
+    {
+      "id": "L-035",
+      "key": "spec_precision_gap::when openapi alignment is an ac define an automated check or explicit smoke checklist otherwise mark it as a process gate not a testable outcome",
+      "text": "When OpenAPI alignment is an AC, define an automated check or explicit smoke checklist; otherwise mark it as a process gate not a testable outcome",
+      "signal": "spec_precision_gap",
+      "scope": "auth",
+      "status": "candidate",
+      "features": [
+        "auth/session-and-profile"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec SP-13 OpenAPI alignment AC (auth)"
+      ],
+      "created": "2026-07-30T13:04:31Z",
+      "last_seen": "2026-07-30T13:04:31Z"
     }
   ]
 }

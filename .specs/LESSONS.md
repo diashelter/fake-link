@@ -194,6 +194,36 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: Reset-request AC8 / PW-01 PW-04 any-status rate limit (auth/rate-limit)
 - last seen: 2026-07-28T21:19:03Z
 
+### L-031 — When asserting no-op updates do not bump updated_at, freeze and advance time around the call so same-second writes cannot mask a skipped no-op guard
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `auth` · harmful: 0
+- features: auth/session-and-profile
+- evidence: validation.md Mutation 2 / UpdateCurrentUser.php:29 no-op === flip (auth)
+- last seen: 2026-07-30T13:04:31Z
+
+### L-032 — When the same rate-limit middleware is shared across routes, assert 429 on each route named by the acceptance criteria, not only on one sibling endpoint
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth` · harmful: 0
+- features: auth/session-and-profile
+- evidence: spec logout-all AC7 / PATCH AC7 write throttle 429 (auth)
+- last seen: 2026-07-30T13:04:31Z
+
+### L-033 — For compound validation ACs joined by OR, cover every branch (missing, empty-after-normalize, maxLength, extras) with its own assertion
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth` · harmful: 0
+- features: auth/session-and-profile
+- evidence: spec PATCH AC5 absent/>120; logout-all AC6 maxLength (auth)
+- last seen: 2026-07-30T13:04:31Z
+
+### L-034 — When headers are required on success and error responses, assert Cache-Control and request id on at least one representative error path
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth` · harmful: 0
+- features: auth/session-and-profile
+- evidence: spec SP-13 error-path headers (auth)
+- last seen: 2026-07-30T13:04:31Z
+
+### L-035 — When OpenAPI alignment is an AC, define an automated check or explicit smoke checklist; otherwise mark it as a process gate not a testable outcome
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth` · harmful: 0
+- features: auth/session-and-profile
+- evidence: spec SP-13 OpenAPI alignment AC (auth)
+- last seen: 2026-07-30T13:04:31Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

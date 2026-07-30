@@ -27,7 +27,7 @@
 | 4 | Login | [login](./login/spec.md) | Approved | bearer-tokens | `POST /api/v1/auth/login` |
 | 5 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Approved (Design + Tasks) | registration, login | `POST …/email/verify`, `POST …/email/verification-notification` |
 | 6 | Senha (alterar e recuperar) | [password](./password/spec.md) | Approved (Design+Tasks draft) | bearer-tokens, login, email-verification | `POST …/password/change`, `…/reset-request`, `…/reset` |
-| 7 | Sessão e perfil | [session-and-profile](./session-and-profile/spec.md) | Pendente | bearer-tokens, login | `POST …/logout`, `…/logout-all`, `GET/PATCH /api/v1/me` |
+| 7 | Sessão e perfil | [session-and-profile](./session-and-profile/spec.md) | Tasks draft | bearer-tokens, login | `POST …/logout`, `…/logout-all`, `GET/PATCH /api/v1/me` |
 
 ```mermaid
 flowchart LR
