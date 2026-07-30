@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\RateLimit;
 
+use Modules\Auth\Domain\ValueObjects\AuthTokenId;
 use Modules\Auth\Domain\ValueObjects\UserId;
 
 final class HmacRateLimitKeyFactory
@@ -76,6 +77,15 @@ final class HmacRateLimitKeyFactory
         return hash_hmac(
             'sha256',
             'private-auth:write:'.$userId->value(),
+            (string) config('auth.rate_limit_hmac_key'),
+        );
+    }
+
+    public function forPrivateAuthRead(AuthTokenId $tokenId): string
+    {
+        return hash_hmac(
+            'sha256',
+            'private-auth:read:'.$tokenId->value(),
             (string) config('auth.rate_limit_hmac_key'),
         );
     }
