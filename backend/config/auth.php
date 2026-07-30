@@ -175,6 +175,10 @@ return [
             'max_attempts' => 120,
             'decay_seconds' => 60,
         ],
+        'private_auth_read' => [
+            'max_attempts' => 300,
+            'decay_seconds' => 60,
+        ],
     ],
 
     'rate_limit_hmac_key' => env('AUTH_RATE_LIMIT_HMAC_KEY'),

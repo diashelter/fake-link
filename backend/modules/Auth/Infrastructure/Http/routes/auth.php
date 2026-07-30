@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Modules\Auth\Infrastructure\Http\Controllers\ChangePasswordController;
 use Modules\Auth\Infrastructure\Http\Controllers\LoginUserController;
+use Modules\Auth\Infrastructure\Http\Controllers\LogoutAllController;
+use Modules\Auth\Infrastructure\Http\Controllers\LogoutController;
 use Modules\Auth\Infrastructure\Http\Controllers\RegisterUserController;
 use Modules\Auth\Infrastructure\Http\Controllers\RequestPasswordResetController;
 use Modules\Auth\Infrastructure\Http\Controllers\ResendEmailVerificationController;
@@ -38,6 +40,19 @@ Route::post('/password/reset', ResetPasswordController::class)
     ->middleware('throttle.password_reset.complete');
 
 Route::post('/password/change', ChangePasswordController::class)
+    ->middleware([
+        'auth.bearer',
+        'token.kind:session',
+        'throttle.private_auth.write',
+    ]);
+
+Route::post('/logout', LogoutController::class)
+    ->middleware([
+        'auth.bearer',
+        'throttle.private_auth.write',
+    ]);
+
+Route::post('/logout-all', LogoutAllController::class)
     ->middleware([
         'auth.bearer',
         'token.kind:session',

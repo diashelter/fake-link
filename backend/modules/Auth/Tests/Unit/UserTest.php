@@ -102,4 +102,32 @@ describe('User entity', function () {
             ->and($updated->termsAcceptedAt())->toEqual($acceptedAt)
             ->and($original->passwordHash())->toBe('$argon2id$v=19$m=65536,t=4,p=1$old-hash');
     });
+
+    it('withName returns a new instance with updated name leaving email status hash and terms unchanged', function () {
+        $acceptedAt = new DateTimeImmutable('2026-01-01T00:00:00+00:00');
+        $verifiedAt = new DateTimeImmutable('2026-01-02T12:00:00+00:00');
+        $original = User::create(
+            id: UserId::fromString('018e8b8a-7b6a-7000-8000-123456789abc'),
+            name: 'Jane Doe',
+            email: EmailAddress::fromString('jane@example.com'),
+            passwordHash: '$argon2id$v=19$m=65536,t=4,p=1$hash',
+            status: UserStatus::Active,
+            emailVerifiedAt: $verifiedAt,
+            termsVersion: '2026-01',
+            termsAcceptedAt: $acceptedAt,
+        );
+
+        $updated = $original->withName('Ana Silva');
+
+        expect($updated)->not->toBe($original)
+            ->and($updated->name())->toBe('Ana Silva')
+            ->and($updated->id()->value())->toBe($original->id()->value())
+            ->and($updated->email()->value())->toBe('jane@example.com')
+            ->and($updated->passwordHash())->toBe('$argon2id$v=19$m=65536,t=4,p=1$hash')
+            ->and($updated->status())->toBe(UserStatus::Active)
+            ->and($updated->emailVerifiedAt())->toEqual($verifiedAt)
+            ->and($updated->termsVersion())->toBe('2026-01')
+            ->and($updated->termsAcceptedAt())->toEqual($acceptedAt)
+            ->and($original->name())->toBe('Jane Doe');
+    });
 });

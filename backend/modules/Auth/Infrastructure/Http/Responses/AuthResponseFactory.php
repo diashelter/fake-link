@@ -7,6 +7,7 @@ namespace Modules\Auth\Infrastructure\Http\Responses;
 use Illuminate\Http\JsonResponse;
 use Modules\Auth\DTOs\Output\LoggedInUserDto;
 use Modules\Auth\DTOs\Output\RegisteredUserDto;
+use Modules\Auth\DTOs\Output\UserProfileDto;
 use Modules\Auth\Infrastructure\Http\Resources\AuthUserResource;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -67,6 +68,22 @@ final class AuthResponseFactory
         $resolvedRequestId = $requestId ?? 'stub-request-id';
 
         return response('', Response::HTTP_NO_CONTENT)->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'X-Request-ID' => $resolvedRequestId,
+        ]);
+    }
+
+    public function user(UserProfileDto $profile, ?string $requestId = null): JsonResponse
+    {
+        $resolvedRequestId = $requestId ?? 'stub-request-id';
+
+        return response()->json([
+            'data' => AuthUserResource::toArray(
+                $profile->user,
+                $profile->createdAt,
+                $profile->updatedAt,
+            ),
+        ], Response::HTTP_OK)->withHeaders([
             'Cache-Control' => 'private, no-store',
             'X-Request-ID' => $resolvedRequestId,
         ]);

@@ -52,14 +52,21 @@ final class UserMapper
     /**
      * @return array<string, mixed>
      */
-    public function toPersistenceUpdate(User $user): array
+    public function toPersistenceUpdate(User $user, ?DateTimeImmutable $updatedAt = null): array
     {
-        return [
+        $payload = [
+            'name' => $user->name(),
             'password' => $user->passwordHash(),
             'status' => $user->status()->value,
             'email_verified_at' => $user->emailVerifiedAt() !== null
                 ? Carbon::instance($user->emailVerifiedAt())
                 : null,
         ];
+
+        if ($updatedAt !== null) {
+            $payload['updated_at'] = Carbon::instance($updatedAt);
+        }
+
+        return $payload;
     }
 }

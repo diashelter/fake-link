@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Modules\Auth\Domain\ValueObjects\AuthTokenId;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Tests\TestCase;
@@ -158,5 +159,21 @@ describe('HmacRateLimitKeyFactory', function () {
         expect($first)->toBe($expected)
             ->and($first)->toMatch('/^[a-f0-9]{64}$/')
             ->and($first)->not->toContain($userId->value());
+    });
+
+    it('returns a stable private auth read digest without raw token id', function () {
+        $factory = new HmacRateLimitKeyFactory;
+        $tokenId = AuthTokenId::fromString('01901234-5678-7abc-89ab-cdef0123456a');
+        $hmacKey = (string) config('auth.rate_limit_hmac_key');
+
+        $first = $factory->forPrivateAuthRead($tokenId);
+        $expected = hash_hmac('sha256', 'private-auth:read:'.$tokenId->value(), $hmacKey);
+
+        expect($first)->toBe($expected)
+            ->and($first)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($first)->not->toContain($tokenId->value())
+            ->and($first)->not->toBe(
+                $factory->forPrivateAuthWrite(UserId::fromString('01901234-5678-7abc-89ab-cdef01234569'))
+            );
     });
 });

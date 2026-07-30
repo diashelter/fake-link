@@ -111,4 +111,18 @@ final class User
             termsAcceptedAt: $this->termsAcceptedAt,
         );
     }
+
+    public function withName(string $name): self
+    {
+        return new self(
+            id: $this->id,
+            name: $name,
+            email: $this->email,
+            passwordHash: $this->passwordHash,
+            status: $this->status,
+            emailVerifiedAt: $this->emailVerifiedAt,
+            termsVersion: $this->termsVersion,
+            termsAcceptedAt: $this->termsAcceptedAt,
+        );
+    }
 }

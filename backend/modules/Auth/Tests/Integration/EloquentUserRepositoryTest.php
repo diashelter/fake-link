@@ -173,4 +173,60 @@ describe('EloquentUserRepository', function () {
             ->and($reloaded->status())->toBe(UserStatus::Active)
             ->and($reloaded->emailVerifiedAt()?->format('Y-m-d\TH:i:sP'))->toBe('2026-03-01T15:30:00+00:00');
     });
+
+    it('loads a profile with real created_at and updated_at timestamps', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'profile@example.com');
+        $repository->save($user);
+
+        $model = UserModel::query()->find($user->id()->value());
+        $profile = $repository->findProfileById($user->id());
+
+        expect($profile)->not->toBeNull()
+            ->and($profile->user->id()->value())->toBe($user->id()->value())
+            ->and($profile->user->name())->toBe('Jane Doe')
+            ->and($profile->createdAt->format('Y-m-d\TH:i:sP'))->toBe(
+                DateTimeImmutable::createFromInterface($model->created_at)->format('Y-m-d\TH:i:sP')
+            )
+            ->and($profile->updatedAt->format('Y-m-d\TH:i:sP'))->toBe(
+                DateTimeImmutable::createFromInterface($model->updated_at)->format('Y-m-d\TH:i:sP')
+            )
+            ->and($repository->findProfileById(
+                UserId::fromString('018e8b8a-7b6a-7000-8000-999999999999')
+            ))->toBeNull();
+    });
+
+    it('persists renamed name and bumps updated_at when timestamp is provided', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'rename@example.com');
+        $repository->save($user);
+
+        $renamedAt = new DateTimeImmutable('2030-04-01T12:00:00+00:00');
+        $repository->update($user->withName('Ana Silva'), $renamedAt);
+
+        $after = UserModel::query()->find($user->id()->value());
+        $profile = $repository->findProfileById($user->id());
+
+        expect($after?->name)->toBe('Ana Silva')
+            ->and($after?->updated_at?->toIso8601String())->toBe('2030-04-01T12:00:00+00:00')
+            ->and($profile?->user->name())->toBe('Ana Silva')
+            ->and($profile?->updatedAt->format('Y-m-d\TH:i:sP'))->toBe('2030-04-01T12:00:00+00:00');
+    });
+
+    it('update without updatedAt still persists domain fields without requiring an explicit timestamp', function () {
+        $repository = makeAuthUserRepository();
+        $user = makePersistableUser($repository, 'no-bump@example.com');
+        $repository->save($user);
+
+        $repository->update($user->markEmailVerified(new DateTimeImmutable('2026-03-15T10:00:00+00:00')));
+
+        $after = UserModel::query()->find($user->id()->value());
+        $reloaded = $repository->findById($user->id());
+
+        expect($after?->status)->toBe('active')
+            ->and($after?->name)->toBe('Jane Doe')
+            ->and($after?->email_verified_at?->toIso8601String())->toBe('2026-03-15T10:00:00+00:00')
+            ->and($reloaded?->status())->toBe(UserStatus::Active)
+            ->and($reloaded?->name())->toBe('Jane Doe');
+    });
 });

@@ -19,16 +19,17 @@
 
 ## Handoff
 
-- **Feature**: `auth/password` — ✅ Complete (Verifier PASS)
-- **Phase / Task**: Execute + re-verify done
-- **Completed**: T1–T18; fix `3184620`; re-verify PASS (sensor 6/6 killed)
+- **Feature**: `auth/session-and-profile` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅
+- **Phase / Task**: Complete
+- **Completed**: T1–T14 + Verifier PASS (fix→re-verify iteration 1)
 - **In-progress**: none
-- **Next step**: none for this feature (ready for PR when requested)
+- **Next step**: User review / PR; commit remaining docs (`context.md`, `design.md`, `validation.md`, README/spec status) if desired
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/password/{spec,context,design,tasks,validation}.md`
-- **Branch**: `feature/auth-password`
-- **Gate**: lint OK, 350 passed
-- **Commits**: T1 e6dccec … T18 8b86955; fix 3184620
-- **Validation**: `.specs/features/auth/password/validation.md` — PASS (re-verify 1)
+- **Artifacts**: `.specs/features/auth/session-and-profile/{spec,context,design,tasks,validation}.md`
+- **Branch**: `feature/auth-session-profile`
+- **Commit range**: `8b9d0b0`…`29046cd`
+- **Gate**: `make lint` ✅ · Pest **392 passed** · Auth coverage ≥80% ✅
+- **Validation**: PASS — report in `validation.md`
+- **Batches**: inline Execute (user chose option 2)
 
 

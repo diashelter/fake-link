@@ -39,16 +39,20 @@ use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentAuthTo
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentEmailActionTokenRepository;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories\EloquentUserRepository;
 use Modules\Auth\UseCases\ChangePassword;
+use Modules\Auth\UseCases\GetCurrentUser;
 use Modules\Auth\UseCases\IssueAuthToken;
 use Modules\Auth\UseCases\IssueEmailVerificationToken;
 use Modules\Auth\UseCases\IssuePasswordResetToken;
 use Modules\Auth\UseCases\LoginUser;
+use Modules\Auth\UseCases\LogoutAllSessions;
+use Modules\Auth\UseCases\LogoutCurrentToken;
 use Modules\Auth\UseCases\RegisterUser;
 use Modules\Auth\UseCases\RequestPasswordReset;
 use Modules\Auth\UseCases\ResendEmailVerification;
 use Modules\Auth\UseCases\ResetPassword;
 use Modules\Auth\UseCases\RevokeAllUserTokens;
 use Modules\Auth\UseCases\RevokeAuthToken;
+use Modules\Auth\UseCases\UpdateCurrentUser;
 use Modules\Auth\UseCases\ValidateAuthToken;
 use Modules\Auth\UseCases\VerifyUserEmail;
 
@@ -89,6 +93,10 @@ final class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(RequestPasswordReset::class);
         $this->app->singleton(ResetPassword::class);
         $this->app->singleton(ChangePassword::class);
+        $this->app->singleton(LogoutCurrentToken::class);
+        $this->app->singleton(LogoutAllSessions::class);
+        $this->app->singleton(GetCurrentUser::class);
+        $this->app->singleton(UpdateCurrentUser::class);
         $this->app->singleton(ValidateAuthToken::class);
         $this->app->singleton(RevokeAuthToken::class);
         $this->app->singleton(RevokeAllUserTokens::class);
@@ -107,6 +115,12 @@ final class AuthServiceProvider extends ServiceProvider
             ->middleware('api')
             ->group(function (): void {
                 $this->loadRoutesFrom(__DIR__.'/../Infrastructure/Http/routes/auth.php');
+            });
+
+        Route::prefix('api/v1')
+            ->middleware('api')
+            ->group(function (): void {
+                $this->loadRoutesFrom(__DIR__.'/../Infrastructure/Http/routes/me.php');
             });
     }
 }

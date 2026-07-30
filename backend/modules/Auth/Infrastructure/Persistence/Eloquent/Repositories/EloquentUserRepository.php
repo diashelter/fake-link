@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Auth\Infrastructure\Persistence\Eloquent\Repositories;
 
+use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Modules\Auth\Contracts\Repositories\UserRepository;
@@ -11,6 +12,7 @@ use Modules\Auth\Contracts\Services\UserIdGenerator;
 use Modules\Auth\Domain\Entities\User;
 use Modules\Auth\Domain\ValueObjects\EmailAddress;
 use Modules\Auth\Domain\ValueObjects\UserId;
+use Modules\Auth\DTOs\Output\UserProfileDto;
 use Modules\Auth\Exceptions\AuthDomainException;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Mappers\UserMapper;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
@@ -60,6 +62,22 @@ final class EloquentUserRepository implements UserRepository
         return $this->userMapper->toDomain($model);
     }
 
+    public function findProfileById(UserId $id): ?UserProfileDto
+    {
+        /** @var UserModel|null $model */
+        $model = UserModel::query()->find($id->value());
+
+        if ($model === null) {
+            return null;
+        }
+
+        return new UserProfileDto(
+            user: $this->userMapper->toDomain($model),
+            createdAt: DateTimeImmutable::createFromInterface($model->created_at),
+            updatedAt: DateTimeImmutable::createFromInterface($model->updated_at),
+        );
+    }
+
     public function save(User $user): void
     {
         try {
@@ -69,10 +87,10 @@ final class EloquentUserRepository implements UserRepository
         }
     }
 
-    public function update(User $user): void
+    public function update(User $user, ?DateTimeImmutable $updatedAt = null): void
     {
         UserModel::query()
             ->where('id', $user->id()->value())
-            ->update($this->userMapper->toPersistenceUpdate($user));
+            ->update($this->userMapper->toPersistenceUpdate($user, $updatedAt));
     }
 }
