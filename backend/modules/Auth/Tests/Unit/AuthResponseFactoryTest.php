@@ -11,6 +11,7 @@ use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\DTOs\Output\IssuedAuthTokenDto;
 use Modules\Auth\DTOs\Output\LoggedInUserDto;
 use Modules\Auth\DTOs\Output\RegisteredUserDto;
+use Modules\Auth\DTOs\Output\UserProfileDto;
 use Modules\Auth\Infrastructure\Http\Responses\AuthResponseFactory;
 use Tests\TestCase;
 
@@ -137,5 +138,35 @@ describe('AuthResponseFactory', function () {
             ->and($response->headers->get('Cache-Control'))->toContain('no-store')
             ->and($response->headers->get('X-Request-ID'))->toBe('req-204')
             ->and($response->getContent())->toBe('');
+    });
+
+    it('builds 200 UserResponse with explicit timestamps and private no-store headers', function () {
+        $createdAt = new DateTimeImmutable('2026-01-10T08:00:00+00:00');
+        $updatedAt = new DateTimeImmutable('2026-02-15T09:30:00+00:00');
+        $profile = new UserProfileDto(makeAuthResponseUser(), $createdAt, $updatedAt);
+
+        $response = (new AuthResponseFactory)->user($profile, 'req-me');
+
+        expect($response->getStatusCode())->toBe(200)
+            ->and($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($response->headers->get('X-Request-ID'))->toBe('req-me');
+
+        $payload = $response->getData(true);
+
+        expect($payload)->toHaveKey('data')
+            ->and($payload)->not->toHaveKey('success')
+            ->and($payload)->not->toHaveKey('message')
+            ->and($payload['data'])->toBe([
+                'id' => '01901234-5678-7abc-89ab-cdef01234567',
+                'name' => 'Invited User',
+                'email' => 'invited@example.com',
+                'status' => 'pending_verification',
+                'email_verified_at' => null,
+                'terms_version' => '2026-01',
+                'terms_accepted_at' => '2026-07-26T12:00:00Z',
+                'created_at' => '2026-01-10T08:00:00Z',
+                'updated_at' => '2026-02-15T09:30:00Z',
+            ]);
     });
 });
