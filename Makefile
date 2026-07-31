@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend lint lint-backend analyse-backend md-backend format-backend
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-backend lint-frontend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -97,6 +97,9 @@ test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend conta
 test-frontend: ## Run Vitest tests in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend pnpm test
 
+test-frontend-coverage: ## Run Vitest with coverage thresholds (≥75% on modules/**)
+	$(COMPOSE) run --rm --no-deps frontend pnpm test:coverage
+
 test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-backend
 	$(MAKE) test-frontend
@@ -133,7 +136,12 @@ md-backend: ## Run PHPMD in the backend container
 format-backend: ## Run Pint style check in the backend container
 	$(COMPOSE) run --rm --no-deps backend composer run lint
 
-lint: ## Run backend static analysis, Architecture suite, then Pest tests (fail-fast)
+lint-frontend: ## Run TypeScript, ESLint, and Prettier checks in the frontend container
+	$(COMPOSE) run --rm --no-deps frontend sh -c 'pnpm typecheck && pnpm lint && pnpm format:check'
+	node scripts/assert-lint-staged.mjs
+
+lint: ## Run backend quality, frontend lint, Architecture suite, then Pest tests (fail-fast)
 	$(MAKE) lint-backend
+	$(MAKE) lint-frontend
 	$(MAKE) test-architecture
 	$(MAKE) test-backend

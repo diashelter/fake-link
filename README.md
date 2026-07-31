@@ -87,13 +87,32 @@ O script gera os certificados em `docker/nginx/certs/` e imprime o comando de im
 | `make up` / `make down` | Sobe / derruba a stack |
 | `make up-docs` | Stack + Swagger UI |
 | `make smoke` | Health + rotas Nginx |
-| `make lint` | Gates de qualidade backend (Pint, Larastan, PHPMD, Pest Arch, Pest) via Docker |
+| `make lint` | Gates de qualidade backend + `lint-frontend` (fail-fast) via Docker |
+| `make lint-frontend` | Typecheck + ESLint + Prettier no container frontend |
+| `make test-frontend-coverage` | Vitest com cobertura ≥75% em `modules/**` |
 | `make test-backend-coverage` | Pest com cobertura PCOV no container backend |
 | `make test` | Pest, Vitest, compose gates e smoke |
 | `make test-backend` / `make test-frontend` | Suites isoladas |
 | `make logs` / `make ps` | Observabilidade operacional |
 
 CI backend: workflow [`.github/workflows/backend-quality.yml`](.github/workflows/backend-quality.yml) (PR e push em `main`) executa os mesmos targets via Docker Compose — sem PHP/Composer no host do runner.
+
+### Git hooks (host)
+
+Para ativar Husky + lint-staged (pre-commit só em arquivos staged sob `frontend/`):
+
+```bash
+pnpm install
+CI=true pnpm --dir frontend install
+```
+
+Rode o primeiro comando na **raiz do monorepo**. O segundo instala as ferramentas de lint/format usadas pelo hook no host. Os gates Docker (`make lint`, `make lint-frontend`, `make test-frontend`, `make test-frontend-coverage`) continuam obrigatórios independentemente dos hooks.
+
+Checklist da fundação BFF Auth (Out of Scope desta fatia):
+
+- Sem Route Handlers Auth de produto (`login`/`register`/etc.)
+- Sem Radix UI
+- Sem Bearer token no browser
 
 Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
 

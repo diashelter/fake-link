@@ -11,16 +11,12 @@ export const sessionCookieDefaults: Pick<
   path: '/',
 };
 
-type SessionCookieOverrides = Omit<
-  Partial<ResponseCookie>,
-  'httpOnly' | 'secure' | 'sameSite'
->;
+type SessionCookieOverrides = Omit<Partial<ResponseCookie>, 'httpOnly' | 'secure' | 'sameSite'>;
 
 /** Merge options while forcing Secure / HttpOnly / SameSite=Lax (DOCKER-06). */
 export function buildSessionCookieOptions(
   overrides: SessionCookieOverrides = {},
-): Pick<ResponseCookie, 'httpOnly' | 'secure' | 'sameSite' | 'path'> &
-  SessionCookieOverrides {
+): Pick<ResponseCookie, 'httpOnly' | 'secure' | 'sameSite' | 'path'> & SessionCookieOverrides {
   return {
     ...overrides,
     ...sessionCookieDefaults,

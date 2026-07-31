@@ -14,9 +14,12 @@ docker/nginx/certs/go.localhost.*
 
 # Dependencies (scaffolded later)
 backend/vendor/
+node_modules/
 frontend/node_modules/
 frontend/.pnpm-store/
 frontend/.next/
+frontend/coverage/
+frontend/tsconfig.tsbuildinfo
 
 # OS / editor
 .DS_Store

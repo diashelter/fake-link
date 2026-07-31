@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 36,
+  "next_id": 42,
   "lessons": [
     {
       "id": "L-001",
@@ -635,6 +635,114 @@
       ],
       "created": "2026-07-30T13:04:31Z",
       "last_seen": "2026-07-30T13:04:31Z"
+    },
+    {
+      "id": "L-036",
+      "key": "ac_gap::assert viewport reflow outcomes e g no horizontal overflow at the documented min width instead of assuming tailwind responsive classes are enough",
+      "text": "Assert viewport reflow outcomes (e.g. no horizontal overflow at the documented min width) instead of assuming Tailwind responsive classes are enough",
+      "signal": "ac_gap",
+      "scope": "frontend",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-07 / validation.md Fix 1 (frontend)"
+      ],
+      "created": "2026-07-31T01:23:32Z",
+      "last_seen": "2026-07-31T01:23:32Z"
+    },
+    {
+      "id": "L-037",
+      "key": "ac_gap::when independent test requires staged file hook simulation ship a behavioral script that proves auto fix and non zero exit config presence alone is not evidence",
+      "text": "When Independent Test requires staged-file hook simulation, ship a behavioral script that proves auto-fix and non-zero exit — config presence alone is not evidence",
+      "signal": "ac_gap",
+      "scope": "frontend/hooks",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-13,FND-14 / validation.md Fix 2 (frontend/hooks)"
+      ],
+      "created": "2026-07-31T01:23:32Z",
+      "last_seen": "2026-07-31T01:23:32Z"
+    },
+    {
+      "id": "L-038",
+      "key": "ac_gap::absence requirements forbidden routes or packages need automated allowlist denylist assertions not checklist only verification",
+      "text": "Absence requirements (forbidden routes or packages) need automated allowlist/denylist assertions, not checklist-only verification",
+      "signal": "ac_gap",
+      "scope": "frontend",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-02,FND-08 / validation.md Fix 3 (frontend)"
+      ],
+      "created": "2026-07-31T01:23:32Z",
+      "last_seen": "2026-07-31T01:23:32Z"
+    },
+    {
+      "id": "L-039",
+      "key": "spec_precision_gap::when the spec requires utilities to apply assert concrete class tokens or rendered style outcomes rather than only theme css markers",
+      "text": "When the spec requires utilities to apply, assert concrete class tokens or rendered style outcomes rather than only theme CSS markers",
+      "signal": "spec_precision_gap",
+      "scope": "frontend",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "BFFUI-05/FND-07 Tailwind apply / validation.md (frontend)"
+      ],
+      "created": "2026-07-31T01:23:32Z",
+      "last_seen": "2026-07-31T01:23:32Z"
+    },
+    {
+      "id": "L-040",
+      "key": "spec_precision_gap::lint staged path skip behavior needs a staged non matching file proof not only glob configuration review",
+      "text": "Lint-staged path-skip behavior needs a staged non-matching-file proof, not only glob configuration review",
+      "signal": "spec_precision_gap",
+      "scope": "frontend/hooks",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-14 non-frontend skip / validation.md (frontend/hooks)"
+      ],
+      "created": "2026-07-31T01:23:32Z",
+      "last_seen": "2026-07-31T01:23:32Z"
+    },
+    {
+      "id": "L-041",
+      "key": "spec_precision_gap::when a hook ac requires exit non zero on unfixable lint errors assert that exit code with a staged bad file requiring eslint fix in config alone is incomplete",
+      "text": "When a hook AC requires exit non-zero on unfixable lint errors, assert that exit code with a staged bad file — requiring eslint --fix in config alone is incomplete",
+      "signal": "spec_precision_gap",
+      "scope": "frontend/hooks",
+      "status": "candidate",
+      "features": [
+        "bff-auth/foundation"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "FND-14 hard-fail / validation.md re-verify iter 1 (frontend/hooks)"
+      ],
+      "created": "2026-07-31T01:30:26Z",
+      "last_seen": "2026-07-31T01:30:26Z"
     }
   ]
 }
