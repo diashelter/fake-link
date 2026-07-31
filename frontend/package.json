@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
     "test": "vitest run",
-    "lint": "echo 'lint placeholder'"
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
