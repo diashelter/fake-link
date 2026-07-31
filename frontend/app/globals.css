@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-background: #f7f5f1;
+  --color-foreground: #1a1a1a;
+  --color-muted: #5c5c5c;
+  --color-accent: #0f6b4c;
+  --color-accent-foreground: #ffffff;
+  --font-sans: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-display: 'Georgia', 'Times New Roman', serif;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-h-dvh bg-background font-sans text-foreground antialiased;
+  }
+}
