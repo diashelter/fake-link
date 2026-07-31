@@ -25,6 +25,7 @@ minimumReleaseAgeExclude:
   - '@next/swc-win32-arm64-msvc@16.2.11'
   - '@next/swc-win32-x64-msvc@16.2.11'
   - brace-expansion@1.1.18
+  - brace-expansion@2.1.4
   - brace-expansion@5.0.9
   - enhanced-resolve@5.24.5
   - flatted@3.4.4
