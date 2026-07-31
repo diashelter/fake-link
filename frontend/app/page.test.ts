@@ -11,7 +11,11 @@ describe('HomePage landing shell', () => {
     expect(layoutSource).toContain('lang="pt-BR"');
     expect(pageSource).toContain('Fake Link');
     expect(pageSource).toContain('Plataforma de encurtamento de URLs.');
+    expect(pageSource).toContain('w-full');
+    expect(pageSource).toContain('px-6');
     expect(cssSource).toContain('color-scheme: light');
+    expect(cssSource).toContain('@import \'tailwindcss\'');
     expect(cssSource).not.toContain('.dark');
+    expect(pageSource).toMatch(/className=.*bg-accent|text-muted|font-display/);
   });
 });
