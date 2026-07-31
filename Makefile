@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend lint lint-backend lint-frontend analyse-backend md-backend format-backend
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-backend lint-frontend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -96,6 +96,9 @@ test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend conta
 
 test-frontend: ## Run Vitest tests in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend pnpm test
+
+test-frontend-coverage: ## Run Vitest with coverage thresholds (≥75% on modules/**)
+	$(COMPOSE) run --rm --no-deps frontend pnpm test:coverage
 
 test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) test-backend
