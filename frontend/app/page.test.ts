@@ -14,7 +14,7 @@ describe('HomePage landing shell', () => {
     expect(pageSource).toContain('w-full');
     expect(pageSource).toContain('px-6');
     expect(cssSource).toContain('color-scheme: light');
-    expect(cssSource).toContain('@import \'tailwindcss\'');
+    expect(cssSource).toContain("@import 'tailwindcss'");
     expect(cssSource).not.toContain('.dark');
     expect(pageSource).toMatch(/className=.*bg-accent|text-muted|font-display/);
   });
