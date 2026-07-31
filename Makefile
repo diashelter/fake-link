@@ -138,6 +138,7 @@ format-backend: ## Run Pint style check in the backend container
 
 lint-frontend: ## Run TypeScript, ESLint, and Prettier checks in the frontend container
 	$(COMPOSE) run --rm --no-deps frontend sh -c 'pnpm typecheck && pnpm lint && pnpm format:check'
+	node scripts/assert-lint-staged.mjs
 
 lint: ## Run backend quality, frontend lint, Architecture suite, then Pest tests (fail-fast)
 	$(MAKE) lint-backend

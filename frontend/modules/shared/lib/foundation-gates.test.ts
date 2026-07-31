@@ -1,10 +1,8 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const frontendRoot = path.resolve(__dirname, '../../..');
-const repoRoot = path.resolve(frontendRoot, '..');
 
 function walkFiles(dir: string, predicate: (file: string) => boolean): string[] {
   const results: string[] = [];
@@ -20,7 +18,7 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
   return results;
 }
 
-describe('foundation gates (FND-02, FND-07, FND-08, FND-13, FND-14)', () => {
+describe('foundation gates (FND-02, FND-07, FND-08)', () => {
   it('does not introduce Auth product Route Handlers beyond health', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
@@ -54,34 +52,5 @@ describe('foundation gates (FND-02, FND-07, FND-08, FND-13, FND-14)', () => {
     expect(pageSource).toMatch(/max-w-/);
     expect(pageSource).not.toMatch(/min-w-\[\d{3,}px\]/);
     expect(pageSource).not.toMatch(/w-\[\d{3,}px\]/);
-  });
-
-  it('configures lint-staged to autofix frontend and skip non-frontend globs', async () => {
-    const configPath = path.join(repoRoot, 'lint-staged.config.mjs');
-    const configModule = (await import(pathToFileURL(configPath).href)) as {
-      default: Record<string, unknown>;
-    };
-    const config = configModule.default;
-    const globs = Object.keys(config);
-
-    expect(globs.every((glob) => glob.startsWith('frontend/'))).toBe(true);
-    expect(globs.some((glob) => glob.startsWith('backend/'))).toBe(false);
-
-    const tsGlob = 'frontend/**/*.{ts,tsx,js,jsx,mjs,cjs}';
-    const factory = config[tsGlob];
-    expect(typeof factory).toBe('function');
-    if (typeof factory !== 'function') {
-      return;
-    }
-
-    const commands = factory([
-      path.join(repoRoot, 'frontend/modules/shared/schemas/email.ts'),
-    ]) as string[];
-    expect(commands.some((command) => command.includes('eslint') && command.includes('--fix'))).toBe(
-      true,
-    );
-    expect(
-      commands.some((command) => command.includes('prettier') && command.includes('--write')),
-    ).toBe(true);
   });
 });
