@@ -224,6 +224,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec SP-13 OpenAPI alignment AC (auth)
 - last seen: 2026-07-30T13:04:31Z
 
+### L-036 — Assert viewport reflow outcomes (e.g. no horizontal overflow at the documented min width) instead of assuming Tailwind responsive classes are enough
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend` · harmful: 0
+- features: bff-auth/foundation
+- evidence: FND-07 / validation.md Fix 1 (frontend)
+- last seen: 2026-07-31T01:23:32Z
+
+### L-037 — When Independent Test requires staged-file hook simulation, ship a behavioral script that proves auto-fix and non-zero exit — config presence alone is not evidence
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/hooks` · harmful: 0
+- features: bff-auth/foundation
+- evidence: FND-13,FND-14 / validation.md Fix 2 (frontend/hooks)
+- last seen: 2026-07-31T01:23:32Z
+
+### L-038 — Absence requirements (forbidden routes or packages) need automated allowlist/denylist assertions, not checklist-only verification
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend` · harmful: 0
+- features: bff-auth/foundation
+- evidence: FND-02,FND-08 / validation.md Fix 3 (frontend)
+- last seen: 2026-07-31T01:23:32Z
+
+### L-039 — When the spec requires utilities to apply, assert concrete class tokens or rendered style outcomes rather than only theme CSS markers
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend` · harmful: 0
+- features: bff-auth/foundation
+- evidence: BFFUI-05/FND-07 Tailwind apply / validation.md (frontend)
+- last seen: 2026-07-31T01:23:32Z
+
+### L-040 — Lint-staged path-skip behavior needs a staged non-matching-file proof, not only glob configuration review
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend/hooks` · harmful: 0
+- features: bff-auth/foundation
+- evidence: FND-14 non-frontend skip / validation.md (frontend/hooks)
+- last seen: 2026-07-31T01:23:32Z
+
+### L-041 — When a hook AC requires exit non-zero on unfixable lint errors, assert that exit code with a staged bad file — requiring eslint --fix in config alone is incomplete
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend/hooks` · harmful: 0
+- features: bff-auth/foundation
+- evidence: FND-14 hard-fail / validation.md re-verify iter 1 (frontend/hooks)
+- last seen: 2026-07-31T01:30:26Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
