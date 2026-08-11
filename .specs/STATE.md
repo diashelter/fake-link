@@ -22,13 +22,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/foundation` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
-- **Phase / Task**: Complete (T1–T16 + Verifier PASS)
-- **Completed**: All foundation tasks; validation PASS (29/30 ACs; 1 FND-14 hard-fail precision gap)
+- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute in progress
+- **Phase / Task**: Batch 2 complete (T9–T13); Phase 3 Auth OpenAPI contract tests
+- **Completed**: T9 Register+Login contract · T10 Email verification contract · T11 Password contract · T12 Session/profile contract · T13 Contract regression sweep (no OpenAPI drift)
 - **In-progress**: none
-- **Next step**: Próxima fatia BFF Auth (`session-core` ou conforme índice `.specs/features/bff-auth/README.md`)
+- **Next step**: Batch 3 — T14–T19 (P2 gaps + fechamento documental + Verifier)
 - **Blockers**: none
-- **Artifacts**: `.specs/features/bff-auth/foundation/{spec,context,design,tasks,validation}.md`
-- **Branch**: `feature/auth-fundation-frontend`
-- **Gate**: `make lint-frontend` + `make test-frontend` (30) + `make test-frontend-coverage` (≥75%) verdes
-- **Tip commits**: `e9db79f`…`aeac7ed`
+- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks}.md`
+- **Branch**: `feature/auth-module-closure`
+- **Gate**: `make lint` ✅ · `make test-backend` 419 passed (5 Contract files, 11 Auth endpoints)
+- **Tip commits**: Batch 2 `6d58db3`…`1d0df83`
