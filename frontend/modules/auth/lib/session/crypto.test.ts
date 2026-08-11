@@ -43,9 +43,11 @@ describe('AES-GCM bearer envelope (SC-01, SC-07, SC-15)', () => {
   it('throws SessionDecryptError when GCM tag/ciphertext is invalid', () => {
     const config = testConfig();
     const envelope = encryptBearer('valid-bearer', config);
+    const sealed = Buffer.from(envelope.ciphertext, 'base64url');
+    sealed[0] ^= 0xff;
     const corrupted = {
       ...envelope,
-      ciphertext: `${envelope.ciphertext.slice(0, -1)}${envelope.ciphertext.endsWith('A') ? 'B' : 'A'}`,
+      ciphertext: sealed.toString('base64url'),
     };
 
     expect(() => decryptBearer(corrupted, config)).toThrow(SessionDecryptError);
