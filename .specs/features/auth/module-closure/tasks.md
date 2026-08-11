@@ -525,9 +525,9 @@ T18 → T19
 
 **Done when**:
 
-- [ ] Duas chamadas sequenciais/rápidas com mesmo bearer+password → token count 0
-- [ ] Segunda chamada não deixa tokens residuais
-- [ ] Gate check passes: `make test-backend`
+- [x] Duas chamadas sequenciais/rápidas com mesmo bearer+password → token count 0
+- [x] Segunda chamada não deixa tokens residuais
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature  
 **Gate**: full
