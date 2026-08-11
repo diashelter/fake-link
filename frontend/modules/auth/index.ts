@@ -1,3 +1,5 @@
+/** Auth module — BFF helpers exported from `./bff`. */
+export * from './bff';
 /**
  * Auth module public surface — safe types only.
  *

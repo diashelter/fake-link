@@ -21,6 +21,12 @@ export default defineConfig({
         branches: 75,
         functions: 75,
         statements: 75,
+        'modules/auth/bff/**': {
+          lines: 80,
+          branches: 80,
+          functions: 80,
+          statements: 80,
+        },
       },
     },
   },
