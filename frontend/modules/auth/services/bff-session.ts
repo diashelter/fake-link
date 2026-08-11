@@ -14,6 +14,7 @@ import type {
   CreateSessionInput,
   CreateSessionResult,
   GetSessionResult,
+  SessionKind,
   SessionRecord,
 } from '../lib/session/types';
 import {
@@ -35,6 +36,12 @@ export type BffSessionDependencies = {
   config?: BffSessionConfig;
   store?: SessionStore;
   now?: () => Date;
+};
+
+export type SessionSummary = {
+  sessionId: string;
+  kind: SessionKind;
+  userId: string;
 };
 
 type ResolvedDeps = {
@@ -235,6 +242,20 @@ export async function touchSession(
     return;
   }
   await store.set(redisKey, updated, exSeconds);
+}
+
+/** Server-only session metadata without bearer — safe for RSC boundaries (LOG-11). */
+export async function getSessionFromRequest(
+  request: Request,
+  deps: BffSessionDependencies = {},
+): Promise<SessionSummary | null> {
+  const result = await getSession(request.headers.get('cookie'), deps);
+  if (!result.context) {
+    return null;
+  }
+
+  const { sessionId, kind, userId } = result.context;
+  return { sessionId, kind, userId };
 }
 
 /** Delete Redis session key and instruct cookie clear (SC-11). */
