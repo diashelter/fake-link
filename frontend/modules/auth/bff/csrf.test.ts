@@ -7,10 +7,12 @@ import {
   CSRF_TOKEN_COOKIE,
   deriveCsrfToken,
   derivePreAuthCsrfToken,
+  ensurePreAuthCsrfCookies,
   issueCsrfForSession,
   issuePreAuthCsrf,
   readPreAuthCsrfSid,
   validateCsrfDoubleSubmit,
+  writePreAuthCsrfCookies,
 } from './csrf';
 
 const TEST_KEY = Buffer.alloc(32, 9).toString('base64');
@@ -34,6 +36,29 @@ function makeRequest(
       ...(cookieHeader ? { cookie: cookieHeader } : {}),
     },
   });
+}
+
+type MemoryCookieStore = {
+  values: Map<string, { value: string; options?: Record<string, unknown> }>;
+  set: (name: string, value: string, options?: Record<string, unknown>) => void;
+  get: (name: string) => { value: string } | undefined;
+};
+
+function createMemoryCookieStore(initial: Record<string, string> = {}): MemoryCookieStore {
+  const values = new Map<string, { value: string; options?: Record<string, unknown> }>(
+    Object.entries(initial).map(([name, value]) => [name, { value }]),
+  );
+
+  return {
+    values,
+    set(name, value, options) {
+      values.set(name, { value, options });
+    },
+    get(name) {
+      const entry = values.get(name);
+      return entry ? { value: entry.value } : undefined;
+    },
+  };
 }
 
 describe('csrf double-submit', () => {
@@ -128,5 +153,66 @@ describe('csrf double-submit', () => {
     const request = makeRequest({}, { [CSRF_SID_COOKIE]: 'sid-from-cookie' });
 
     expect(readPreAuthCsrfSid(request)).toBe('sid-from-cookie');
+  });
+});
+
+describe('writePreAuthCsrfCookies / ensurePreAuthCsrfCookies', () => {
+  beforeEach(() => {
+    vi.stubEnv('BFF_CSRF_HMAC_KEY', TEST_KEY);
+  });
+
+  it('issuePreAuthCsrf remains compatible with existing behavior', () => {
+    const response = issuePreAuthCsrf(NextResponse.json({ ok: true }), 'sid-123');
+    const cookies = response.headers.getSetCookie();
+
+    expect(cookies.some((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toBe(true);
+    expect(cookies.some((value) => value.startsWith(`${CSRF_SID_COOKIE}=sid-123`))).toBe(true);
+  });
+
+  it('writePreAuthCsrfCookies emits sid and token cookies', () => {
+    const store = createMemoryCookieStore();
+    const sid = writePreAuthCsrfCookies(store, 'custom-sid');
+
+    expect(sid).toBe('custom-sid');
+    expect(store.get(CSRF_SID_COOKIE)?.value).toBe('custom-sid');
+    expect(store.get(CSRF_TOKEN_COOKIE)?.value).toBe(derivePreAuthCsrfToken('custom-sid'));
+  });
+
+  it('ensurePreAuthCsrfCookies is idempotent when valid cookies exist', () => {
+    const sid = 'existing-sid';
+    const token = derivePreAuthCsrfToken(sid);
+    const store = createMemoryCookieStore({
+      [CSRF_SID_COOKIE]: sid,
+      [CSRF_TOKEN_COOKIE]: token,
+    });
+    const setSpy = vi.spyOn(store, 'set');
+
+    ensurePreAuthCsrfCookies(store);
+
+    expect(setSpy).not.toHaveBeenCalled();
+  });
+
+  it('ensurePreAuthCsrfCookies emits cookies when sid or token is missing', () => {
+    const store = createMemoryCookieStore();
+
+    ensurePreAuthCsrfCookies(store);
+
+    expect(store.get(CSRF_SID_COOKIE)?.value).toBeTruthy();
+    expect(store.get(CSRF_TOKEN_COOKIE)?.value).toBe(
+      derivePreAuthCsrfToken(store.get(CSRF_SID_COOKIE)!.value),
+    );
+  });
+
+  it('ensurePreAuthCsrfCookies re-issues cookies when token does not match sid', () => {
+    const store = createMemoryCookieStore({
+      [CSRF_SID_COOKIE]: 'sid-a',
+      [CSRF_TOKEN_COOKIE]: 'invalid-token',
+    });
+
+    ensurePreAuthCsrfCookies(store);
+
+    expect(store.get(CSRF_TOKEN_COOKIE)?.value).toBe(
+      derivePreAuthCsrfToken(store.get(CSRF_SID_COOKIE)!.value),
+    );
   });
 });
