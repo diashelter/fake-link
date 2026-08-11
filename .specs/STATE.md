@@ -24,12 +24,12 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/login` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ⏳
+- **Feature**: `bff-auth/login` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅ PASS
 - **Phase / Task**: T1–T11 complete (T9 no-op via T3)
-- **Completed**: login schema, auth types/messages, `performBffLogin`, allowlist, route handler, CSRF RSC bootstrap, LoginForm, `/login` page, foundation gates
-- **In-progress**: Verifier validation report
-- **Next step**: Review `validation.md`; merge `feature/bff-auth-login` when PASS
+- **Completed**: login schema, auth types/messages, `performBffLogin`, allowlist, route handler, CSRF RSC bootstrap, LoginForm, `/login` page, foundation gates, verifier gaps closed
+- **In-progress**: none
+- **Next step**: Open PR for `feature/bff-auth-login` → merge after review
 - **Blockers**: none
 - **Artifacts**: `.specs/features/bff-auth/login/{spec,design,tasks,validation}.md`
-- **Commits**: `7dc2d2f`..`8286286` (9 feat/test commits)
-- **Gate alvo**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (215 tests)
+- **Commits**: `7dc2d2f`..`9c8f34c` (11 commits)
+- **Gate**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (222 tests)

@@ -30,7 +30,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | T8 login page | ✅ | ac82fa2 |
 | T9 getSessionFromRequest | ✅ no-op (delivered in T3) | — |
 | T10 foundation gates | ✅ | 8286286 |
-| T11 quality gates | ✅ | pending validation commit |
+| T11 quality gates | ✅ | 9c8f34c |
 
 ## Test Coverage Matrix
 
