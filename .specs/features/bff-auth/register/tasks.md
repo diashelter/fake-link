@@ -175,9 +175,9 @@ T11
 
 **Done when**:
 
-- [ ] Default `2026-01` quando env ausente
-- [ ] Override via `NEXT_PUBLIC_AUTH_TERMS_CURRENT_VERSION` funciona em teste
-- [ ] Gate: `make test-frontend` passa
+- [x] Default `2026-01` quando env ausente
+- [x] Override via `NEXT_PUBLIC_AUTH_TERMS_CURRENT_VERSION` funciona em teste
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
