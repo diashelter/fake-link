@@ -35,7 +35,9 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     const authIndex = readFileSync(path.join(frontendRoot, 'modules/auth/index.ts'), 'utf8');
     expect(authIndex).toMatch(/export type \{/);
     expect(authIndex).not.toMatch(/export\s+(async\s+)?function/);
-    expect(authIndex).not.toMatch(/export\s+\{[^}]*\b(createSession|getSession|encryptBearer|decryptBearer)\b/);
+    expect(authIndex).not.toMatch(
+      /export\s+\{[^}]*\b(createSession|getSession|encryptBearer|decryptBearer)\b/,
+    );
     expect(authIndex).not.toMatch(/from ['"].*\/(bff-session|crypto)['"]/);
   });
 

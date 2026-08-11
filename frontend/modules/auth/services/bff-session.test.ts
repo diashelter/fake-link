@@ -7,11 +7,7 @@ import type { BffSessionConfig } from '../lib/session/config';
 import { buildRedisSessionKey } from '../lib/session/redis-key';
 import { parseSessionId } from '../lib/session/session-id';
 import { FakeSessionStore } from '../lib/session/test/fake-session-store';
-import {
-  ABSOLUTE_TTL_SECONDS,
-  IDLE_TTL_SECONDS,
-  TOUCH_THROTTLE_SECONDS,
-} from '../lib/session/ttl';
+import { ABSOLUTE_TTL_SECONDS, IDLE_TTL_SECONDS, TOUCH_THROTTLE_SECONDS } from '../lib/session/ttl';
 import { getDecryptFailCount } from '../lib/session/metrics';
 import {
   applySessionCookie,
@@ -335,9 +331,7 @@ describe('touchSession + expiry enforcement (SC-08, SC-09, SC-10)', () => {
 
     const record = await store.get(key);
     expect(record!.lastActivityAt).toBe(touchedAt.toISOString());
-    expect(store.getExSeconds(key)).toBe(
-      ABSOLUTE_TTL_SECONDS.session - TOUCH_THROTTLE_SECONDS,
-    );
+    expect(store.getExSeconds(key)).toBe(ABSOLUTE_TTL_SECONDS.session - TOUCH_THROTTLE_SECONDS);
   });
 });
 

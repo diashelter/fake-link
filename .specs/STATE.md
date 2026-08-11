@@ -23,13 +23,15 @@
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
-- **Phase / Task**: Complete (T1–T19 + Verifier PASS)
-- **Completed**: Auth Backend module closed — OpenAPI Spectral lint, Auth contract tests (11 endpoints), P2 gaps, docs/AD-016
+- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ⏳
+- **Phase / Task**: Phase 3 (Batch 3) complete — Execute complete, awaiting Verifier
+- **Completed**: T1–T16 (all phases: primitives, store/facade, Docker env, probe route, foundation gates, coverage)
 - **In-progress**: none
-- **Next step**: `bff-auth/session-core` (conforme `.specs/features/bff-auth/README.md`)
+- **Next step**: Dispatch Verifier (author ≠ verifier) → `.specs/features/bff-auth/session-core/validation.md`
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-module-closure`
-- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth 93.74% lines / 86.10% methods)
-- **Tip commits**: `4b53a5a`…`b1012d9` + verifier docs commit
+- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks}.md`
+- **Branch**: `feature/bff-auth-session-core`
+- **Gate**: `make lint-frontend` + `make test-frontend-coverage` — 89 passed, 0 failed; auth module ≥75% lines/branches
+- **Batch 3 commits**: T13 `37209b1`, T14 `5da0b6b`, T15 `654abbe`, T16 (this handoff after commit)
+- **Uncommitted**: `.specs/features/bff-auth/session-core/design.md` (planning artifact if not yet committed); `.specs/features/bff-auth/README.md` status drift
+- **Note**: Foundation allowlist pulled forward into T14 so `make test-frontend` could pass; T15 verified allowlist + auth barrel types-only

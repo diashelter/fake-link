@@ -20,13 +20,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth` (índice + 9 SPEC-sementes)
-- **Phase / Task**: Specify (seed) ✅ — deepen / Design / Tasks / Execute pendentes
-- **Completed**: README + `foundation`, `session-core`, `csrf-proxy`, `login`, `register`, `email-verification`, `password`, `session-shell`, `e2e-security-gate` specs seed
+- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ⏳
+- **Phase / Task**: Execute complete (T1–T16) — awaiting Verifier
+- **Completed**: All session-core tasks; SC-01…SC-18 marked Done in spec traceability
 - **In-progress**: none
-- **Next step**: Specify deepen da fatia `bff-auth/foundation` (fechar assumptions, ACs precisos, Status → Approved)
-- **Blockers**: none — API Auth MVP já verificada
-- **Artifacts**: `.specs/features/bff-auth/README.md` + `*/spec.md` (9)
-- **Branch**: `main` (docs only; sem commit automático)
-- **Validation**: N/A (seeds)
-- **Batches**: N/A
+- **Next step**: Verifier sub-agent → `validation.md`
+- **Blockers**: none
+- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks}.md`
+- **Branch**: `feature/bff-auth-session-core`
+- **Validation**: pending Verifier
+- **Batches**: 3 complete (T1–7, T8–12, T13–16)

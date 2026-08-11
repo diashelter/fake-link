@@ -502,9 +502,9 @@ T13 → T14 → T15 → T16
 
 **Done when**:
 
-- [ ] `make lint-frontend && make test-frontend-coverage` exit 0
-- [ ] Cobertura auth module ≥75% lines/branches
-- [ ] Nenhum teste skipped/deleted vs T1 baseline
+- [x] `make lint-frontend && make test-frontend-coverage` exit 0
+- [x] Cobertura auth module ≥75% lines/branches
+- [x] Nenhum teste skipped/deleted vs T1 baseline
 
 **Tests**: coverage gate
 **Gate**: coverage

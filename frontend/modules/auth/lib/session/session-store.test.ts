@@ -28,9 +28,7 @@ function testConfig(): Pick<BffSessionConfig, 'redisUrl'> {
   return { redisUrl: 'redis://redis-ephemeral:6379' };
 }
 
-function createInjectedClient(
-  overrides: Partial<RedisSessionClient> = {},
-): RedisSessionClient {
+function createInjectedClient(overrides: Partial<RedisSessionClient> = {}): RedisSessionClient {
   return {
     isOpen: true,
     connect: vi.fn().mockResolvedValue(undefined),
@@ -77,11 +75,9 @@ describe('createSessionStore (injectable client, no real Redis)', () => {
 
     await store.set('bff:sess:abc', validRecord, 3600);
 
-    expect(client.set).toHaveBeenCalledWith(
-      'bff:sess:abc',
-      serializeSessionRecord(validRecord),
-      { EX: 3600 },
-    );
+    expect(client.set).toHaveBeenCalledWith('bff:sess:abc', serializeSessionRecord(validRecord), {
+      EX: 3600,
+    });
   });
 
   it('GET returns parsed SessionRecord', async () => {
