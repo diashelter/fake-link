@@ -10,6 +10,7 @@ x-backend-image: &backend-image
       COMPOSER_VERSION: ${COMPOSER_VERSION:-2.10.2}
   volumes:
     - ./backend:/var/www/html
+    - ./docs:/var/www/docs:ro
   env_file:
     - path: .env
       required: false
@@ -263,6 +264,16 @@ services:
   test-runner:
     profiles: ["test"]
     image: busybox:1.37
+    command: ["true"]
+    restart: "no"
+
+  # Node tooling for OpenAPI Spectral lint (ABMC-01). Ephemeral; run via
+  # `docker compose run --rm --no-deps openapi-tooling …`.
+  openapi-tooling:
+    image: node:${NODE_VERSION:-24.18.0}-bookworm-slim
+    working_dir: /repo
+    volumes:
+      - .:/repo
     command: ["true"]
     restart: "no"
 
