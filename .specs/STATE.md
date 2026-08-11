@@ -23,13 +23,13 @@
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute (P2 + docs) ✅ · Verifier pending
-- **Phase / Task**: Phase 5 — T18 docs closed; T19 gates then orchestrator Verifier
-- **Completed**: T14–T17 P2 gaps · T18 documentary closure (AD-016, Goals 4–7, index Fatia 8 Implementing)
+- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verifier pending (orchestrator)
+- **Phase / Task**: Gates green — awaiting Verifier
+- **Completed**: T14–T19 (P2, docs/AD-016, `make lint` + `make test-backend-coverage`)
 - **In-progress**: none
-- **Next step**: After Verifier PASS → mark Auth Backend concluded; next feature `bff-auth/session-core`
-- **Blockers**: none — awaiting independent Verifier (author ≠ verifier)
+- **Next step**: Orchestrator Verifier → then `bff-auth/session-core`
+- **Blockers**: none
 - **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks}.md`
 - **Branch**: `feature/auth-module-closure`
-- **Tip**: Auth Backend nearly closed (OpenAPI lint + contract tests + P2); official “Concluído” only after Verifier
-- **Gate**: docs sync (T18); final `make lint && make test-backend-coverage` on T19
+- **Tip**: Auth Backend nearly closed; Auth coverage lines 93.75% / methods 86.10%
+- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth ≥80/80)
