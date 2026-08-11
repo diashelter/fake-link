@@ -4,7 +4,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-backend lint-frontend analyse-backend md-backend format-backend
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-openapi lint-backend lint-frontend analyse-backend md-backend format-backend
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -124,6 +124,9 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) smoke
 	$(MAKE) smoke-docs
 
+lint-openapi: ## Lint docs/openapi.yaml with Spectral (Docker openapi-tooling)
+	bash scripts/lint-openapi.sh
+
 lint-backend: ## Run Pint, PHPStan, and PHPMD in the backend container
 	$(COMPOSE) run --rm --no-deps backend composer run quality
 
@@ -140,7 +143,8 @@ lint-frontend: ## Run TypeScript, ESLint, and Prettier checks in the frontend co
 	$(COMPOSE) run --rm --no-deps frontend sh -c 'pnpm typecheck && pnpm lint && pnpm format:check'
 	node scripts/assert-lint-staged.mjs
 
-lint: ## Run backend quality, frontend lint, Architecture suite, then Pest tests (fail-fast)
+lint: ## Run OpenAPI Spectral lint, backend quality, frontend lint, Architecture suite, then Pest tests (fail-fast)
+	$(MAKE) lint-openapi
 	$(MAKE) lint-backend
 	$(MAKE) lint-frontend
 	$(MAKE) test-architecture
