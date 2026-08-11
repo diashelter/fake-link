@@ -228,10 +228,10 @@ T11
 
 **Done when**:
 
-- [ ] `lookupAllowlistEntry('POST', '/api/bff/auth/register')` resolve
-- [ ] Teste confirma `requireSession: false`, `requireCsrf: true`
-- [ ] Login entry continua presente
-- [ ] Gate: `make test-frontend` passa
+- [x] `lookupAllowlistEntry('POST', '/api/bff/auth/register')` resolve
+- [x] Teste confirma `requireSession: false`, `requireCsrf: true`
+- [x] Login entry continua presente
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

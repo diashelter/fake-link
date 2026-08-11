@@ -4,6 +4,7 @@ import {
   AUTH_BFF_ALLOWLIST,
   buildUpstreamUrl,
   LOGIN_ALLOWLIST_ENTRY,
+  REGISTER_ALLOWLIST_ENTRY,
   lookupAllowlistEntry,
   type AllowlistEntry,
 } from './allowlist';
@@ -24,9 +25,11 @@ const TEST_TABLE: readonly AllowlistEntry[] = [
 ];
 
 describe('AUTH_BFF_ALLOWLIST', () => {
-  it('exports exactly one production login entry (LOG-14)', () => {
-    expect(AUTH_BFF_ALLOWLIST).toHaveLength(1);
-    expect(AUTH_BFF_ALLOWLIST[0]).toEqual(LOGIN_ALLOWLIST_ENTRY);
+  it('exports login and register production entries (LOG-14, RGR-18)', () => {
+    expect(AUTH_BFF_ALLOWLIST).toHaveLength(2);
+    expect(AUTH_BFF_ALLOWLIST).toEqual(
+      expect.arrayContaining([LOGIN_ALLOWLIST_ENTRY, REGISTER_ALLOWLIST_ENTRY]),
+    );
   });
 });
 
@@ -37,6 +40,17 @@ describe('LOGIN_ALLOWLIST_ENTRY', () => {
     expect(entry).toEqual(LOGIN_ALLOWLIST_ENTRY);
     expect(entry?.requireSession).toBe(false);
     expect(entry?.requireCsrf).toBe(true);
+  });
+});
+
+describe('REGISTER_ALLOWLIST_ENTRY', () => {
+  it('resolves register route with pre-auth CSRF and no session requirement (RGR-18)', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/register');
+
+    expect(entry).toEqual(REGISTER_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(false);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/register');
   });
 });
 
