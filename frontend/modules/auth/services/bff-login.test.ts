@@ -242,6 +242,25 @@ describe('performBffLogin', () => {
     expect(result.ok).toBe(false);
     expect(result.response.status).toBe(403);
     expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_SUSPENDED' });
+    const setCookies = result.response.headers.getSetCookie?.() ?? [];
+    expect(setCookies.some((value) => value.includes('__Host-fl_session='))).toBe(false);
+  });
+
+  it('forwards upstream 403 ACCOUNT_PENDING_DELETION without session cookie', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json(
+        { code: 'ACCOUNT_PENDING_DELETION', message: 'Pending deletion.' },
+        { status: 403 },
+      ),
+    );
+
+    const result = await performBffLogin(makeLoginRequest(), deps(fetchMock));
+
+    expect(result.ok).toBe(false);
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_PENDING_DELETION' });
+    const setCookies = result.response.headers.getSetCookie?.() ?? [];
+    expect(setCookies.some((value) => value.includes('__Host-fl_session='))).toBe(false);
   });
 
   it('forwards upstream 422 validation errors', async () => {
@@ -272,6 +291,24 @@ describe('performBffLogin', () => {
     expect(result.ok).toBe(false);
     expect(result.response.status).toBe(429);
     expect(result.response.headers.get('Retry-After')).toBe('60');
+    const setCookies = result.response.headers.getSetCookie?.() ?? [];
+    expect(setCookies.some((value) => value.includes('__Host-fl_session='))).toBe(false);
+  });
+
+  it('returns generic pt-BR message for upstream 503 without session cookie', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json({ message: 'Service unavailable' }, { status: 503 }),
+    );
+
+    const result = await performBffLogin(makeLoginRequest(), deps(fetchMock));
+
+    expect(result.ok).toBe(false);
+    expect(result.response.status).toBe(503);
+    expect(await result.response.json()).toEqual({
+      message: 'Algo deu errado. Tente novamente.',
+    });
+    const setCookies = result.response.headers.getSetCookie?.() ?? [];
+    expect(setCookies.some((value) => value.includes('__Host-fl_session='))).toBe(false);
   });
 
   it('returns generic pt-BR message for upstream 500', async () => {
@@ -300,6 +337,31 @@ describe('performBffLogin', () => {
     expect(await result.response.json()).toEqual({
       message: 'Não foi possível conectar ao serviço. Tente novamente.',
     });
+  });
+
+  it('defaults redirect_to to / when returnUrl query is absent', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json(buildUpstreamAuthPayload({ token_kind: 'session' }), { status: 200 }),
+    );
+
+    const result = await performBffLogin(makeLoginRequest(), deps(fetchMock));
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.success.redirectTo).toBe('/');
+    const body = await result.response.json();
+    expect(body.data.redirect_to).toBe('/');
+  });
+
+  it('returns 500 when upstream 200 returns invalid JSON', async () => {
+    const fetchMock = vi.fn(async () => new Response('not-json', { status: 200 }));
+
+    const result = await performBffLogin(makeLoginRequest(), deps(fetchMock));
+
+    expect(result.ok).toBe(false);
+    expect(result.response.status).toBe(500);
   });
 
   it('returns 500 when upstream 200 lacks token', async () => {

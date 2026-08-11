@@ -50,6 +50,16 @@ describe('LoginPage (LOG-11, LOG-10)', () => {
     vi.clearAllMocks();
   });
 
+  it('redirects authenticated session users to / when returnUrl is absent', async () => {
+    getSessionFromRequestMock.mockResolvedValue({
+      sessionId: 'sid',
+      kind: 'session',
+      userId: 'uid',
+    });
+
+    await expect(LoginPage({ searchParams: Promise.resolve({}) })).rejects.toThrow('REDIRECT:/');
+  });
+
   it('redirects authenticated session users to safe returnUrl', async () => {
     getSessionFromRequestMock.mockResolvedValue({
       sessionId: 'sid',

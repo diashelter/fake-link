@@ -59,6 +59,55 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
     });
   });
 
+  it('shows the same anti-enum message for unknown email and wrong password', async () => {
+    const scenarios = [
+      { label: 'unknown-email', body: { code: 'INVALID_CREDENTIALS', message: 'Invalid.' } },
+      { label: 'wrong-password', body: { code: 'INVALID_CREDENTIALS', message: 'Bad password.' } },
+    ];
+
+    for (const scenario of scenarios) {
+      server.use(
+        http.post('/api/bff/auth/login', () => HttpResponse.json(scenario.body, { status: 401 })),
+      );
+
+      const user = userEvent.setup();
+      render(<LoginForm />);
+      await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
+      await user.type(screen.getByLabelText('Senha'), 'secret');
+      await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert').textContent).toBe('E-mail ou senha incorretos.');
+      });
+
+      cleanup();
+      server.resetHandlers();
+    }
+  });
+
+  it('shows pending deletion message for 403 ACCOUNT_PENDING_DELETION', async () => {
+    server.use(
+      http.post('/api/bff/auth/login', () =>
+        HttpResponse.json(
+          { code: 'ACCOUNT_PENDING_DELETION', message: 'Pending deletion.' },
+          { status: 403 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
+    await user.type(screen.getByLabelText('Senha'), 'secret');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Esta conta está em processo de exclusão.',
+      );
+    });
+  });
+
   it('shows anti-enum message for 401 INVALID_CREDENTIALS', async () => {
     server.use(
       http.post('/api/bff/auth/login', () =>
