@@ -10,6 +10,8 @@ export function messageForAuthError(code: string | undefined, status: number): s
       return 'Muitas tentativas. Aguarde antes de tentar novamente.';
     case 'VALIDATION_FAILED':
       return 'Verifique os campos informados.';
+    case 'REGISTRATION_NOT_ALLOWED':
+      return 'Não foi possível concluir o cadastro. Verifique seus dados ou entre em contato com o suporte.';
     default:
       break;
   }

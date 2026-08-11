@@ -150,9 +150,9 @@ T11
 
 **Done when**:
 
-- [ ] `REGISTRATION_NOT_ALLOWED` retorna mesma string para convite inválido e duplicata
-- [ ] Códigos login existentes inalterados (regressão)
-- [ ] Gate: `make test-frontend` passa
+- [x] `REGISTRATION_NOT_ALLOWED` retorna mesma string para convite inválido e duplicata
+- [x] Códigos login existentes inalterados (regressão)
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

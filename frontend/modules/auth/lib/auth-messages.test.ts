@@ -27,6 +27,21 @@ describe('messageForAuthError', () => {
     expect(messageForAuthError('VALIDATION_FAILED', 422)).toBe('Verifique os campos informados.');
   });
 
+  it('maps REGISTRATION_NOT_ALLOWED to uniform pt-BR anti-enum message (RGR-04, RGR-05)', () => {
+    const expected =
+      'Não foi possível concluir o cadastro. Verifique seus dados ou entre em contato com o suporte.';
+    expect(messageForAuthError('REGISTRATION_NOT_ALLOWED', 403)).toBe(expected);
+  });
+
+  it('returns the same REGISTRATION_NOT_ALLOWED string for invite and duplicate scenarios', () => {
+    const inviteMessage = messageForAuthError('REGISTRATION_NOT_ALLOWED', 403);
+    const duplicateMessage = messageForAuthError('REGISTRATION_NOT_ALLOWED', 403);
+    expect(inviteMessage).toBe(duplicateMessage);
+    expect(inviteMessage).toBe(
+      'Não foi possível concluir o cadastro. Verifique seus dados ou entre em contato com o suporte.',
+    );
+  });
+
   it('maps 504 to gateway pt-BR message', () => {
     expect(messageForAuthError(undefined, 504)).toBe(
       'Não foi possível conectar ao serviço. Tente novamente.',
