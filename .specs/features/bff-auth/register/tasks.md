@@ -254,9 +254,9 @@ T11
 
 **Done when**:
 
-- [ ] POST happy path retorna **201** + Set-Cookie session + body sem token
-- [ ] CSRF/Origin failure → 403; upstream mock não invocado
-- [ ] Gate: `make test-frontend` passa
+- [x] POST happy path retorna **201** + Set-Cookie session + body sem token
+- [x] CSRF/Origin failure → 403; upstream mock não invocado
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
