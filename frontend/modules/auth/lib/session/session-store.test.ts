@@ -101,11 +101,20 @@ describe('createSessionStore (injectable client, no real Redis)', () => {
     await expect(store.get('bff:sess:abc')).resolves.toBeNull();
   });
 
-  it('DEL removes the key', async () => {
+  it('DEL removes the key and reports whether it existed', async () => {
     const store = createSessionStore(testConfig(), { client });
 
-    await store.del('bff:sess:abc');
+    await expect(store.del('bff:sess:abc')).resolves.toBe(true);
 
     expect(client.del).toHaveBeenCalledWith('bff:sess:abc');
+  });
+
+  it('DEL returns false when Redis reports zero keys removed', async () => {
+    client = createInjectedClient({
+      del: vi.fn().mockResolvedValue(0),
+    });
+    const store = createSessionStore(testConfig(), { client });
+
+    await expect(store.del('bff:sess:missing')).resolves.toBe(false);
   });
 });

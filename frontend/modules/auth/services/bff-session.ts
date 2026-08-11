@@ -128,12 +128,12 @@ async function deleteSessionRecord(
   sessionId: string,
   config: BffSessionConfig,
   store: SessionStore,
-): Promise<void> {
+): Promise<boolean> {
   const sessionIdBytes = parseSessionId(sessionId);
   if (!sessionIdBytes) {
-    return;
+    return false;
   }
-  await store.del(buildRedisSessionKey(sessionIdBytes, config.hmacKey));
+  return store.del(buildRedisSessionKey(sessionIdBytes, config.hmacKey));
 }
 
 /**
@@ -250,6 +250,7 @@ export async function destroySession(
 /**
  * Invalidate current session id and create a new one (delete-before-create) (SC-11).
  * When `input` is omitted, bearer/kind/userId are copied from the current record.
+ * Concurrent rotates on the same id: only the caller that claims DEL may create (edge case).
  */
 export async function rotateSession(
   currentSessionId: string,
@@ -275,6 +276,9 @@ export async function rotateSession(
     };
   }
 
-  await deleteSessionRecord(currentSessionId, config, store);
+  const claimed = await deleteSessionRecord(currentSessionId, config, store);
+  if (!claimed) {
+    throw new SessionValidationError('Current session not found');
+  }
   return createSession(createInput, deps);
 }

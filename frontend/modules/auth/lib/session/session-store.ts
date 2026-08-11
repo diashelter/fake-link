@@ -19,7 +19,8 @@ export type RedisSessionClient = {
 export interface SessionStore {
   get(key: string): Promise<SessionRecord | null>;
   set(key: string, record: SessionRecord, exSeconds: number): Promise<void>;
-  del(key: string): Promise<void>;
+  /** @returns true when the key existed and was removed. */
+  del(key: string): Promise<boolean>;
 }
 
 export type CreateSessionStoreOptions = {
@@ -120,9 +121,10 @@ export function createSessionStore(
       await client.set(key, serializeSessionRecord(record), { EX: exSeconds });
     },
 
-    async del(key: string): Promise<void> {
+    async del(key: string): Promise<boolean> {
       const client = await resolveClient();
-      await client.del(key);
+      const removed = await client.del(key);
+      return Number(removed) > 0;
     },
   };
 }

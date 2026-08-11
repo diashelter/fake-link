@@ -20,8 +20,9 @@ export class FakeSessionStore {
     this.entries.set(key, { record: structuredClone(record), exSeconds });
   }
 
-  async del(key: string): Promise<void> {
-    this.entries.delete(key);
+  /** @returns true when a key was removed (claim for concurrent rotate). */
+  async del(key: string): Promise<boolean> {
+    return this.entries.delete(key);
   }
 
   /** Test helper: inspect TTL written with the last SET. */

@@ -375,6 +375,40 @@ describe('rotateSession / destroySession / Redis failure (SC-11, SC-12, SC-13)',
     expect(newResult.context!.bearer).toBe(TEST_BEARER);
   });
 
+  it('concurrent rotateSession on same id leaves at most one valid successor', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+    const deps = { config, store, now: () => fixedNow };
+
+    const results = await Promise.allSettled([
+      rotateSession(created.sessionId, undefined, deps),
+      rotateSession(created.sessionId, undefined, deps),
+    ]);
+
+    const fulfilled = results.filter(
+      (result): result is PromiseFulfilledResult<Awaited<ReturnType<typeof rotateSession>>> =>
+        result.status === 'fulfilled',
+    );
+    const rejected = results.filter((result) => result.status === 'rejected');
+
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0]).toMatchObject({
+      status: 'rejected',
+      reason: expect.any(SessionValidationError),
+    });
+
+    const oldResult = await getSession(`${config.cookieName}=${created.sessionId}`, deps);
+    expect(oldResult).toEqual({ context: null, clearCookie: true });
+
+    const successor = fulfilled[0]!.value;
+    const newResult = await getSession(`${config.cookieName}=${successor.sessionId}`, deps);
+    expect(newResult.context).not.toBeNull();
+    expect(newResult.context!.bearer).toBe(TEST_BEARER);
+  });
+
   it('destroySession removes Redis key and returns clearCookie (SC-11)', async () => {
     const created = await createSession(
       { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
