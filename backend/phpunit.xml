@@ -12,6 +12,7 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
             <directory>modules/Auth/Tests/Feature</directory>
+            <directory>modules/Auth/Tests/Contract</directory>
         </testsuite>
         <testsuite name="Integration">
             <directory>modules/Auth/Tests/Integration</directory>
@@ -54,5 +55,6 @@
         <env name="AUTH_TERMS_CURRENT_VERSION" value="2026-01"/>
         <env name="AUTH_INVITE_ALLOWLIST_PATH" value="/var/www/html/config/invite-allowlist.testing.json"/>
         <env name="AUTH_RATE_LIMIT_HMAC_KEY" value="testing-auth-rate-limit-hmac-key"/>
+        <env name="OPENAPI_SPEC_PATH" value="/var/www/docs/openapi.yaml"/>
     </php>
 </phpunit>

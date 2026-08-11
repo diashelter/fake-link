@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -150,6 +152,50 @@ describe('POST /api/v1/auth/email/verify', function () {
         $response->assertForbidden()
             ->assertJsonPath('code', 'EMAIL_ALREADY_VERIFIED')
             ->assertJsonPath('message', 'The email address is already verified.');
+    });
+
+    it('returns 422 VALIDATION_FAILED for whitespace-only token without consuming email action tokens', function () {
+        // Bypass TrimStrings so the request body keeps `' '` (not collapsed to '').
+        // Note: Laravel also skips non-implicit rules (including not_regex) for blank values;
+        // `required` yields this 422. Rule presence is asserted in VerifyEmailRequestTest.
+        $this->withoutMiddleware([
+            TrimStrings::class,
+            ConvertEmptyStringsToNull::class,
+        ]);
+
+        $user = UserModel::factory()->create([
+            'email' => 'verify-whitespace@example.com',
+        ]);
+        $bearer = issueVerificationBearer($user);
+        $emailToken = issueEmailVerificationPlaintext($user);
+        clearEmailVerificationRateLimits(UserId::fromString($user->id));
+
+        $response = $this->postJson('/api/v1/auth/email/verify', [
+            'token' => ' ',
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonPath('code', 'VALIDATION_FAILED')
+            ->assertJsonPath('errors.token.0.code', 'INVALID');
+
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))
+            ->toBeNull()
+            // @phpstan-ignore staticMethod.dynamicCall
+            ->and(EmailActionTokenModel::query()->where('user_id', $user->id)->count())->toBe(1);
+
+        $this->getJson('/api/v1/_test/auth/probe', [
+            'Authorization' => 'Bearer '.$bearer,
+        ])->assertOk();
+
+        // Ensure a real token still works after the whitespace rejection.
+        clearEmailVerificationRateLimits(UserId::fromString($user->id));
+        $this->postJson('/api/v1/auth/email/verify', [
+            'token' => $emailToken,
+        ], [
+            'Authorization' => 'Bearer '.$bearer,
+        ])->assertNoContent();
     });
 
     it('returns 422 VALIDATION_FAILED when token is missing or extra fields are present', function () {

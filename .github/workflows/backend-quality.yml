@@ -24,6 +24,11 @@ jobs:
       - name: Install Composer dependencies
         run: docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.dev.yml run --rm --no-deps backend composer install --no-interaction --prefer-dist
 
+      # OpenAPI Spectral lint before PHP gates (fail-fast, cheaper than Pint/PHPStan).
+      # Order: checkout → env → build → composer → lint-openapi → Pint → PHPStan → PHPMD → Arch → coverage.
+      - name: OpenAPI Spectral lint
+        run: make lint-openapi
+
       - name: Pint style check
         run: make format-backend
 

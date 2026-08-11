@@ -43,6 +43,47 @@ function clearPrivateAuthWriteLimitForLogoutAll(UserId $userId): void
 }
 
 describe('POST /api/v1/auth/logout-all', function () {
+    it('leaves zero tokens after two rapid logout-all calls with the same bearer and password', function () {
+        $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
+            'email' => 'logout.all.concurrent@example.com',
+        ]);
+        $tokenA = issueSessionBearerForLogoutAll($user);
+        $tokenB = issueSessionBearerForLogoutAll($user);
+        clearPrivateAuthWriteLimitForLogoutAll(UserId::fromString($user->id));
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe(2);
+
+        $first = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/logout-all', [
+                'current_password' => $this->knownPassword,
+            ], [
+                'Authorization' => 'Bearer '.$tokenA,
+            ]);
+
+        $first->assertNoContent();
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe(0);
+
+        clearPrivateAuthWriteLimitForLogoutAll(UserId::fromString($user->id));
+
+        $second = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/logout-all', [
+                'current_password' => $this->knownPassword,
+            ], [
+                'Authorization' => 'Bearer '.$tokenA,
+            ]);
+
+        $second->assertUnauthorized()
+            ->assertJsonPath('code', 'UNAUTHENTICATED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->where('user_id', $user->id)->count())->toBe(0);
+
+        $this->getJson('/api/v1/_test/auth/probe', [
+            'Authorization' => 'Bearer '.$tokenB,
+        ])->assertUnauthorized();
+    });
+
     it('revokes all bearers when current password matches', function () {
         $user = UserModel::factory()->active()->withPassword($this->knownPassword)->create([
             'email' => 'logout.all.ok@example.com',

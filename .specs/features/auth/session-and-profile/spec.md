@@ -14,13 +14,13 @@ Usuários autenticados precisam encerrar a sessão atual, revogar todas as sess�
 
 ## Goals
 
-- [ ] `POST /api/v1/auth/logout` → `204`; revoga **somente** o Bearer apresentado (`session` ou `verification`).
-- [ ] `POST /api/v1/auth/logout-all` → `204`; exige Bearer `session` + `current_password`; revoga **todos** os Bearers da conta (incluindo o apresentado).
-- [ ] `GET /api/v1/me` → `200` `UserResponse`; aceita `session` ou `verification`.
-- [ ] `PATCH /api/v1/me` → `200` `UserResponse`; aceita somente `session`; altera **somente** `name`; e-mail imutável.
-- [ ] Representação pública do `User` alinhada a `docs/openapi.yaml` (`id`, `name`, `email`, `status`, `email_verified_at`, `terms_version`, `terms_accepted_at`, `created_at`, `updated_at`).
-- [ ] Rate limits: leituras privadas 300/min por token; escritas privadas 120/min por conta (logout, logout-all, PATCH).
-- [ ] Feature + integration tests cobrindo auth boundaries, revogação, validação de nome, rate limits e envelope OpenAPI.
+- [x] `POST /api/v1/auth/logout` → `204`; revoga **somente** o Bearer apresentado (`session` ou `verification`).
+- [x] `POST /api/v1/auth/logout-all` → `204`; exige Bearer `session` + `current_password`; revoga **todos** os Bearers da conta (incluindo o apresentado).
+- [x] `GET /api/v1/me` → `200` `UserResponse`; aceita `session` ou `verification`.
+- [x] `PATCH /api/v1/me` → `200` `UserResponse`; aceita somente `session`; altera **somente** `name`; e-mail imutável.
+- [x] Representação pública do `User` alinhada a `docs/openapi.yaml` (`id`, `name`, `email`, `status`, `email_verified_at`, `terms_version`, `terms_accepted_at`, `created_at`, `updated_at`).
+- [x] Rate limits: leituras privadas 300/min por token; escritas privadas 120/min por conta (logout, logout-all, PATCH).
+- [x] Feature + integration tests cobrindo auth boundaries, revogação, validação de nome, rate limits e envelope OpenAPI.
 
 ## Out of Scope
 

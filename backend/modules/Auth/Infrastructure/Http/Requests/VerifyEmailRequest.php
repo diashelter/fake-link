@@ -37,7 +37,7 @@ final class VerifyEmailRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'token' => ['required', 'string', 'min:1'],
+            'token' => ['required', 'string', 'min:1', 'not_regex:/^\s+$/'],
         ];
     }
 

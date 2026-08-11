@@ -19,16 +19,17 @@
 | AD-013 | 2026-07-30 | Frontend modular: domínio em `frontend/modules/{module}/`; App Router em `frontend/app/` (sem `src/`) |
 | AD-014 | 2026-07-30 | Qualidade frontend: ESLint 9 flat + Prettier + TypeScript strict via `make lint-frontend`; `make lint` inclui frontend após backend; Husky + lint-staged na **raiz** do monorepo (globs `frontend/**` only) |
 | AD-015 | 2026-07-30 | Estilo frontend greenfield: **Tailwind CSS v4** (CSS-first, `@tailwindcss/postcss`); tema claro único; Radix adiado além da fundação BFF Auth |
+| AD-016 | 2026-08-11 | OpenAPI: lint via **Spectral** (`@stoplight/spectral-cli`) no monorepo (`make lint-openapi`); contract tests Pest em `modules/{Module}/Tests/Contract/`; containers backend montam `./docs:/var/www/docs:ro` (`OPENAPI_SPEC_PATH`) |
 
 ## Handoff
 
-- **Feature**: `bff-auth/foundation` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
-- **Phase / Task**: Complete (T1–T16 + Verifier PASS)
-- **Completed**: All foundation tasks; validation PASS (29/30 ACs; 1 FND-14 hard-fail precision gap)
+- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
+- **Phase / Task**: Complete (T1–T19 + Verifier PASS)
+- **Completed**: Auth Backend module closed — OpenAPI Spectral lint, Auth contract tests (11 endpoints), P2 gaps, docs/AD-016
 - **In-progress**: none
-- **Next step**: Próxima fatia BFF Auth (`session-core` ou conforme índice `.specs/features/bff-auth/README.md`)
+- **Next step**: `bff-auth/session-core` (conforme `.specs/features/bff-auth/README.md`)
 - **Blockers**: none
-- **Artifacts**: `.specs/features/bff-auth/foundation/{spec,context,design,tasks,validation}.md`
-- **Branch**: `feature/auth-fundation-frontend`
-- **Gate**: `make lint-frontend` + `make test-frontend` (30) + `make test-frontend-coverage` (≥75%) verdes
-- **Tip commits**: `e9db79f`…`aeac7ed`
+- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks,validation}.md`
+- **Branch**: `feature/auth-module-closure`
+- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth 93.74% lines / 86.10% methods)
+- **Tip commits**: `4b53a5a`…`b1012d9` + verifier docs commit

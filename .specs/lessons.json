@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 42,
+  "next_id": 43,
   "lessons": [
     {
       "id": "L-001",
@@ -743,6 +743,24 @@
       ],
       "created": "2026-07-31T01:30:26Z",
       "last_seen": "2026-07-31T01:30:26Z"
+    },
+    {
+      "id": "L-042",
+      "key": "surviving_mutant::when rejecting whitespace only input assert against a value that survives trimstrings or disable trimming in the test so whitespace validation rules are not masked by framework middleware",
+      "text": "When rejecting whitespace-only input, assert against a value that survives TrimStrings (or disable trimming in the test) so whitespace validation rules are not masked by framework middleware",
+      "signal": "surviving_mutant",
+      "scope": "auth,validation,http-requests",
+      "status": "candidate",
+      "features": [
+        "auth/module-closure"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M3 VerifyEmailRequest.php:40 / EmailVerificationTest.php:155 (auth,validation,http-requests)"
+      ],
+      "created": "2026-08-11T13:34:56Z",
+      "last_seen": "2026-08-11T13:34:56Z"
     }
   ]
 }
