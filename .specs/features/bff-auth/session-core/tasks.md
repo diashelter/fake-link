@@ -476,9 +476,9 @@ T13 → T14 → T15 → T16
 
 **Done when**:
 
-- [ ] Gate allowlist inclui apenas health + probe
-- [ ] `modules/auth/index.ts` não exporta bearer helpers perigosos para client
-- [ ] `make test-frontend` verde
+- [x] Gate allowlist inclui apenas health + probe
+- [x] `modules/auth/index.ts` não exporta bearer helpers perigosos para client
+- [x] `make test-frontend` verde
 
 **Tests**: unit
 **Gate**: full
