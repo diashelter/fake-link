@@ -200,12 +200,12 @@ T11
 
 **Done when**:
 
-- [ ] Happy path → `201` + `redirect_to: '/verify-email'` + sessão `verification`
-- [ ] Matriz 403/422/429 repasse; 500/503/504 genérico; guard 403 sem fetch
-- [ ] Upstream 201 com `token_kind !== verification` → 500 sem cookie
-- [ ] `JSON.stringify` resposta sucesso não contém Bearer fixture
-- [ ] destroySession chamado quando sessão prévia existe
-- [ ] Gate: `make test-frontend` passa; ≥18 casos no service test
+- [x] Happy path → `201` + `redirect_to: '/verify-email'` + sessão `verification`
+- [x] Matriz 403/422/429 repasse; 500/503/504 genérico; guard 403 sem fetch
+- [x] Upstream 201 com `token_kind !== verification` → 500 sem cookie
+- [x] `JSON.stringify` resposta sucesso não contém Bearer fixture
+- [x] destroySession chamado quando sessão prévia existe
+- [x] Gate: `make test-frontend` passa; ≥18 casos no service test
 
 **Tests**: unit  
 **Gate**: quick  
