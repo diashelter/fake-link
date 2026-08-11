@@ -23,13 +23,13 @@
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verifier pending (orchestrator)
-- **Phase / Task**: Gates green — awaiting Verifier
-- **Completed**: T14–T19 (P2, docs/AD-016, `make lint` + `make test-backend-coverage`)
+- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
+- **Phase / Task**: Complete (T1–T19 + Verifier PASS)
+- **Completed**: Auth Backend module closed — OpenAPI Spectral lint, Auth contract tests (11 endpoints), P2 gaps, docs/AD-016
 - **In-progress**: none
-- **Next step**: Orchestrator Verifier → then `bff-auth/session-core`
+- **Next step**: `bff-auth/session-core` (conforme `.specs/features/bff-auth/README.md`)
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks}.md`
+- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks,validation}.md`
 - **Branch**: `feature/auth-module-closure`
-- **Tip**: Auth Backend nearly closed; Auth coverage lines 93.75% / methods 86.10%
-- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth ≥80/80)
+- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth 93.74% lines / 86.10% methods)
+- **Tip commits**: `4b53a5a`…`b1012d9` + verifier docs commit

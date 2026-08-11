@@ -16,12 +16,12 @@ Sem esta fatia de fechamento, o módulo Auth Backend **não pode ser declarado o
 
 ## Goals
 
-- [ ] Gate automatizado de **lint OpenAPI** para `docs/openapi.yaml` (Auth + schemas compartilhados referenciados pelos endpoints Auth).
-- [ ] **Contract tests** Pest que validem respostas HTTP reais dos 11 endpoints Auth contra o contrato OpenAPI (status, envelope, campos, códigos de erro estáveis).
-- [ ] Integração dos gates de contrato em **`make lint`** (ou target dedicado invocado por `make lint`) e no workflow **`.github/workflows/backend-quality.yml`**.
-- [ ] **Fechamento documental**: índice Auth, goals das specs 4–7, `.specs/STATE.md`, `README.md` raiz e critérios de saída do módulo refletindo estado real.
-- [ ] **Verifier final** do módulo completo com diff range cobrindo esta fatia e confirmação cumulativa dos critérios de saída.
-- [ ] *(P2)* Fechar gaps menores de teste sinalizados nas validações das fatias login, email-verification, password e session-and-profile.
+- [x] Gate automatizado de **lint OpenAPI** para `docs/openapi.yaml` (Auth + schemas compartilhados referenciados pelos endpoints Auth).
+- [x] **Contract tests** Pest que validem respostas HTTP reais dos 11 endpoints Auth contra o contrato OpenAPI (status, envelope, campos, códigos de erro estáveis).
+- [x] Integração dos gates de contrato em **`make lint`** (ou target dedicado invocado por `make lint`) e no workflow **`.github/workflows/backend-quality.yml`**.
+- [x] **Fechamento documental**: índice Auth, goals das specs 4–7, `.specs/STATE.md`, `README.md` raiz e critérios de saída do módulo refletindo estado real.
+- [x] **Verifier final** do módulo completo com diff range cobrindo esta fatia e confirmação cumulativa dos critérios de saída.
+- [x] *(P2)* Fechar gaps menores de teste sinalizados nas validações das fatias login, email-verification, password e session-and-profile.
 
 ## Out of Scope
 
@@ -243,12 +243,12 @@ Sem esta fatia de fechamento, o módulo Auth Backend **não pode ser declarado o
 
 Módulo Auth Backend **oficialmente concluído** quando:
 
-- [ ] `make lint && make test-backend && make test-backend-coverage` verdes incluindo lint OpenAPI e contract tests Auth.
-- [ ] Workflow CI `backend-quality.yml` inclui lint OpenAPI com paridade local.
-- [ ] `.specs/features/auth/README.md` marca fatias 1–8 como Concluída/Verified.
-- [ ] `.specs/features/auth/module-closure/validation.md` com Verifier **Ready** e sensor PASS.
-- [ ] `.specs/STATE.md` Handoff aponta BFF Auth como próximo passo.
-- [ ] Nenhum endpoint Auth entregue diverge do contrato OpenAPI sem atualização simultânea de `docs/openapi.yaml` (detectável pelos contract tests).
+- [x] `make lint && make test-backend && make test-backend-coverage` verdes incluindo lint OpenAPI e contract tests Auth.
+- [x] Workflow CI `backend-quality.yml` inclui lint OpenAPI com paridade local.
+- [x] `.specs/features/auth/README.md` marca fatias 1–8 como Concluída/Verified.
+- [x] `.specs/features/auth/module-closure/validation.md` com Verifier **Ready** e sensor PASS.
+- [x] `.specs/STATE.md` Handoff aponta BFF Auth como próximo passo.
+- [x] Nenhum endpoint Auth entregue diverge do contrato OpenAPI sem atualização simultânea de `docs/openapi.yaml` (detectável pelos contract tests).
 
 ---
 

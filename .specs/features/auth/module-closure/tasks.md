@@ -10,9 +10,9 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/auth/module-closure/design.md`  
 **Spec**: `.specs/features/auth/module-closure/spec.md`  
-**Status**: Gates green — awaiting Verifier
+**Status**: Verified — Execute complete (Verifier PASS)
 
-> **Sub-agent note:** 19 tasks → 3 batches phase-aligned (T1–T8 | T9–T13 | T14–T19). User accepted sub-agents 2026-08-11. T19: lint + coverage green; Verifier deferred to orchestrator.
+> **Sub-agent note:** 19 tasks → 3 batches phase-aligned (T1–T8 | T9–T13 | T14–T19). User accepted sub-agents 2026-08-11. Verifier PASS 2026-08-11 (sensor 3/3 killed after fix `b1012d9`).
 
 ---
 
@@ -581,8 +581,8 @@ T18 → T19
 
 - [x] `make lint && make test-backend-coverage` exit 0
 - [x] Cobertura Auth ≥80% linhas e métodos (`check-auth-coverage-gate.php`)
-- [ ] Verifier PASS em `validation.md` com sensor ≥3/3 killed — orchestrator Verifier
-- [ ] Fatia 8 index → Verified — orchestrator Verifier
+- [x] Verifier PASS em `validation.md` com sensor ≥3/3 killed — orchestrator Verifier
+- [x] Fatia 8 index → Verified — orchestrator Verifier
 
 **Tests**: none (Verifier re-runs gates)  
 **Gate**: Final

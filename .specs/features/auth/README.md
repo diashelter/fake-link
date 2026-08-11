@@ -1,5 +1,7 @@
 # Auth Backend API — Índice de specs
 
+**Status do módulo:** Concluído (fatias 1–8 Verified) — 2026-08-11
+
 **Escopo do módulo:** backend Laravel em `backend/modules/Auth/` — endpoints `/api/v1` de identidade, credenciais e sessão Bearer.
 
 **Fora do escopo:** BFF Next.js, UI, cookies, CSRF, comandos do módulo `Operations`.
@@ -28,7 +30,7 @@
 | 5 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Concluída | registration, login | `POST …/email/verify`, `POST …/email/verification-notification` |
 | 6 | Senha (alterar e recuperar) | [password](./password/spec.md) | Concluída | bearer-tokens, login, email-verification | `POST …/password/change`, `…/reset-request`, `…/reset` |
 | 7 | Sessão e perfil | [session-and-profile](./session-and-profile/spec.md) | Concluída | bearer-tokens, login | `POST …/logout`, `…/logout-all`, `GET/PATCH /api/v1/me` |
-| 8 | Fechamento do módulo | [module-closure](./module-closure/spec.md) | Implementing | fatias 1–7 | Lint OpenAPI, contract tests, docs/STATE, Verifier final |
+| 8 | Fechamento do módulo | [module-closure](./module-closure/spec.md) | Verified | fatias 1–7 | Lint OpenAPI, contract tests, docs/STATE, Verifier final |
 
 ```mermaid
 flowchart LR

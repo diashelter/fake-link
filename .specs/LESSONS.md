@@ -260,6 +260,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: FND-14 hard-fail / validation.md re-verify iter 1 (frontend/hooks)
 - last seen: 2026-07-31T01:30:26Z
 
+### L-042 — When rejecting whitespace-only input, assert against a value that survives TrimStrings (or disable trimming in the test) so whitespace validation rules are not masked by framework middleware
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `auth,validation,http-requests` · harmful: 0
+- features: auth/module-closure
+- evidence: M3 VerifyEmailRequest.php:40 / EmailVerificationTest.php:155 (auth,validation,http-requests)
+- last seen: 2026-08-11T13:34:56Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
