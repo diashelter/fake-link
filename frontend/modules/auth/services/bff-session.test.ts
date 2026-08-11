@@ -8,10 +8,12 @@ import { buildRedisSessionKey } from '../lib/session/redis-key';
 import { parseSessionId } from '../lib/session/session-id';
 import { FakeSessionStore } from '../lib/session/test/fake-session-store';
 import { ABSOLUTE_TTL_SECONDS } from '../lib/session/ttl';
+import { getDecryptFailCount } from '../lib/session/metrics';
 import {
   applySessionCookie,
   clearSessionCookie,
   createSession,
+  getSession,
   SessionValidationError,
 } from './bff-session';
 
@@ -141,5 +143,97 @@ describe('applySessionCookie / clearSessionCookie (SC-03)', () => {
 
     expect(header).toContain('__Host-fl_session=');
     expect(header).toMatch(/Max-Age=0/i);
+  });
+});
+
+describe('getSession (SC-05, SC-06, SC-07, SC-12)', () => {
+  let store: FakeSessionStore;
+  let config: BffSessionConfig;
+  const fixedNow = new Date('2026-08-11T12:00:00.000Z');
+
+  beforeEach(() => {
+    store = new FakeSessionStore();
+    config = testConfig();
+  });
+
+  async function createAndCookie(): Promise<string> {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+    return `${config.cookieName}=${created.sessionId}`;
+  }
+
+  it('happy path returns context with decrypted bearer in memory', async () => {
+    const cookieHeader = await createAndCookie();
+
+    const result = await getSession(cookieHeader, { config, store, now: () => fixedNow });
+
+    expect(result.context).not.toBeNull();
+    expect(result.context!.bearer).toBe(TEST_BEARER);
+    expect(result.context!.userId).toBe(TEST_USER_ID);
+    expect(result.context!.kind).toBe('session');
+  });
+
+  it('SessionContext holds bearer in memory; safe response shape must not (SC-05 negative)', async () => {
+    const cookieHeader = await createAndCookie();
+    const result = await getSession(cookieHeader, { config, store, now: () => fixedNow });
+    const context = result.context!;
+
+    // Bearer is present in the in-memory context (required for BFF upstream calls).
+    expect(context.bearer).toBe(TEST_BEARER);
+    // Negative: serializing SessionContext WOULD leak bearer — product must never do this.
+    expect(JSON.stringify(context)).toContain(TEST_BEARER);
+    // Probe/product-safe shape must omit bearer (leak detector).
+    const safeShape = { authenticated: true, kind: context.kind };
+    expect(JSON.stringify(safeShape)).not.toContain(TEST_BEARER);
+
+    const idBytes = parseSessionId(context.sessionId)!;
+    const record = await store.get(buildRedisSessionKey(idBytes, config.hmacKey));
+    expect(JSON.stringify(record)).not.toContain(TEST_BEARER);
+  });
+
+  it('malformed cookie returns null without store get (SC-06)', async () => {
+    const getSpy = vi.spyOn(store, 'get');
+
+    const result = await getSession(`${config.cookieName}=not-a-valid-session-id`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
+    expect(getSpy).not.toHaveBeenCalled();
+  });
+
+  it('decrypt fail destroys session, increments metric, and clears cookie (SC-07)', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+    const idBytes = parseSessionId(created.sessionId)!;
+    const key = buildRedisSessionKey(idBytes, config.hmacKey);
+    const record = await store.get(key);
+    expect(record).not.toBeNull();
+
+    const corrupted = {
+      ...record!,
+      envelope: {
+        ...record!.envelope,
+        ciphertext: `${record!.envelope.ciphertext.slice(0, -1)}${record!.envelope.ciphertext.endsWith('A') ? 'B' : 'A'}`,
+      },
+    };
+    await store.set(key, corrupted, ABSOLUTE_TTL_SECONDS.session);
+
+    const before = getDecryptFailCount();
+    const result = await getSession(`${config.cookieName}=${created.sessionId}`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
+    expect(getDecryptFailCount()).toBe(before + 1);
+    expect(await store.get(key)).toBeNull();
   });
 });

@@ -5,11 +5,17 @@ import { NextResponse } from 'next/server';
 import { setSessionCookie } from '@/lib/session-cookie';
 
 import { loadBffSessionConfig, type BffSessionConfig } from '../lib/session/config';
-import { encryptBearer } from '../lib/session/crypto';
+import { decryptBearer, encryptBearer, SessionDecryptError } from '../lib/session/crypto';
+import { incrementDecryptFail } from '../lib/session/metrics';
 import { buildRedisSessionKey } from '../lib/session/redis-key';
 import { generateSessionId, parseSessionId } from '../lib/session/session-id';
 import { createSessionStore, type SessionStore } from '../lib/session/session-store';
-import type { CreateSessionInput, CreateSessionResult, SessionRecord } from '../lib/session/types';
+import type {
+  CreateSessionInput,
+  CreateSessionResult,
+  GetSessionResult,
+  SessionRecord,
+} from '../lib/session/types';
 import { ABSOLUTE_TTL_SECONDS, remainingAbsoluteSeconds } from '../lib/session/ttl';
 
 export class SessionValidationError extends Error {
@@ -92,4 +98,82 @@ export function clearSessionCookie(
 ): NextResponse {
   const { config } = resolveDeps(deps);
   return setSessionCookie(response, config.cookieName, '', { maxAge: 0 });
+}
+
+function extractCookieValue(cookieHeader: string | null, name: string): string | null {
+  if (!cookieHeader) {
+    return null;
+  }
+  for (const part of cookieHeader.split(';')) {
+    const trimmed = part.trim();
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) {
+      continue;
+    }
+    const key = trimmed.slice(0, eq);
+    if (key === name) {
+      return trimmed.slice(eq + 1);
+    }
+  }
+  return null;
+}
+
+async function deleteSessionRecord(
+  sessionId: string,
+  config: BffSessionConfig,
+  store: SessionStore,
+): Promise<void> {
+  const sessionIdBytes = parseSessionId(sessionId);
+  if (!sessionIdBytes) {
+    return;
+  }
+  await store.del(buildRedisSessionKey(sessionIdBytes, config.hmacKey));
+}
+
+/**
+ * Read path: cookie → Redis GET → decrypt Bearer into in-memory SessionContext (SC-05–SC-07).
+ */
+export async function getSession(
+  cookieHeader: string | null,
+  deps: BffSessionDependencies = {},
+): Promise<GetSessionResult> {
+  const { config, store } = resolveDeps(deps);
+  const cookieValue = extractCookieValue(cookieHeader, config.cookieName);
+  if (!cookieValue) {
+    return { context: null, clearCookie: true };
+  }
+
+  const sessionIdBytes = parseSessionId(cookieValue);
+  if (!sessionIdBytes) {
+    return { context: null, clearCookie: true };
+  }
+
+  const redisKey = buildRedisSessionKey(sessionIdBytes, config.hmacKey);
+  const record = await store.get(redisKey);
+  if (!record) {
+    return { context: null, clearCookie: true };
+  }
+
+  let bearer: string;
+  try {
+    bearer = decryptBearer(record.envelope, config);
+  } catch (error) {
+    if (error instanceof SessionDecryptError) {
+      incrementDecryptFail();
+      await deleteSessionRecord(cookieValue, config, store);
+      return { context: null, clearCookie: true };
+    }
+    throw error;
+  }
+
+  return {
+    context: {
+      sessionId: cookieValue,
+      kind: record.kind,
+      userId: record.userId,
+      bearer,
+      createdAt: new Date(record.createdAt),
+      lastActivityAt: new Date(record.lastActivityAt),
+    },
+  };
 }
