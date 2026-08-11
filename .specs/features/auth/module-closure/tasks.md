@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/auth/module-closure/design.md`  
 **Spec**: `.specs/features/auth/module-closure/spec.md`  
-**Status**: Implementing — Batch 3 (T14–T19) ✅ complete; next Batch 3 (T14–T19)
+**Status**: Implementing — Batch 3 (T14–T18) docs/P2; T19 gates + Verifier pending
 
 > **Sub-agent note:** 19 tasks → 3 batches phase-aligned (T1–T8 | T9–T13 | T14–T19). User accepted sub-agents 2026-08-11.
 
@@ -551,11 +551,11 @@ T18 → T19
 
 **Done when**:
 
-- [ ] Fatia 8 index → Implementing/Done conforme progresso
-- [ ] Goals `[x]` em login, email-verification, password, session-and-profile
-- [ ] STATE Handoff: Auth Backend concluído; next `bff-auth/session-core`
-- [ ] AD-016 appended em STATE Decisions
-- [ ] README raiz §Estado atual atualizado
+- [x] Fatia 8 index → Implementing/Done conforme progresso
+- [x] Goals `[x]` em login, email-verification, password, session-and-profile
+- [x] STATE Handoff: Auth Backend concluído; next `bff-auth/session-core`
+- [x] AD-016 appended em STATE Decisions
+- [x] README raiz §Estado atual atualizado
 
 **Tests**: none  
 **Gate**: build

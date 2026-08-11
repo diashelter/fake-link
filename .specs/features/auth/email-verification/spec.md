@@ -12,13 +12,13 @@ Usuários em `pending_verification` precisam confirmar posse do e-mail antes de 
 
 ## Goals
 
-- [ ] Migration `email_action_tokens` com purpose `email_verification`, hash, TTL 60 min e consumo atômico.
-- [ ] Envio de verificação via Resend (job na fila `notifications`), substituindo o stub de registro.
-- [ ] `POST /api/v1/auth/email/verification-notification` → `202` (Bearer `verification`).
-- [ ] `POST /api/v1/auth/email/verify` → `204` (Bearer `verification` + token de e-mail no body).
-- [ ] Ativação pós-verify: `status=active`, `email_verified_at` preenchido, revogação do Bearer `verification` **atual**; **sem** emissão de `session` (novo login obrigatório — AUTH-12).
-- [ ] Rate limits: reenvio 3/h por conta; verify 5/h por conta.
-- [ ] Feature + integration tests cobrindo TTL, uso único, concorrência, rate limit, privacidade e transição de status.
+- [x] Migration `email_action_tokens` com purpose `email_verification`, hash, TTL 60 min e consumo atômico.
+- [x] Envio de verificação via Resend (job na fila `notifications`), substituindo o stub de registro.
+- [x] `POST /api/v1/auth/email/verification-notification` → `202` (Bearer `verification`).
+- [x] `POST /api/v1/auth/email/verify` → `204` (Bearer `verification` + token de e-mail no body).
+- [x] Ativação pós-verify: `status=active`, `email_verified_at` preenchido, revogação do Bearer `verification` **atual**; **sem** emissão de `session` (novo login obrigatório — AUTH-12).
+- [x] Rate limits: reenvio 3/h por conta; verify 5/h por conta.
+- [x] Feature + integration tests cobrindo TTL, uso único, concorrência, rate limit, privacidade e transição de status.
 
 ## Out of Scope
 

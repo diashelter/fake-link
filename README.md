@@ -4,9 +4,11 @@ Fake Link é um encurtador de URLs com criação e gestão de `Short Links`, red
 
 ## Estado atual
 
-O repositório está na fase de definição concluída. Comportamento, escopo, contrato OpenAPI e decisões estruturais estão sincronizados; o próximo marco é implementar a fundação descrita no roadmap.
+A **Fase 1 Auth Backend API** (`backend/modules/Auth/`) está entregue nas fatias 1–7 (register → verify → login → password → session/profile), com OpenAPI lint (Spectral), contract tests e fechamento documental em andamento na fatia 8 (`auth/module-closure`). Declaração oficial de módulo concluído depende do Verifier dessa fatia.
 
-Em caso de divergência durante essa fase, [decisions.md](docs/decisions.md) registra a política confirmada, os ADRs explicam os trade-offs duráveis e [product.md](docs/product.md) define o comportamento esperado.
+Próximo marco após Verifier: **BFF Auth** (`bff-auth/session-core`).
+
+Em caso de divergência, [decisions.md](docs/decisions.md) e `.specs/STATE.md` (Decisions AD-NNN) registram a política confirmada; [product.md](docs/product.md) define o comportamento esperado.
 
 ## Stack prevista
 

@@ -24,10 +24,11 @@
 | 1 | Fundação do módulo | [foundation](./foundation/spec.md) | Concluída | Fase 0 (Docker, quality gates) | Scaffold hexagonal, migrations, domínio compartilhado |
 | 2 | Tokens Bearer | [bearer-tokens](./bearer-tokens/spec.md) | Concluída | foundation | Middleware, emissão, revogação, TTL e idle |
 | 3 | Registro por convite | [registration](./registration/spec.md) | Concluída | bearer-tokens | `POST /api/v1/auth/register` |
-| 4 | Login | [login](./login/spec.md) | Approved | bearer-tokens | `POST /api/v1/auth/login` |
-| 5 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Approved (Design + Tasks) | registration, login | `POST …/email/verify`, `POST …/email/verification-notification` |
-| 6 | Senha (alterar e recuperar) | [password](./password/spec.md) | Approved (Design+Tasks draft) | bearer-tokens, login, email-verification | `POST …/password/change`, `…/reset-request`, `…/reset` |
-| 7 | Sessão e perfil | [session-and-profile](./session-and-profile/spec.md) | Tasks draft | bearer-tokens, login | `POST …/logout`, `…/logout-all`, `GET/PATCH /api/v1/me` |
+| 4 | Login | [login](./login/spec.md) | Concluída | bearer-tokens | `POST /api/v1/auth/login` |
+| 5 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Concluída | registration, login | `POST …/email/verify`, `POST …/email/verification-notification` |
+| 6 | Senha (alterar e recuperar) | [password](./password/spec.md) | Concluída | bearer-tokens, login, email-verification | `POST …/password/change`, `…/reset-request`, `…/reset` |
+| 7 | Sessão e perfil | [session-and-profile](./session-and-profile/spec.md) | Concluída | bearer-tokens, login | `POST …/logout`, `…/logout-all`, `GET/PATCH /api/v1/me` |
+| 8 | Fechamento do módulo | [module-closure](./module-closure/spec.md) | Implementing | fatias 1–7 | Lint OpenAPI, contract tests, docs/STATE, Verifier final |
 
 ```mermaid
 flowchart LR
@@ -40,6 +41,9 @@ flowchart LR
     login --> password
     bearerTokens --> sessionProfile[session-and-profile]
     login --> sessionProfile
+    sessionProfile --> moduleClosure[module-closure]
+    password --> moduleClosure
+    emailVerification --> moduleClosure
 ```
 
 ---
@@ -126,7 +130,7 @@ Cada spec filha inclui os limites da sua superfície. Referência global: `docs/
 
 ## Critérios de saída do módulo (completo)
 
-Quando **todas** as fatias 1–7 estiverem implementadas e verificadas:
+Quando **todas** as fatias 1–8 estiverem implementadas e verificadas (fatias 1–7 = funcionalidade; fatia 8 = [module-closure](./module-closure/spec.md)):
 
 - Usuário convidado registra, verifica e-mail, faz login e gerencia sessão somente via API.
 - Enumeração, tokens, TTL, revogação e status de conta comportam-se conforme `docs/testing.md` §6.1 (backend).

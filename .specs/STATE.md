@@ -19,16 +19,17 @@
 | AD-013 | 2026-07-30 | Frontend modular: domínio em `frontend/modules/{module}/`; App Router em `frontend/app/` (sem `src/`) |
 | AD-014 | 2026-07-30 | Qualidade frontend: ESLint 9 flat + Prettier + TypeScript strict via `make lint-frontend`; `make lint` inclui frontend após backend; Husky + lint-staged na **raiz** do monorepo (globs `frontend/**` only) |
 | AD-015 | 2026-07-30 | Estilo frontend greenfield: **Tailwind CSS v4** (CSS-first, `@tailwindcss/postcss`); tema claro único; Radix adiado além da fundação BFF Auth |
+| AD-016 | 2026-08-11 | OpenAPI: lint via **Spectral** (`@stoplight/spectral-cli`) no monorepo (`make lint-openapi`); contract tests Pest em `modules/{Module}/Tests/Contract/`; containers backend montam `./docs:/var/www/docs:ro` (`OPENAPI_SPEC_PATH`) |
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute in progress
-- **Phase / Task**: Batch 2 complete (T9–T13); Phase 3 Auth OpenAPI contract tests
-- **Completed**: T9 Register+Login contract · T10 Email verification contract · T11 Password contract · T12 Session/profile contract · T13 Contract regression sweep (no OpenAPI drift)
+- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute (P2 + docs) ✅ · Verifier pending
+- **Phase / Task**: Phase 5 — T18 docs closed; T19 gates then orchestrator Verifier
+- **Completed**: T14–T17 P2 gaps · T18 documentary closure (AD-016, Goals 4–7, index Fatia 8 Implementing)
 - **In-progress**: none
-- **Next step**: Batch 3 — T14–T19 (P2 gaps + fechamento documental + Verifier)
-- **Blockers**: none
+- **Next step**: After Verifier PASS → mark Auth Backend concluded; next feature `bff-auth/session-core`
+- **Blockers**: none — awaiting independent Verifier (author ≠ verifier)
 - **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks}.md`
 - **Branch**: `feature/auth-module-closure`
-- **Gate**: `make lint` ✅ · `make test-backend` 419 passed (5 Contract files, 11 Auth endpoints)
-- **Tip commits**: Batch 2 `6d58db3`…`1d0df83`
+- **Tip**: Auth Backend nearly closed (OpenAPI lint + contract tests + P2); official “Concluído” only after Verifier
+- **Gate**: docs sync (T18); final `make lint && make test-backend-coverage` on T19

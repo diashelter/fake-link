@@ -13,13 +13,13 @@ Usuários autenticados precisam alterar a senha com confirmação da senha atual
 
 ## Goals
 
-- [ ] Estender `email_action_tokens` / `EmailActionPurpose` com `password_reset` (TTL absoluto 30 min).
-- [ ] `POST /api/v1/auth/password/reset-request` → sempre `202` para body válido (anti-enumeração).
-- [ ] `POST /api/v1/auth/password/reset` → `204`; consome token, atualiza hash Argon2id, revoga **todos** os Bearers.
-- [ ] `POST /api/v1/auth/password/change` → `204` (Bearer `session`); exige `current_password`; revoga **todos** os Bearers.
-- [ ] Envio de recuperação via Resend (job na fila `notifications`), espelhando o padrão de verificação.
-- [ ] Rate limits: reset-request 3/h e-mail+IP; reset 5/h IP+token; change sob escritas privadas 120/min por conta.
-- [ ] Feature + integration tests cobrindo TTL, uso único, concorrência, elegibilidade, anti-enumeração, política de senha e revogação total.
+- [x] Estender `email_action_tokens` / `EmailActionPurpose` com `password_reset` (TTL absoluto 30 min).
+- [x] `POST /api/v1/auth/password/reset-request` → sempre `202` para body válido (anti-enumeração).
+- [x] `POST /api/v1/auth/password/reset` → `204`; consome token, atualiza hash Argon2id, revoga **todos** os Bearers.
+- [x] `POST /api/v1/auth/password/change` → `204` (Bearer `session`); exige `current_password`; revoga **todos** os Bearers.
+- [x] Envio de recuperação via Resend (job na fila `notifications`), espelhando o padrão de verificação.
+- [x] Rate limits: reset-request 3/h e-mail+IP; reset 5/h IP+token; change sob escritas privadas 120/min por conta.
+- [x] Feature + integration tests cobrindo TTL, uso único, concorrência, elegibilidade, anti-enumeração, política de senha e revogação total.
 
 ## Out of Scope
 
