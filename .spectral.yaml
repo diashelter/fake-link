@@ -1,0 +1,16 @@
+# Fake Link OpenAPI Spectral ruleset (ABMC-01 / ABMC-02)
+# Severity legend:
+#   error — fails `make lint-openapi` (CI / local gate)
+#   warn  — reported but does not fail the gate by default (Spectral exit 0 for warn-only)
+#   off   — explicitly disabled when too noisy for current docs/openapi.yaml
+extends: spectral:oas
+
+rules:
+  # error — every operationId must be unique across the document
+  operation-operationId-unique: error
+  # error — every operation must declare at least one tag defined in tags[]
+  operation-tag-defined: error
+  # warn — example payloads should match their media schemas (noisy on large specs)
+  oas3-valid-media-example: warn
+  # warn — recommend operationId on every operation (Auth paths already have them)
+  operation-operationId: warn
