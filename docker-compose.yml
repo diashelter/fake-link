@@ -220,6 +220,10 @@ services:
       - frontend_node_modules:/app/node_modules
     environment:
       NODE_ENV: development
+      BFF_APP_ORIGIN: ${BFF_APP_ORIGIN:-https://app.localhost}
+      BFF_CSRF_HMAC_KEY: ${BFF_CSRF_HMAC_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      LARAVEL_INTERNAL_URL: ${LARAVEL_INTERNAL_URL:-http://nginx/api/v1}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://app.localhost}
     depends_on:
       backend:
         condition: service_healthy

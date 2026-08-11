@@ -20,16 +20,16 @@
 | AD-014 | 2026-07-30 | Qualidade frontend: ESLint 9 flat + Prettier + TypeScript strict via `make lint-frontend`; `make lint` inclui frontend após backend; Husky + lint-staged na **raiz** do monorepo (globs `frontend/**` only) |
 | AD-015 | 2026-07-30 | Estilo frontend greenfield: **Tailwind CSS v4** (CSS-first, `@tailwindcss/postcss`); tema claro único; Radix adiado além da fundação BFF Auth |
 | AD-016 | 2026-08-11 | OpenAPI: lint via **Spectral** (`@stoplight/spectral-cli`) no monorepo (`make lint-openapi`); contract tests Pest em `modules/{Module}/Tests/Contract/`; containers backend montam `./docs:/var/www/docs:ro` (`OPENAPI_SPEC_PATH`) |
+| AD-017 | 2026-08-11 | Route Handlers BFF Auth usam prefixo **`/api/bff/...`** no App Router Next.js; Laravel permanece em `/api/v1/...` via nginx |
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
-- **Phase / Task**: Complete (T1–T19 + Verifier PASS)
-- **Completed**: Auth Backend module closed — OpenAPI Spectral lint, Auth contract tests (11 endpoints), P2 gaps, docs/AD-016
+- **Feature**: `bff-auth/csrf-proxy` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅
+- **Phase / Task**: T1–T11 concluídas; aguardando Verifier
+- **Completed**: módulo `frontend/modules/auth/bff/*`, probe route, env docs, cobertura ≥80%
 - **In-progress**: none
-- **Next step**: `bff-auth/session-core` (conforme `.specs/features/bff-auth/README.md`)
-- **Blockers**: none
-- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-module-closure`
-- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth 93.74% lines / 86.10% methods)
-- **Tip commits**: `4b53a5a`…`b1012d9` + verifier docs commit
+- **Next step**: Verifier + fatia `session-core` ou `login`
+- **Blockers**: session-core não executada (integração real na fatia login)
+- **Artifacts**: `.specs/features/bff-auth/csrf-proxy/{spec,design,tasks}.md`
+- **Branch**: `feature/bff-auth-csrf-proxy`
+- **Gate**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (bff ≥97% lines)

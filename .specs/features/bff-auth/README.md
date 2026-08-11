@@ -27,7 +27,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 1 | Fundação frontend | [foundation](./foundation/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ⏳ | API Auth + Fase 0 | Módulos, forms stack, Tailwind, primitivos, ESLint/Prettier/Husky, gates Vitest/lint |
 | 2 | Núcleo de sessão BFF | [session-core](./session-core/spec.md) | Seed | foundation | Crypto, cookie, Redis, TTL/idle |
-| 3 | CSRF e proxy | [csrf-proxy](./csrf-proxy/spec.md) | Seed | session-core | Origin, CSRF, allowlist, returnUrl |
+| 3 | CSRF e proxy | [csrf-proxy](./csrf-proxy/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ | session-core | Origin, CSRF, allowlist, returnUrl |
 | 4 | Login | [login](./login/spec.md) | Seed | csrf-proxy | BFF login + UI login |
 | 5 | Cadastro | [register](./register/spec.md) | Seed | login | BFF register + UI + Terms |
 | 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Seed | register | BFF verify/resend + UI |
