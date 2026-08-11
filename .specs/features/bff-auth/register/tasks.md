@@ -125,9 +125,9 @@ T11
 
 **Done when**:
 
-- [ ] `name`: trim, 1–120; `email`: trim + lowercase; `accept_terms`: literal `true`
-- [ ] `password_confirmation` mismatch → erro de campo
-- [ ] Gate: `make test-frontend` passa
+- [x] `name`: trim, 1–120; `email`: trim + lowercase; `accept_terms`: literal `true`
+- [x] `password_confirmation` mismatch → erro de campo
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
