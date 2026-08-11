@@ -6,7 +6,13 @@ Fake Link é um encurtador de URLs com criação e gestão de `Short Links`, red
 
 A **Fase 1 Auth Backend API** (`backend/modules/Auth/`) está entregue nas fatias 1–7 (register → verify → login → password → session/profile), com OpenAPI lint (Spectral), contract tests e fechamento documental em andamento na fatia 8 (`auth/module-closure`). Declaração oficial de módulo concluído depende do Verifier dessa fatia.
 
-Próximo marco após Verifier: **BFF Auth** (`bff-auth/session-core`).
+No **frontend Auth + BFF** (`frontend/modules/auth/`), três fatias de infraestrutura estão implementadas e verificadas:
+
+- **foundation** — módulos `auth`/`shared`, stack de forms (RHF+Zod), TanStack Query, primitivos UI, gates de qualidade.
+- **session-core** — sessão opaca (cookie `__Host-fl_session`), Bearer cifrado AES-256-GCM no Redis, TTL absoluto/idle, rotação e destroy.
+- **csrf-proxy** — validação de `Origin`, CSRF double-submit, allowlist/proxy upstream, `returnUrl` seguro.
+
+Próximo marco: **login** (`bff-auth/login`) — Route Handlers de produto + UI server-first, integrando sessão BFF com a API Laravel. Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
 
 Em caso de divergência, [decisions.md](docs/decisions.md) e `.specs/STATE.md` (Decisions AD-NNN) registram a política confirmada; [product.md](docs/product.md) define o comportamento esperado.
 
@@ -110,11 +116,11 @@ CI=true pnpm --dir frontend install
 
 Rode o primeiro comando na **raiz do monorepo**. O segundo instala as ferramentas de lint/format usadas pelo hook no host. Os gates Docker (`make lint`, `make lint-frontend`, `make test-frontend`, `make test-frontend-coverage`) continuam obrigatórios independentemente dos hooks.
 
-Checklist da fundação BFF Auth (Out of Scope desta fatia):
+Checklist BFF Auth (estado da infraestrutura — fatias foundation, session-core, csrf-proxy):
 
-- Sem Route Handlers Auth de produto (`login`/`register`/etc.)
-- Sem Radix UI
-- Sem Bearer token no browser
+- Sem Route Handlers Auth de **produto** (`/api/bff/auth/login`, register, etc.) — apenas probes em dev/test
+- Sem Radix UI (adiado além da fundação)
+- Bearer token nunca exposto ao browser (facade server-only + testes Vitest)
 
 Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
 

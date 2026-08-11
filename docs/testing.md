@@ -45,6 +45,7 @@ Os testes de arquitetura devem falhar quando:
 ### 3.2 Frontend e BFF
 
 - Vitest cobre schemas Zod, serviços, funções puras, Route Handlers e regras do BFF.
+- **Cobertura atual do BFF Auth (infra):** `modules/auth/bff/**` e `modules/auth/lib/session/**` com testes unitários para cifra GCM, session ID, TTL/idle, store Redis (fake injectable), CSRF (sessão e pre-auth), `Origin`, allowlist, `returnUrl`, mutation guard, proxy upstream e probe routes. Facade `bff-session` cobre create/get/touch/rotate/destroy, incluindo rotação concorrente e falha Redis. Cobertura medida ≥80% linhas/branches no escopo BFF (`make test-frontend-coverage`). Route Handlers de produto e Playwright E2E dos fluxos Auth ainda não existem.
 - React Testing Library cobre componentes e fluxos pelo comportamento percebido pelo usuário.
 - MSW simula os contratos HTTP, incluindo latência, erros, `ETag`, paginação e respostas fora de ordem.
 - Playwright cobre os fluxos críticos completos contra a composição real.

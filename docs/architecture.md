@@ -220,6 +220,38 @@ Sessões completas expiram em 7 dias absolutos ou 24 horas de inatividade. Sess�
 
 O orçamento da API privada, incluindo chamadas BFF para Laravel, é 10 segundos.
 
+### 8.1 Módulo frontend Auth — organização e estado de implementação
+
+O frontend modulariza Auth em `frontend/modules/auth/`, com suporte compartilhado em `frontend/modules/shared/`. Route Handlers de produto usam o prefixo `/api/bff/...` (AD-017); Laravel permanece em `/api/v1/...` via Nginx.
+
+| Camada | Caminho | Responsabilidade |
+| --- | --- | --- |
+| `bff/` | `modules/auth/bff/` | Allowlist, validação de `Origin`, CSRF double-submit, proxy upstream, `returnUrl`, respostas privadas |
+| `lib/session/` | `modules/auth/lib/session/` | Cifra AES-256-GCM, session ID opaco, chave Redis via HMAC, TTL absoluto/idle, store Redis |
+| `services/` | `modules/auth/services/` | Facade server-only `bff-session` (create/get/touch/rotate/destroy) — importar somente em Route Handlers |
+| Barrel público | `modules/auth/index.ts` | Reexporta helpers BFF e **tipos** de sessão; não reexporta crypto nem facade server-only |
+
+Cookie de sessão: `__Host-fl_session` (configurável via `BFF_SESSION_COOKIE_NAME`). CSRF: cookies `__Host-fl_csrf` (legível pelo browser) e `__Host-fl_csrf_sid` (pre-auth). Chaves separadas: `BFF_SESSION_AES_KEY`, `BFF_SESSION_HMAC_KEY`, `BFF_CSRF_HMAC_KEY`.
+
+**Implementado (infraestrutura BFF, sem UI de produto):**
+
+- Fundação frontend: módulos `auth`/`shared`, Tailwind v4, RHF+Zod, TanStack Query sem persistência, primitivos UI, gates Vitest/ESLint/Prettier, Husky/lint-staged, MSW harness, landing `pt-BR` tema claro.
+- Núcleo de sessão: cifra GCM do Bearer, ID opaco 256-bit, cookie `__Host-`, lookup Redis `HMAC(session_id)`, TTL absoluto/idle (`session`: 7d/24h; `verification`: 24h/1h), throttle de touch (900s), rotação/destruição, falha Redis → logout seguro, métrica de decrypt fail.
+- CSRF e proxy: validação de `Origin` exata, double-submit CSRF (modo sessão e pre-auth), allowlist estática (vazia em produção), `sanitizeReturnUrl`, `Cache-Control: private, no-store`, guard de mutations, proxy upstream com timeout 10s.
+
+**Rotas existentes (não-produto / probe):**
+
+- `GET/POST /api/_test/session` — probe de sessão (404 em produção salvo `BFF_SESSION_PROBE_ENABLED=true`).
+- `GET/POST /api/bff/_probe/mutate` — probe de mutation guard + CSRF (404 em produção).
+
+**Pendente (Fase 1 — fatias login → e2e-security-gate):**
+
+- Route Handlers de produto (`/api/bff/auth/...`) populando `AUTH_BFF_ALLOWLIST`.
+- UI server-first: login, cadastro, verificação, recuperação/reset/change de senha, perfil, guards de rota.
+- Integração end-to-end com API Laravel Auth e gate Playwright de ausência de Bearer no browser.
+
+Detalhes de specs, ACs e validação: `.specs/features/bff-auth/README.md`.
+
 ## 9. Redis e filas
 
 Há duas instâncias independentes:
