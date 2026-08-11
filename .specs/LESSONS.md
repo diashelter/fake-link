@@ -266,6 +266,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: M3 VerifyEmailRequest.php:40 / EmailVerificationTest.php:155 (auth,validation,http-requests)
 - last seen: 2026-08-11T13:34:56Z
 
+### L-043 — When a spec lists a concurrency edge for session rotation, add an explicit concurrent-call test asserting the old id is invalid and at most one successor remains valid
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth/session` · harmful: 0
+- features: bff-auth/session-core
+- evidence: validation.md edge: concurrent rotateSession — no file:line (auth/session)
+- last seen: 2026-08-11T16:35:24Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

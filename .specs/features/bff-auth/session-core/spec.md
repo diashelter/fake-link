@@ -305,24 +305,24 @@ frontend/
 
 | Requirement ID | Story | Catálogo | Phase | Status |
 | --- | --- | --- | --- | --- |
-| SC-01 | P1: Criar sessão | BFFUI-10 | Tasks (T5,T8,T9) | Done |
-| SC-02 | P1: Criar sessão | BFFUI-11 | Tasks (T4,T8,T9) | Done |
-| SC-03 | P1: Criar sessão | BFFUI-12 | Tasks (T9) | Done |
-| SC-04 | P1: Criar sessão | BFFUI-14 | Tasks (T6,T9) | Done |
-| SC-05 | P1: Recuperar sessão | BFFUI-10 | Tasks (T10) | Done |
-| SC-06 | P1: Recuperar sessão | BFFUI-13 | Tasks (T4,T6,T10) | Done |
-| SC-07 | P1: Recuperar sessão | BFFUI-17 | Tasks (T5,T7,T10) | Done |
-| SC-08 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | Done |
-| SC-09 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | Done |
-| SC-10 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | Done |
-| SC-11 | P1: Rotação/destruição | BFFUI-15 | Tasks (T12) | Done |
-| SC-12 | P1: Rotação/destruição | BFFUI-16 | Tasks (T10,T12) | Done |
-| SC-13 | P2: Falha Redis | BFFUI-16 | Tasks (T12) | Done |
-| SC-14 | P2: Falha Redis | BFFUI-10 | Tasks (T3) | Done |
-| SC-15 | P2: Falha Redis | BFFUI-10 | Tasks (T5,T10) | Done |
-| SC-16 | P2: Probe | BFFUI-17 | Tasks (T14,T15) | Done |
-| SC-17 | P2: Probe | BFFUI-17 | Tasks (T14) | Done |
-| SC-18 | P3: Doc rotação chave | BFFUI-10 | Tasks (T13) | Done |
+| SC-01 | P1: Criar sessão | BFFUI-10 | Tasks (T5,T8,T9) | ✅ Verified |
+| SC-02 | P1: Criar sessão | BFFUI-11 | Tasks (T4,T8,T9) | ✅ Verified |
+| SC-03 | P1: Criar sessão | BFFUI-12 | Tasks (T9) | ✅ Verified |
+| SC-04 | P1: Criar sessão | BFFUI-14 | Tasks (T6,T9) | ✅ Verified |
+| SC-05 | P1: Recuperar sessão | BFFUI-10 | Tasks (T10) | ✅ Verified |
+| SC-06 | P1: Recuperar sessão | BFFUI-13 | Tasks (T4,T6,T10) | ✅ Verified |
+| SC-07 | P1: Recuperar sessão | BFFUI-17 | Tasks (T5,T7,T10) | ✅ Verified |
+| SC-08 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | ✅ Verified |
+| SC-09 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | ✅ Verified |
+| SC-10 | P1: Expiração | BFFUI-14 | Tasks (T6,T11) | ✅ Verified |
+| SC-11 | P1: Rotação/destruição | BFFUI-15 | Tasks (T12) | ✅ Verified |
+| SC-12 | P1: Rotação/destruição | BFFUI-16 | Tasks (T10,T12) | ✅ Verified |
+| SC-13 | P2: Falha Redis | BFFUI-16 | Tasks (T12) | ✅ Verified |
+| SC-14 | P2: Falha Redis | BFFUI-10 | Tasks (T3) | ✅ Verified |
+| SC-15 | P2: Falha Redis | BFFUI-10 | Tasks (T5,T10) | ✅ Verified |
+| SC-16 | P2: Probe | BFFUI-17 | Tasks (T14,T15) | ✅ Verified |
+| SC-17 | P2: Probe | BFFUI-17 | Tasks (T14) | ✅ Verified |
+| SC-18 | P3: Doc rotação chave | BFFUI-10 | Tasks (T13) | ✅ Verified |
 
 **Coverage:** 18 total, 18 mapped to tasks ✅
 

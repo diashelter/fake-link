@@ -23,15 +23,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ⏳
-- **Phase / Task**: Phase 3 (Batch 3) complete — Execute complete, awaiting Verifier
-- **Completed**: T1–T16 (all phases: primitives, store/facade, Docker env, probe route, foundation gates, coverage)
+- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ PASS
+- **Phase / Task**: Re-validation iteration 1 complete — Ready
+- **Completed**: T1–T16; Fix 1 (`899d855` claim DEL before create + concurrent rotate test); SC-01…SC-18 + concurrent edge Verified; sensor 3/3 killed; gate 91/0
 - **In-progress**: none
-- **Next step**: Dispatch Verifier (author ≠ verifier) → `.specs/features/bff-auth/session-core/validation.md`
+- **Next step**: Feature ready (merge/handoff); no further fix→re-verify iterations
 - **Blockers**: none
-- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks}.md`
+- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks,validation}.md`
 - **Branch**: `feature/bff-auth-session-core`
-- **Gate**: `make lint-frontend` + `make test-frontend-coverage` — 89 passed, 0 failed; auth module ≥75% lines/branches
-- **Batch 3 commits**: T13 `37209b1`, T14 `5da0b6b`, T15 `654abbe`, T16 (this handoff after commit)
-- **Uncommitted**: `.specs/features/bff-auth/session-core/design.md` (planning artifact if not yet committed); `.specs/features/bff-auth/README.md` status drift
-- **Note**: Foundation allowlist pulled forward into T14 so `make test-frontend` could pass; T15 verified allowlist + auth barrel types-only
+- **Gate**: `make lint-frontend && make test-frontend` — 91 passed, 0 failed
+- **Validation**: PASS — see `.specs/features/bff-auth/session-core/validation.md` (diff `fa24b26^..899d855`)
