@@ -23,7 +23,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
-    expect(relative).toEqual(['health/route.ts']);
+    expect(relative.sort()).toEqual(['api/bff/_probe/mutate/route.ts', 'health/route.ts']);
 
     const forbidden = ['login', 'register', 'verify', 'password', 'auth'];
     for (const segment of forbidden) {
