@@ -24,12 +24,12 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/csrf-proxy` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅
-- **Phase / Task**: T1–T11 concluídas; aguardando Verifier
-- **Completed**: módulo `frontend/modules/auth/bff/*`, probe route, env docs, cobertura ≥80%
-- **In-progress**: none
-- **Next step**: Verifier + fatia `session-core` ou `login`
-- **Blockers**: session-core não executada (integração real na fatia login)
-- **Artifacts**: `.specs/features/bff-auth/csrf-proxy/{spec,design,tasks}.md`
-- **Branch**: `feature/bff-auth-csrf-proxy`
-- **Gate**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (bff ≥97% lines)
+- **Feature**: `bff-auth/login` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ⏳
+- **Phase / Task**: T1–T11 complete (T9 no-op via T3)
+- **Completed**: login schema, auth types/messages, `performBffLogin`, allowlist, route handler, CSRF RSC bootstrap, LoginForm, `/login` page, foundation gates
+- **In-progress**: Verifier validation report
+- **Next step**: Review `validation.md`; merge `feature/bff-auth-login` when PASS
+- **Blockers**: none
+- **Artifacts**: `.specs/features/bff-auth/login/{spec,design,tasks,validation}.md`
+- **Commits**: `7dc2d2f`..`8286286` (9 feat/test commits)
+- **Gate alvo**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (215 tests)
