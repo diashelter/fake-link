@@ -19,11 +19,12 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('does not introduce Auth product Route Handlers beyond health', () => {
+  it('does not introduce Auth product Route Handlers beyond health and gated session probe', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
-    const relative = routes.map((file) => path.relative(appDir, file));
-    expect(relative).toEqual(['health/route.ts']);
+    const relative = routes.map((file) => path.relative(appDir, file)).sort();
+    // SPEC_DEVIATION (pull-forward from T15): allowlist updated early so T14 gate can pass.
+    expect(relative).toEqual(['api/_test/session/route.ts', 'health/route.ts'].sort());
 
     const forbidden = ['login', 'register', 'verify', 'password', 'auth'];
     for (const segment of forbidden) {

@@ -449,10 +449,10 @@ T13 → T14 → T15 → T16
 
 **Done when**:
 
-- [ ] Prod + probe disabled → 404
-- [ ] POST cria sessão; GET com cookie → `{ authenticated: true, kind }`
-- [ ] Response body/headers sem bearer/sessionId/ciphertext
-- [ ] `make test-frontend` verde
+- [x] Prod + probe disabled → 404
+- [x] POST cria sessão; GET com cookie → `{ authenticated: true, kind }`
+- [x] Response body/headers sem bearer/sessionId/ciphertext
+- [x] `make test-frontend` verde
 
 **Tests**: unit
 **Gate**: full
