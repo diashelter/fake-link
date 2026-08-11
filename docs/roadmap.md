@@ -41,7 +41,7 @@
 
 ## Fase 1: Auth + BFF
 
-**Progresso (2026-08-11):** API Laravel Auth entregue (fatias 1–7). No frontend, a infraestrutura BFF está parcialmente concluída: fundação, núcleo de sessão e CSRF/proxy implementados e verificados por Vitest (≥80% em `modules/auth/bff/**`). Faltam Route Handlers de produto, UI dos fluxos de conta e gate E2E Playwright. Índice detalhado: `.specs/features/bff-auth/README.md`.
+**Progresso (2026-08-11):** API Laravel Auth entregue (fatias 1–7). No frontend, a infraestrutura BFF (fundação, session-core, csrf-proxy) e as fatias **login** e **cadastro** estão implementadas e verificadas. Faltam fatias 6–9 (email-verification → e2e-security-gate) e gate E2E Playwright. Índice: `.specs/features/bff-auth/README.md`.
 
 ### Entregáveis
 
@@ -53,10 +53,10 @@
 - Sessão completa com 7 dias absolutos e 24 horas de inatividade; Restricted Session com 24 horas absolutas e 1 hora de inatividade.
 - Perfil limitado à alteração de nome e revogação de todas as sessões após mudança ou reset de senha.
 - Token Bearer de acesso direto com expiração absoluta e por inatividade conforme o tipo e write throttle de `last_used_at` de 15 minutos.
-- BFF em Next.js Route Handlers com token criptografado no servidor, sessão opaca validada por HMAC e chave externa ao Redis. *(infra implementada; rotas de produto pendentes)*
+- BFF em Next.js Route Handlers com token criptografado no servidor, sessão opaca validada por HMAC e chave externa ao Redis. *(infra + login + cadastro implementados)*
 - Cookie `__Host-` quando aplicável, `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` e sem `Domain`. *(implementado)*
 - Proteção de mutations por allowlist de `Origin` e double-submit CSRF. *(implementado)*
-- Allowlist de rotas do BFF, `returnUrl` interno seguro e garantia de que o token não chega ao browser. *(mecanismo implementado; allowlist de produto vazia; UI pendente)*
+- Allowlist de rotas do BFF, `returnUrl` interno seguro e garantia de que o token não chega ao browser. *(login + register na allowlist; demais rotas de produto pendentes)*
 - Logout seguro quando Redis ou API falham e invalidação da sessão após perda do Redis. *(destroy/clear cookie implementados; Route Handler de logout pendente)*
 - UI server-first de convite, cadastro, verificação, login, recuperação, termos e sessão.
 - React Hook Form com Zod e TanStack Query sem persistência, com defaults documentados e testados.
