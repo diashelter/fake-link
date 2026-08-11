@@ -16,7 +16,13 @@ import type {
   GetSessionResult,
   SessionRecord,
 } from '../lib/session/types';
-import { ABSOLUTE_TTL_SECONDS, remainingAbsoluteSeconds } from '../lib/session/ttl';
+import {
+  ABSOLUTE_TTL_SECONDS,
+  isAbsoluteExpired,
+  isIdleExpired,
+  remainingAbsoluteSeconds,
+  shouldTouch,
+} from '../lib/session/ttl';
 
 export class SessionValidationError extends Error {
   constructor(message: string) {
@@ -137,7 +143,7 @@ export async function getSession(
   cookieHeader: string | null,
   deps: BffSessionDependencies = {},
 ): Promise<GetSessionResult> {
-  const { config, store } = resolveDeps(deps);
+  const { config, store, now } = resolveDeps(deps);
   const cookieValue = extractCookieValue(cookieHeader, config.cookieName);
   if (!cookieValue) {
     return { context: null, clearCookie: true };
@@ -151,6 +157,12 @@ export async function getSession(
   const redisKey = buildRedisSessionKey(sessionIdBytes, config.hmacKey);
   const record = await store.get(redisKey);
   if (!record) {
+    return { context: null, clearCookie: true };
+  }
+
+  const current = now();
+  if (isAbsoluteExpired(record, current) || isIdleExpired(record, current)) {
+    await deleteSessionRecord(cookieValue, config, store);
     return { context: null, clearCookie: true };
   }
 
@@ -176,4 +188,45 @@ export async function getSession(
       lastActivityAt: new Date(record.lastActivityAt),
     },
   };
+}
+
+/**
+ * Throttled idle refresh: write lastActivityAt at most once per 900s (SC-10).
+ */
+export async function touchSession(
+  sessionId: string,
+  deps: BffSessionDependencies = {},
+): Promise<void> {
+  const { config, store, now } = resolveDeps(deps);
+  const sessionIdBytes = parseSessionId(sessionId);
+  if (!sessionIdBytes) {
+    return;
+  }
+
+  const redisKey = buildRedisSessionKey(sessionIdBytes, config.hmacKey);
+  const record = await store.get(redisKey);
+  if (!record) {
+    return;
+  }
+
+  const current = now();
+  if (isAbsoluteExpired(record, current) || isIdleExpired(record, current)) {
+    await store.del(redisKey);
+    return;
+  }
+
+  if (!shouldTouch(new Date(record.lastActivityAt), current)) {
+    return;
+  }
+
+  const updated: SessionRecord = {
+    ...record,
+    lastActivityAt: current.toISOString(),
+  };
+  const exSeconds = remainingAbsoluteSeconds(updated, current);
+  if (exSeconds <= 0) {
+    await store.del(redisKey);
+    return;
+  }
+  await store.set(redisKey, updated, exSeconds);
 }

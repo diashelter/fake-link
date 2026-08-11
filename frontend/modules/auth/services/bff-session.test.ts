@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextResponse } from 'next/server';
 
 vi.mock('server-only', () => ({}));
@@ -7,7 +7,11 @@ import type { BffSessionConfig } from '../lib/session/config';
 import { buildRedisSessionKey } from '../lib/session/redis-key';
 import { parseSessionId } from '../lib/session/session-id';
 import { FakeSessionStore } from '../lib/session/test/fake-session-store';
-import { ABSOLUTE_TTL_SECONDS } from '../lib/session/ttl';
+import {
+  ABSOLUTE_TTL_SECONDS,
+  IDLE_TTL_SECONDS,
+  TOUCH_THROTTLE_SECONDS,
+} from '../lib/session/ttl';
 import { getDecryptFailCount } from '../lib/session/metrics';
 import {
   applySessionCookie,
@@ -15,6 +19,7 @@ import {
   createSession,
   getSession,
   SessionValidationError,
+  touchSession,
 } from './bff-session';
 
 const TEST_BEARER = 'test-bearer-token-PLAINTEXT-secret-xyz';
@@ -235,5 +240,101 @@ describe('getSession (SC-05, SC-06, SC-07, SC-12)', () => {
     expect(result).toEqual({ context: null, clearCookie: true });
     expect(getDecryptFailCount()).toBe(before + 1);
     expect(await store.get(key)).toBeNull();
+  });
+});
+
+describe('touchSession + expiry enforcement (SC-08, SC-09, SC-10)', () => {
+  let store: FakeSessionStore;
+  let config: BffSessionConfig;
+  const base = new Date('2026-08-11T12:00:00.000Z');
+
+  beforeEach(() => {
+    store = new FakeSessionStore();
+    config = testConfig();
+    vi.useFakeTimers();
+    vi.setSystemTime(base);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  async function createAtBase(kind: 'session' | 'verification' = 'session') {
+    return createSession(
+      { bearer: TEST_BEARER, kind, userId: TEST_USER_ID },
+      { config, store, now: () => new Date() },
+    );
+  }
+
+  it('idle expired session returns null, clearCookie, and destroys Redis key (SC-09)', async () => {
+    const created = await createAtBase('session');
+    const key = buildRedisSessionKey(parseSessionId(created.sessionId)!, config.hmacKey);
+
+    vi.setSystemTime(new Date(base.getTime() + IDLE_TTL_SECONDS.session * 1000 + 1));
+
+    const result = await getSession(`${config.cookieName}=${created.sessionId}`, {
+      config,
+      store,
+      now: () => new Date(),
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
+    expect(await store.get(key)).toBeNull();
+  });
+
+  it('absolute expired session is destroyed (SC-08)', async () => {
+    const created = await createAtBase('session');
+    const key = buildRedisSessionKey(parseSessionId(created.sessionId)!, config.hmacKey);
+    const record = await store.get(key);
+    // Keep idle fresh; force absolute expiry via createdAt in the past.
+    await store.set(
+      key,
+      {
+        ...record!,
+        createdAt: new Date(base.getTime() - ABSOLUTE_TTL_SECONDS.session * 1000 - 1).toISOString(),
+        lastActivityAt: base.toISOString(),
+      },
+      1,
+    );
+
+    const result = await getSession(`${config.cookieName}=${created.sessionId}`, {
+      config,
+      store,
+      now: () => new Date(),
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
+    expect(await store.get(key)).toBeNull();
+  });
+
+  it('touchSession does not write when elapsed < 900s (SC-10)', async () => {
+    const created = await createAtBase('session');
+    const key = buildRedisSessionKey(parseSessionId(created.sessionId)!, config.hmacKey);
+    const setSpy = vi.spyOn(store, 'set');
+
+    vi.setSystemTime(new Date(base.getTime() + (TOUCH_THROTTLE_SECONDS - 1) * 1000));
+    setSpy.mockClear();
+
+    await touchSession(created.sessionId, { config, store, now: () => new Date() });
+
+    expect(setSpy).not.toHaveBeenCalled();
+    const record = await store.get(key);
+    expect(record!.lastActivityAt).toBe(base.toISOString());
+  });
+
+  it('touchSession updates lastActivityAt when elapsed ≥ 900s (SC-10)', async () => {
+    const created = await createAtBase('session');
+    const key = buildRedisSessionKey(parseSessionId(created.sessionId)!, config.hmacKey);
+
+    const touchedAt = new Date(base.getTime() + TOUCH_THROTTLE_SECONDS * 1000);
+    vi.setSystemTime(touchedAt);
+
+    await touchSession(created.sessionId, { config, store, now: () => new Date() });
+
+    const record = await store.get(key);
+    expect(record!.lastActivityAt).toBe(touchedAt.toISOString());
+    expect(store.getExSeconds(key)).toBe(
+      ABSOLUTE_TTL_SECONDS.session - TOUCH_THROTTLE_SECONDS,
+    );
   });
 });
