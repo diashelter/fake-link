@@ -19,7 +19,7 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('allows login product routes and keeps other auth segments gated', () => {
+  it('allows login and register product routes and keeps other auth segments gated', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
@@ -27,16 +27,27 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/_test/session/route.ts',
       'api/bff/_probe/mutate/route.ts',
       'api/bff/auth/login/route.ts',
+      'api/bff/auth/register/route.ts',
       'health/route.ts',
     ]);
 
-    const forbiddenInRoutes = ['register', 'verify', 'password'];
+    const forbiddenInRoutes = ['verify', 'password'];
     for (const segment of forbiddenInRoutes) {
       expect(relative.some((route) => route.includes(segment))).toBe(false);
     }
 
     const loginPage = path.join(appDir, 'login', 'page.tsx');
+    const registerPage = path.join(appDir, 'register', 'page.tsx');
+    const termsPage = path.join(appDir, 'terms', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
+    expect(statSync(registerPage).isFile()).toBe(true);
+    expect(statSync(termsPage).isFile()).toBe(true);
+
+    const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
+    const relativePages = pages.map((file) => path.relative(appDir, file));
+    for (const segment of forbiddenInRoutes) {
+      expect(relativePages.some((page) => page.includes(`${segment}${path.sep}`))).toBe(false);
+    }
   });
 
   it('auth barrel exports types only (no session facade or bearer helpers)', () => {

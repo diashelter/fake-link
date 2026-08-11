@@ -27,9 +27,13 @@ afterEach(() => {
 afterAll(() => server.close());
 
 describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
+  function setupUser() {
+    return userEvent.setup({ delay: null });
+  }
+
   it('blocks invalid submit without calling fetch', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const user = userEvent.setup();
+    const user = setupUser();
 
     render(<LoginForm />);
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
@@ -48,7 +52,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'secret');
@@ -70,7 +74,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
         http.post('/api/bff/auth/login', () => HttpResponse.json(scenario.body, { status: 401 })),
       );
 
-      const user = userEvent.setup();
+      const user = setupUser();
       render(<LoginForm />);
       await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
       await user.type(screen.getByLabelText('Senha'), 'secret');
@@ -95,7 +99,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'secret');
@@ -118,7 +122,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'wrong');
@@ -136,7 +140,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'secret');
@@ -157,7 +161,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'secret');
@@ -179,7 +183,7 @@ describe('LoginForm (LOG-05, LOG-06, LOG-08, LOG-10, LOG-13)', () => {
       }),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<LoginForm returnUrl="/safe" />);
     await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
     await user.type(screen.getByLabelText('Senha'), 'secret');

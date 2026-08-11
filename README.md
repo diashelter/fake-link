@@ -12,7 +12,9 @@ No **frontend Auth + BFF** (`frontend/modules/auth/`), três fatias de infraestr
 - **session-core** — sessão opaca (cookie `__Host-fl_session`), Bearer cifrado AES-256-GCM no Redis, TTL absoluto/idle, rotação e destroy.
 - **csrf-proxy** — validação de `Origin`, CSRF double-submit, allowlist/proxy upstream, `returnUrl` seguro.
 
-Próximo marco: **login** (`bff-auth/login`) — Route Handlers de produto + UI server-first, integrando sessão BFF com a API Laravel. Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
+**Login** e **cadastro** (`bff-auth/login`, `bff-auth/register`) entregues — Route Handlers BFF, UI `/login` e `/register`, Terms e sessão `verification` verificados.
+
+Próximo marco: **verificação de e-mail** (`bff-auth/email-verification`). Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
 
 Em caso de divergência, [decisions.md](docs/decisions.md) e `.specs/STATE.md` (Decisions AD-NNN) registram a política confirmada; [product.md](docs/product.md) define o comportamento esperado.
 

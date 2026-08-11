@@ -233,21 +233,31 @@ O frontend modulariza Auth em `frontend/modules/auth/`, com suporte compartilhad
 
 Cookie de sessão: `__Host-fl_session` (configurável via `BFF_SESSION_COOKIE_NAME`). CSRF: cookies `__Host-fl_csrf` (legível pelo browser) e `__Host-fl_csrf_sid` (pre-auth). Chaves separadas: `BFF_SESSION_AES_KEY`, `BFF_SESSION_HMAC_KEY`, `BFF_CSRF_HMAC_KEY`.
 
-**Implementado (infraestrutura BFF, sem UI de produto):**
+**Implementado (infraestrutura BFF + login + cadastro):**
 
 - Fundação frontend: módulos `auth`/`shared`, Tailwind v4, RHF+Zod, TanStack Query sem persistência, primitivos UI, gates Vitest/ESLint/Prettier, Husky/lint-staged, MSW harness, landing `pt-BR` tema claro.
 - Núcleo de sessão: cifra GCM do Bearer, ID opaco 256-bit, cookie `__Host-`, lookup Redis `HMAC(session_id)`, TTL absoluto/idle (`session`: 7d/24h; `verification`: 24h/1h), throttle de touch (900s), rotação/destruição, falha Redis → logout seguro, métrica de decrypt fail.
-- CSRF e proxy: validação de `Origin` exata, double-submit CSRF (modo sessão e pre-auth), allowlist estática (vazia em produção), `sanitizeReturnUrl`, `Cache-Control: private, no-store`, guard de mutations, proxy upstream com timeout 10s.
+- CSRF e proxy: validação de `Origin` exata, double-submit CSRF (modo sessão e pre-auth), allowlist estática, `sanitizeReturnUrl`, `Cache-Control: private, no-store`, guard de mutations, proxy upstream com timeout 10s.
+- **Login (fatia 4):** `POST /api/bff/auth/login`, UI `/login`, `performBffLogin`, sessão BFF sem Bearer no browser — verificado (`.specs/features/bff-auth/login/validation.md`).
+- **Cadastro (fatia 5):** `POST /api/bff/auth/register`, UI `/register`, `/terms`, `performBffRegister`, sessão `verification` sem Bearer — verificado (`.specs/features/bff-auth/register/validation.md`).
+
+**Rotas de produto existentes:**
+
+- `POST /api/bff/auth/login` — autenticação via BFF.
+- `POST /api/bff/auth/register` — cadastro via BFF.
+- `GET /login` — UI server-first de login.
+- `GET /register` — UI server-first de cadastro.
+- `GET /terms` — Terms versionados (placeholder pt-BR).
 
 **Rotas existentes (não-produto / probe):**
 
 - `GET/POST /api/_test/session` — probe de sessão (404 em produção salvo `BFF_SESSION_PROBE_ENABLED=true`).
 - `GET/POST /api/bff/_probe/mutate` — probe de mutation guard + CSRF (404 em produção).
 
-**Pendente (Fase 1 — fatias login → e2e-security-gate):**
+**Pendente (Fase 1 — fatias email-verification → e2e-security-gate):**
 
-- Route Handlers de produto (`/api/bff/auth/...`) populando `AUTH_BFF_ALLOWLIST`.
-- UI server-first: login, cadastro, verificação, recuperação/reset/change de senha, perfil, guards de rota.
+- Route Handlers de produto restantes (verify, password, logout, me) populando `AUTH_BFF_ALLOWLIST`.
+- UI server-first: verificação, recuperação/reset/change de senha, perfil, guards de rota.
 - Integração end-to-end com API Laravel Auth e gate Playwright de ausência de Bearer no browser.
 
 Detalhes de specs, ACs e validação: `.specs/features/bff-auth/README.md`.
