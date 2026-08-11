@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -153,6 +155,14 @@ describe('POST /api/v1/auth/email/verify', function () {
     });
 
     it('returns 422 VALIDATION_FAILED for whitespace-only token without consuming email action tokens', function () {
+        // Bypass TrimStrings so the request body keeps `' '` (not collapsed to '').
+        // Note: Laravel also skips non-implicit rules (including not_regex) for blank values;
+        // `required` yields this 422. Rule presence is asserted in VerifyEmailRequestTest.
+        $this->withoutMiddleware([
+            TrimStrings::class,
+            ConvertEmptyStringsToNull::class,
+        ]);
+
         $user = UserModel::factory()->create([
             'email' => 'verify-whitespace@example.com',
         ]);
@@ -167,7 +177,8 @@ describe('POST /api/v1/auth/email/verify', function () {
         ]);
 
         $response->assertUnprocessable()
-            ->assertJsonPath('code', 'VALIDATION_FAILED');
+            ->assertJsonPath('code', 'VALIDATION_FAILED')
+            ->assertJsonPath('errors.token.0.code', 'INVALID');
 
         expect(EmailActionTokenModel::query()->where('user_id', $user->id)->value('used_at'))
             ->toBeNull()
