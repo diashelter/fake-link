@@ -3,7 +3,16 @@ import type { AllowlistEntry, HttpMethod } from './types';
 
 export type { AllowlistEntry, HttpMethod };
 
-export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [];
+export const LOGIN_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'POST',
+  bffPath: '/api/bff/auth/login',
+  upstreamMethod: 'POST',
+  upstreamPath: '/auth/login',
+  requireSession: false,
+  requireCsrf: true,
+};
+
+export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [LOGIN_ALLOWLIST_ENTRY];
 
 export function lookupAllowlistEntry(
   method: string,
