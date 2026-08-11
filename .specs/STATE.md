@@ -24,12 +24,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/login` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅ PASS
-- **Phase / Task**: T1–T11 complete (T9 no-op via T3)
-- **Completed**: login schema, auth types/messages, `performBffLogin`, allowlist, route handler, CSRF RSC bootstrap, LoginForm, `/login` page, foundation gates, verifier gaps closed
+- **Feature**: `bff-auth/register` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅ PASS
+- **Phase / Task**: Complete
+- **Completed**: T1–T11 + coverage fix `ee9bb24`; validation PASS (48/48 ACs, sensor 9/9 killed)
 - **In-progress**: none
-- **Next step**: Open PR for `feature/bff-auth-login` → merge after review
+- **Next step**: Fatia 6 `email-verification` (Specify deepen) ou PR desta branch
 - **Blockers**: none
-- **Artifacts**: `.specs/features/bff-auth/login/{spec,design,tasks,validation}.md`
-- **Commits**: `7dc2d2f`..`9c8f34c` (11 commits)
-- **Gate**: `make lint-frontend` ✅ · `make test-frontend-coverage` ✅ (222 tests)
+- **Commits**: `e06325d`..`ee9bb24` (branch `feature/bff-auth-register`)
+- **Gate**: `make lint-frontend` ✅ · `make test-frontend` ✅ (289) · coverage slice ≥75%
+- **Report**: `.specs/features/bff-auth/register/validation.md`
+- **Artifacts**: `spec.md`, `design.md`, `tasks.md`, `validation.md`

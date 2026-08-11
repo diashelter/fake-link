@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 44,
+  "next_id": 48,
   "lessons": [
     {
       "id": "L-001",
@@ -779,6 +779,78 @@
       ],
       "created": "2026-08-11T16:35:24Z",
       "last_seen": "2026-08-11T16:35:24Z"
+    },
+    {
+      "id": "L-044",
+      "key": "ac_gap::on bff auth success paths assert csrf re issue side effects cookie or issuecsrfforsession not only the session cookie",
+      "text": "On BFF auth success paths, assert CSRF re-issue side effects (cookie or issueCsrfForSession), not only the session cookie",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/register"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Success AC1 / bff-register.test.ts happy path — missing issueCsrfForSession (frontend/modules/auth)"
+      ],
+      "created": "2026-08-11T20:38:51Z",
+      "last_seen": "2026-08-11T20:38:51Z"
+    },
+    {
+      "id": "L-045",
+      "key": "ac_gap::when the spec requires multiple success body fields assert every named field value not a subset",
+      "text": "When the spec requires multiple success body fields, assert every named field value, not a subset",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/register"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Terms AC5 / bff-register.test.ts:129 — terms_accepted_at (frontend/modules/auth)"
+      ],
+      "created": "2026-08-11T20:38:51Z",
+      "last_seen": "2026-08-11T20:38:51Z"
+    },
+    {
+      "id": "L-046",
+      "key": "ac_gap::for client bff submits assert content type and csrf header together with the request body shape",
+      "text": "For client BFF submits, assert Content-Type and CSRF header together with the request body shape",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/register"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "UI AC3 / register-form.test.tsx — Content-Type (frontend/modules/auth)"
+      ],
+      "created": "2026-08-11T20:38:51Z",
+      "last_seen": "2026-08-11T20:38:51Z"
+    },
+    {
+      "id": "L-047",
+      "key": "ac_gap::when stripping bearer from bff json assert absence of the bare substring token not only token field names",
+      "text": "When stripping Bearer from BFF JSON, assert absence of the bare substring token, not only token_* field names",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/register"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Success AC3 / bff-register.test.ts:160 — bare token substring (frontend/modules/auth)"
+      ],
+      "created": "2026-08-11T20:38:51Z",
+      "last_seen": "2026-08-11T20:38:51Z"
     }
   ]
 }

@@ -272,6 +272,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md edge: concurrent rotateSession — no file:line (auth/session)
 - last seen: 2026-08-11T16:35:24Z
 
+### L-044 — On BFF auth success paths, assert CSRF re-issue side effects (cookie or issueCsrfForSession), not only the session cookie
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/register
+- evidence: Success AC1 / bff-register.test.ts happy path — missing issueCsrfForSession (frontend/modules/auth)
+- last seen: 2026-08-11T20:38:51Z
+
+### L-045 — When the spec requires multiple success body fields, assert every named field value, not a subset
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/register
+- evidence: Terms AC5 / bff-register.test.ts:129 — terms_accepted_at (frontend/modules/auth)
+- last seen: 2026-08-11T20:38:51Z
+
+### L-046 — For client BFF submits, assert Content-Type and CSRF header together with the request body shape
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/register
+- evidence: UI AC3 / register-form.test.tsx — Content-Type (frontend/modules/auth)
+- last seen: 2026-08-11T20:38:51Z
+
+### L-047 — When stripping Bearer from BFF JSON, assert absence of the bare substring token, not only token_* field names
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/register
+- evidence: Success AC3 / bff-register.test.ts:160 — bare token substring (frontend/modules/auth)
+- last seen: 2026-08-11T20:38:51Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
