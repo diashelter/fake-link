@@ -1,0 +1,5 @@
+# Root tooling workspace (Spectral OpenAPI lint via scripts/lint-openapi.sh).
+# pnpm 11 requires an explicit allowBuilds decision for packages with install scripts.
+# @scarf/scarf is transitive telemetry from Spectral deps — deny its build scripts.
+allowBuilds:
+  '@scarf/scarf': false
