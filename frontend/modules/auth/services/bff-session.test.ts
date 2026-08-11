@@ -17,7 +17,9 @@ import {
   applySessionCookie,
   clearSessionCookie,
   createSession,
+  destroySession,
   getSession,
+  rotateSession,
   SessionValidationError,
   touchSession,
 } from './bff-session';
@@ -336,5 +338,84 @@ describe('touchSession + expiry enforcement (SC-08, SC-09, SC-10)', () => {
     expect(store.getExSeconds(key)).toBe(
       ABSOLUTE_TTL_SECONDS.session - TOUCH_THROTTLE_SECONDS,
     );
+  });
+});
+
+describe('rotateSession / destroySession / Redis failure (SC-11, SC-12, SC-13)', () => {
+  let store: FakeSessionStore;
+  let config: BffSessionConfig;
+  const fixedNow = new Date('2026-08-11T12:00:00.000Z');
+
+  beforeEach(() => {
+    store = new FakeSessionStore();
+    config = testConfig();
+  });
+
+  it('after rotate, old id does not resolve and new id does (SC-11)', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+
+    const rotated = await rotateSession(created.sessionId, undefined, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+
+    expect(rotated.sessionId).not.toBe(created.sessionId);
+
+    const oldResult = await getSession(`${config.cookieName}=${created.sessionId}`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+    expect(oldResult).toEqual({ context: null, clearCookie: true });
+
+    const newResult = await getSession(`${config.cookieName}=${rotated.sessionId}`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+    expect(newResult.context).not.toBeNull();
+    expect(newResult.context!.bearer).toBe(TEST_BEARER);
+  });
+
+  it('destroySession removes Redis key and returns clearCookie (SC-11)', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+    const key = buildRedisSessionKey(parseSessionId(created.sessionId)!, config.hmacKey);
+
+    const destroyed = await destroySession(created.sessionId, { config, store });
+
+    expect(destroyed).toEqual({ clearCookie: true });
+    expect(await store.get(key)).toBeNull();
+
+    const response = NextResponse.json({ ok: true });
+    clearSessionCookie(response, { config });
+    const setCookie = response.headers.getSetCookie?.() ?? [];
+    const header =
+      setCookie.find((value) => value.includes('__Host-fl_session=')) ??
+      response.headers.get('set-cookie') ??
+      '';
+    expect(header).toMatch(/Max-Age=0/i);
+  });
+
+  it('store throw on getSession returns null + clearCookie (SC-13)', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+    vi.spyOn(store, 'get').mockRejectedValueOnce(new Error('Redis connection failed'));
+
+    const result = await getSession(`${config.cookieName}=${created.sessionId}`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
   });
 });

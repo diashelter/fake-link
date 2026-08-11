@@ -155,7 +155,13 @@ export async function getSession(
   }
 
   const redisKey = buildRedisSessionKey(sessionIdBytes, config.hmacKey);
-  const record = await store.get(redisKey);
+  let record: SessionRecord | null;
+  try {
+    record = await store.get(redisKey);
+  } catch {
+    // Redis connection/timeout errors → same as miss (SC-13).
+    return { context: null, clearCookie: true };
+  }
   if (!record) {
     return { context: null, clearCookie: true };
   }
@@ -229,4 +235,46 @@ export async function touchSession(
     return;
   }
   await store.set(redisKey, updated, exSeconds);
+}
+
+/** Delete Redis session key and instruct cookie clear (SC-11). */
+export async function destroySession(
+  sessionId: string,
+  deps: BffSessionDependencies = {},
+): Promise<{ clearCookie: true }> {
+  const { config, store } = resolveDeps(deps);
+  await deleteSessionRecord(sessionId, config, store);
+  return { clearCookie: true };
+}
+
+/**
+ * Invalidate current session id and create a new one (delete-before-create) (SC-11).
+ * When `input` is omitted, bearer/kind/userId are copied from the current record.
+ */
+export async function rotateSession(
+  currentSessionId: string,
+  input?: CreateSessionInput,
+  deps: BffSessionDependencies = {},
+): Promise<CreateSessionResult> {
+  const { config, store } = resolveDeps(deps);
+
+  let createInput = input;
+  if (!createInput) {
+    const sessionIdBytes = parseSessionId(currentSessionId);
+    if (!sessionIdBytes) {
+      throw new SessionValidationError('Invalid current session id');
+    }
+    const record = await store.get(buildRedisSessionKey(sessionIdBytes, config.hmacKey));
+    if (!record) {
+      throw new SessionValidationError('Current session not found');
+    }
+    createInput = {
+      bearer: decryptBearer(record.envelope, config),
+      kind: record.kind,
+      userId: record.userId,
+    };
+  }
+
+  await deleteSessionRecord(currentSessionId, config, store);
+  return createSession(createInput, deps);
 }
