@@ -473,9 +473,9 @@ T18 → T19
 
 **Done when**:
 
-- [ ] POST verify com token `" "` → 422 VALIDATION_FAILED
-- [ ] Email action token permanece unused
-- [ ] Gate check passes: `make test-backend`
+- [x] POST verify com token `" "` → 422 VALIDATION_FAILED
+- [x] Email action token permanece unused
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature  
 **Gate**: full
