@@ -393,11 +393,11 @@ T18 → T19
 
 **Done when**:
 
-- [ ] GET /me: 200 UserResponse exact keys (9 campos em `data`)
-- [ ] PATCH /me: 403 TOKEN_RESTRICTED com verification bearer
-- [ ] logout + logout-all: 204 happy; 401 missing bearer
-- [ ] Headers em GET /me happy path
-- [ ] Gate check passes: `make test-backend`
+- [x] GET /me: 200 UserResponse exact keys (9 campos em `data`)
+- [x] PATCH /me: 403 TOKEN_RESTRICTED com verification bearer
+- [x] logout + logout-all: 204 happy; 401 missing bearer
+- [x] Headers em GET /me happy path
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (contract)  
 **Gate**: full
