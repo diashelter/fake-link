@@ -11,6 +11,8 @@ export {
   issuePreAuthCsrf,
   readPreAuthCsrfSid,
   validateCsrfDoubleSubmit,
+  writePreAuthCsrfCookies,
+  ensurePreAuthCsrfCookies,
 } from './csrf';
 
 export { getBffAppOrigin, getCsrfHmacKey, getLaravelInternalUrl } from './env';

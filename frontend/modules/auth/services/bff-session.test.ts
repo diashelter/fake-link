@@ -15,6 +15,7 @@ import {
   createSession,
   destroySession,
   getSession,
+  getSessionFromRequest,
   rotateSession,
   SessionValidationError,
   touchSession,
@@ -445,5 +446,70 @@ describe('rotateSession / destroySession / Redis failure (SC-11, SC-12, SC-13)',
     });
 
     expect(result).toEqual({ context: null, clearCookie: true });
+  });
+});
+
+describe('getSessionFromRequest (LOG-11)', () => {
+  let store: FakeSessionStore;
+  let config: BffSessionConfig;
+  const fixedNow = new Date('2026-08-11T12:00:00.000Z');
+
+  beforeEach(() => {
+    store = new FakeSessionStore();
+    config = testConfig();
+  });
+
+  function makeRequest(cookieHeader: string | null): Request {
+    return new Request('https://app.localhost/login', {
+      headers: cookieHeader ? { cookie: cookieHeader } : {},
+    });
+  }
+
+  it('returns null when cookie is absent', async () => {
+    const summary = await getSessionFromRequest(makeRequest(null), {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+    expect(summary).toBeNull();
+  });
+
+  it('returns session metadata without bearer for valid cookie', async () => {
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => fixedNow },
+    );
+
+    const summary = await getSessionFromRequest(
+      makeRequest(`${config.cookieName}=${created.sessionId}`),
+      { config, store, now: () => fixedNow },
+    );
+
+    expect(summary).toEqual({
+      sessionId: created.sessionId,
+      kind: 'session',
+      userId: TEST_USER_ID,
+    });
+    expect(JSON.stringify(summary)).not.toContain(TEST_BEARER);
+  });
+
+  it('returns null for expired session cookie', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(fixedNow);
+
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config, store, now: () => new Date() },
+    );
+
+    vi.setSystemTime(new Date(fixedNow.getTime() + IDLE_TTL_SECONDS.session * 1000 + 1));
+
+    const summary = await getSessionFromRequest(
+      makeRequest(`${config.cookieName}=${created.sessionId}`),
+      { config, store, now: () => new Date() },
+    );
+
+    expect(summary).toBeNull();
+    vi.useRealTimers();
   });
 });

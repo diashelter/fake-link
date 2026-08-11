@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 
 import { NextResponse } from 'next/server';
+import type { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 
 import { buildSessionCookieOptions } from '@/lib/session-cookie';
 
@@ -18,6 +19,14 @@ const csrfTokenCookieDefaults = {
   secure: true,
   sameSite: 'lax' as const,
   path: '/',
+};
+
+type CookieWriter = {
+  set: (name: string, value: string, options?: Partial<ResponseCookie>) => void;
+};
+
+type PreAuthCookieStore = CookieWriter & {
+  get: (name: string) => { value: string } | undefined;
 };
 
 function readCookie(request: Request, name: string): string | null {
@@ -50,18 +59,30 @@ export function issueCsrfForSession(sessionId: string, response: NextResponse): 
   return response;
 }
 
-export function issuePreAuthCsrf(response: NextResponse, csrfSid?: string): NextResponse {
+export function writePreAuthCsrfCookies(store: CookieWriter, csrfSid?: string): string {
   const sid = csrfSid ?? randomBytes(32).toString('base64url');
   const token = derivePreAuthCsrfToken(sid);
 
-  response.cookies.set(CSRF_TOKEN_COOKIE, token, csrfTokenCookieDefaults);
-  response.cookies.set(
-    CSRF_SID_COOKIE,
-    sid,
-    buildSessionCookieOptions({ maxAge: PRE_AUTH_MAX_AGE }),
-  );
+  store.set(CSRF_TOKEN_COOKIE, token, csrfTokenCookieDefaults);
+  store.set(CSRF_SID_COOKIE, sid, buildSessionCookieOptions({ maxAge: PRE_AUTH_MAX_AGE }));
 
+  return sid;
+}
+
+export function issuePreAuthCsrf(response: NextResponse, csrfSid?: string): NextResponse {
+  writePreAuthCsrfCookies(response.cookies, csrfSid);
   return response;
+}
+
+export function ensurePreAuthCsrfCookies(cookies: PreAuthCookieStore): void {
+  const sid = cookies.get(CSRF_SID_COOKIE)?.value;
+  const token = cookies.get(CSRF_TOKEN_COOKIE)?.value;
+
+  if (sid && token && timingSafeEqualString(token, derivePreAuthCsrfToken(sid))) {
+    return;
+  }
+
+  writePreAuthCsrfCookies(cookies, undefined);
 }
 
 function expectedToken(ctx: CsrfContext): string {

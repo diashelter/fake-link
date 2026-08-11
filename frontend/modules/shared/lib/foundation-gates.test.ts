@@ -19,16 +19,24 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('does not introduce Auth product Route Handlers beyond health and gated session probe', () => {
+  it('allows login product routes and keeps other auth segments gated', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
-    expect(relative.sort()).toEqual(['api/bff/_probe/mutate/route.ts', 'health/route.ts']);
+    expect(relative.sort()).toEqual([
+      'api/_test/session/route.ts',
+      'api/bff/_probe/mutate/route.ts',
+      'api/bff/auth/login/route.ts',
+      'health/route.ts',
+    ]);
 
-    const forbidden = ['login', 'register', 'verify', 'password', 'auth'];
-    for (const segment of forbidden) {
+    const forbiddenInRoutes = ['register', 'verify', 'password'];
+    for (const segment of forbiddenInRoutes) {
       expect(relative.some((route) => route.includes(segment))).toBe(false);
     }
+
+    const loginPage = path.join(appDir, 'login', 'page.tsx');
+    expect(statSync(loginPage).isFile()).toBe(true);
   });
 
   it('auth barrel exports types only (no session facade or bearer helpers)', () => {
