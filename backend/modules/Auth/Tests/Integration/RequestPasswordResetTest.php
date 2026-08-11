@@ -162,6 +162,46 @@ describe('RequestPasswordReset', function () {
         Queue::assertNothingPushed();
     });
 
+    it('persists the password reset token when enqueue fails after issue', function () {
+        Queue::fake();
+
+        $user = UserModel::factory()->active()->create([
+            'email' => 'enqueue.fail@example.com',
+        ]);
+
+        $issuePasswordResetToken = new IssuePasswordResetToken(
+            emailActionTokenRepository: new EloquentEmailActionTokenRepository(new EmailActionTokenMapper),
+            emailActionTokenIdGenerator: new Uuid7EmailActionTokenIdGenerator,
+            bearerTokenGenerator: new BearerTokenGenerator,
+            tokenHasher: new Sha256TokenHasher,
+        );
+
+        $queue = new class($issuePasswordResetToken) implements QueuePasswordReset
+        {
+            public function __construct(
+                private readonly IssuePasswordResetToken $issuePasswordResetToken,
+            ) {}
+
+            public function dispatch(UserId $userId): void
+            {
+                $this->issuePasswordResetToken->execute($userId);
+
+                throw new RuntimeException('queue unavailable after token persist');
+            }
+        };
+
+        expect(fn () => makeRequestPasswordReset(queue: $queue)->execute(
+            new RequestPasswordResetDto('enqueue.fail@example.com'),
+        ))->toThrow(RuntimeException::class, 'queue unavailable after token persist');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(EmailActionTokenModel::query()->where('user_id', $user->id)->where('purpose', 'password_reset')->count())->toBe(1)
+            ->and(EmailActionTokenModel::query()->where('user_id', $user->id)->where('purpose', 'password_reset')->value('used_at'))
+            ->toBeNull();
+
+        Queue::assertNothingPushed();
+    });
+
     it('always runs PasswordHasher::verify against the dummy hash before deciding eligibility', function () {
         Queue::fake();
 

@@ -499,9 +499,9 @@ T18 → T19
 
 **Done when**:
 
-- [ ] Teste asserta comportamento observável documentado **OU**
-- [ ] `validation.md` draft note ops-verified com rationale (somente se seam inviável)
-- [ ] Gate check passes: `make test-backend`
+- [x] Teste asserta comportamento observável documentado **OU**
+- [x] `validation.md` draft note ops-verified com rationale (somente se seam inviável)
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: integration  
 **Gate**: full
