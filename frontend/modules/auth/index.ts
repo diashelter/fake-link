@@ -1,2 +1,2 @@
-/** Auth module scaffold — product handlers live in later BFF Auth slices. */
-export {};
+/** Auth module — BFF helpers exported from `./bff`. */
+export * from './bff';
