@@ -20,13 +20,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ⏳
-- **Phase / Task**: Execute complete (T1–T16) — awaiting Verifier
-- **Completed**: All session-core tasks; SC-01…SC-18 marked Done in spec traceability
+- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ PASS
+- **Phase / Task**: Re-validation iteration 1 complete — Ready
+- **Completed**: T1–T16; Fix 1 (`899d855` claim DEL before create + concurrent rotate test); SC-01…SC-18 + concurrent edge Verified; sensor 3/3 killed; gate 91/0
 - **In-progress**: none
-- **Next step**: Verifier sub-agent → `validation.md`
+- **Next step**: Feature ready (merge/handoff); no further fix→re-verify iterations
 - **Blockers**: none
-- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks}.md`
+- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks,validation}.md`
 - **Branch**: `feature/bff-auth-session-core`
-- **Validation**: pending Verifier
-- **Batches**: 3 complete (T1–7, T8–12, T13–16)
+- **Gate**: `make lint-frontend && make test-frontend` — 91 passed, 0 failed
+- **Validation**: PASS — see `.specs/features/bff-auth/session-core/validation.md` (diff `fa24b26^..899d855`)
