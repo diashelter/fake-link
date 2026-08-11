@@ -366,10 +366,10 @@ T18 → T19
 
 **Done when**:
 
-- [ ] reset-request: 202 Accepted envelope
-- [ ] reset: 204; 422 PASSWORD_REUSED com message OpenAPI
-- [ ] change: 204; 403 TOKEN_RESTRICTED on verification bearer
-- [ ] Gate check passes: `make test-backend`
+- [x] reset-request: 202 Accepted envelope
+- [x] reset: 204; 422 PASSWORD_REUSED com message OpenAPI
+- [x] change: 204; 403 TOKEN_RESTRICTED on verification bearer
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (contract)  
 **Gate**: full
