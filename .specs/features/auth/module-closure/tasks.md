@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/auth/module-closure/design.md`  
 **Spec**: `.specs/features/auth/module-closure/spec.md`  
-**Status**: Implementing — Batch 2 (T9–T13) ✅ complete; next Batch 3 (T14–T19)
+**Status**: Implementing — Batch 3 (T14–T19) ✅ complete; next Batch 3 (T14–T19)
 
 > **Sub-agent note:** 19 tasks → 3 batches phase-aligned (T1–T8 | T9–T13 | T14–T19). User accepted sub-agents 2026-08-11.
 
@@ -447,9 +447,9 @@ T18 → T19
 
 **Done when**:
 
-- [ ] HTTP 500 + `code=INTERNAL_ERROR`
-- [ ] `auth_tokens` count 0 após falha
-- [ ] Gate check passes: `make test-backend`
+- [x] HTTP 500 + `code=INTERNAL_ERROR`
+- [x] `auth_tokens` count 0 após falha
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature  
 **Gate**: full

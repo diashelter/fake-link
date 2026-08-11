@@ -8,12 +8,21 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Testing\TestResponse;
+use Modules\Auth\Contracts\Repositories\AuthTokenRepository;
+use Modules\Auth\Contracts\Services\AuthTokenIdGenerator;
+use Modules\Auth\Contracts\Services\TokenHasher;
+use Modules\Auth\Domain\Entities\AuthToken;
 use Modules\Auth\Domain\Enums\UserStatus;
+use Modules\Auth\Domain\Services\BearerTokenGenerator;
+use Modules\Auth\Domain\ValueObjects\AuthTokenId;
+use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Infrastructure\Jobs\SendEmailVerificationJob;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\AuthTokenModel;
 use Modules\Auth\Infrastructure\Persistence\Eloquent\Models\UserModel;
 use Modules\Auth\Infrastructure\RateLimit\HmacRateLimitKeyFactory;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
+use Modules\Auth\UseCases\IssueAuthToken;
+use Modules\Auth\UseCases\LoginUser;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -65,6 +74,61 @@ function assertInvalidCredentialsEnvelope(TestResponse $response): void
 }
 
 describe('POST /api/v1/auth/login', function () {
+    it('returns 500 INTERNAL_ERROR when token issuance fails after valid credentials without persisting tokens', function () {
+        UserModel::factory()
+            ->active()
+            ->withPassword($this->knownPassword)
+            ->create(['email' => 'issue-fail@example.com']);
+
+        $this->app->instance(
+            IssueAuthToken::class,
+            new IssueAuthToken(
+                authTokenRepository: new class implements AuthTokenRepository
+                {
+                    public function save(AuthToken $token, string $tokenHash): void
+                    {
+                        throw new RuntimeException('token issue failed');
+                    }
+
+                    public function findByHash(string $tokenHash): ?AuthToken
+                    {
+                        return null;
+                    }
+
+                    public function deleteById(AuthTokenId $id): void {}
+
+                    public function deleteByHash(string $tokenHash): void {}
+
+                    public function deleteAllForUser(UserId $userId): int
+                    {
+                        return 0;
+                    }
+
+                    public function touchLastUsedAtIfStale(AuthTokenId $id, DateTimeImmutable $now, int $minIntervalSeconds): bool
+                    {
+                        return false;
+                    }
+                },
+                authTokenIdGenerator: $this->app->make(AuthTokenIdGenerator::class),
+                bearerTokenGenerator: $this->app->make(BearerTokenGenerator::class),
+                tokenHasher: $this->app->make(TokenHasher::class),
+            ),
+        );
+        $this->app->forgetInstance(LoginUser::class);
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $this->clientIp])
+            ->postJson('/api/v1/auth/login', loginPayload([
+                'email' => 'issue-fail@example.com',
+                'password' => $this->knownPassword,
+            ]));
+
+        $response->assertStatus(500)
+            ->assertJsonPath('code', 'INTERNAL_ERROR');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        expect(AuthTokenModel::query()->count())->toBe(0);
+    });
+
     it('logs in an active user with session token and required headers', function () {
         Carbon::setTestNow('2026-07-27T12:00:00+00:00');
 
