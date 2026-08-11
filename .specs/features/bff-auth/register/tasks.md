@@ -279,13 +279,13 @@ T11
 
 **Done when**:
 
-- [ ] Validação client bloqueia submit inválido (incl. Terms desmarcado) sem fetch
-- [ ] MSW: 201 → router.push(`/verify-email`); 403 REGISTRATION_NOT_ALLOWED mensagem idêntica nos dois fixtures
-- [ ] 422 server-side errors mapeados para campos
-- [ ] 429 exibe throttle + Retry-After quando presente
-- [ ] Link "Já tenho conta" → `/login`
-- [ ] Submit envia CSRF header + credentials include
-- [ ] Gate: `make test-frontend` passa
+- [x] Validação client bloqueia submit inválido (incl. Terms desmarcado) sem fetch
+- [x] MSW: 201 → router.push(`/verify-email`); 403 REGISTRATION_NOT_ALLOWED mensagem idêntica nos dois fixtures
+- [x] 422 server-side errors mapeados para campos
+- [x] 429 exibe throttle + Retry-After quando presente
+- [x] Link "Já tenho conta" → `/login`
+- [x] Submit envia CSRF header + credentials include
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
 **Gate**: full  
@@ -308,11 +308,11 @@ T11
 
 **Done when**:
 
-- [ ] Sessão `session` → redirect `/`
-- [ ] Sessão `verification` → redirect `/verify-email`
-- [ ] Anônimo → renderiza formulário; CSRF bootstrap invocado; `termsVersion` passada ao form
-- [ ] HTML/props não contêm Bearer
-- [ ] Gate: `make test-frontend` passa
+- [x] Sessão `session` → redirect `/`
+- [x] Sessão `verification` → redirect `/verify-email`
+- [x] Anônimo → renderiza formulário; CSRF bootstrap invocado; `termsVersion` passada ao form
+- [x] HTML/props não contêm Bearer
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: full  
@@ -335,9 +335,9 @@ T11
 
 **Done when**:
 
-- [ ] Renderiza versão de `getAuthTermsCurrentVersion()`
-- [ ] Texto pt-BR placeholder (conteúdo legal final fora do escopo)
-- [ ] Gate: `make test-frontend` passa
+- [x] Renderiza versão de `getAuthTermsCurrentVersion()`
+- [x] Texto pt-BR placeholder (conteúdo legal final fora do escopo)
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: quick  
@@ -360,11 +360,11 @@ T11
 
 **Done when**:
 
-- [ ] Gate lista `api/bff/auth/register/route.ts`, `register/page.tsx`, `terms/page.tsx` como permitidos
-- [ ] Segmentos `verify`, `password` ainda proibidos em prod routes
-- [ ] `make lint-frontend` verde
-- [ ] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
-- [ ] Nenhum teste silenciosamente removido vs contagem baseline login (222+)
+- [x] Gate lista `api/bff/auth/register/route.ts`, `register/page.tsx`, `terms/page.tsx` como permitidos
+- [x] Segmentos `verify`, `password` ainda proibidos em prod routes
+- [x] `make lint-frontend` verde
+- [x] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
+- [x] Nenhum teste silenciosamente removido vs contagem baseline login (222+)
 
 **Tests**: unit (foundation) + none (coverage gate)  
 **Gate**: build  

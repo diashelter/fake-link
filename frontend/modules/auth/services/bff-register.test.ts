@@ -368,10 +368,9 @@ describe('performBffRegister', () => {
 
   it('returns 500 without cookie when upstream 201 has token_kind !== verification', async () => {
     const fetchMock = vi.fn(async () =>
-      Response.json(
-        buildUpstreamAuthPayload({ token_kind: 'session', user: PENDING_USER }),
-        { status: 201 },
-      ),
+      Response.json(buildUpstreamAuthPayload({ token_kind: 'session', user: PENDING_USER }), {
+        status: 201,
+      }),
     );
 
     const result = await performBffRegister(makeRegisterRequest(), deps(fetchMock));

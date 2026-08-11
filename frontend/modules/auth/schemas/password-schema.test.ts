@@ -48,9 +48,11 @@ describe('passwordSchema (RGR-08)', () => {
     const result = passwordSchema.safeParse('ABCDEFGHIJ1!');
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'A senha deve conter uma letra minúscula.')).toBe(
-        true,
-      );
+      expect(
+        result.error.issues.some(
+          (issue) => issue.message === 'A senha deve conter uma letra minúscula.',
+        ),
+      ).toBe(true);
     }
   });
 
@@ -58,9 +60,11 @@ describe('passwordSchema (RGR-08)', () => {
     const result = passwordSchema.safeParse('abcdefghij1!');
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'A senha deve conter uma letra maiúscula.')).toBe(
-        true,
-      );
+      expect(
+        result.error.issues.some(
+          (issue) => issue.message === 'A senha deve conter uma letra maiúscula.',
+        ),
+      ).toBe(true);
     }
   });
 
@@ -68,7 +72,9 @@ describe('passwordSchema (RGR-08)', () => {
     const result = passwordSchema.safeParse('Abcdefghij!!');
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'A senha deve conter um dígito.')).toBe(true);
+      expect(
+        result.error.issues.some((issue) => issue.message === 'A senha deve conter um dígito.'),
+      ).toBe(true);
     }
   });
 
@@ -76,7 +82,9 @@ describe('passwordSchema (RGR-08)', () => {
     const result = passwordSchema.safeParse('Abcdefghij12');
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'A senha deve conter um símbolo.')).toBe(true);
+      expect(
+        result.error.issues.some((issue) => issue.message === 'A senha deve conter um símbolo.'),
+      ).toBe(true);
     }
   });
 

@@ -13,8 +13,8 @@ export default function TermsPage() {
           será publicado nesta página em uma atualização futura.
         </p>
         <p>
-          Ao criar uma conta, você confirma que leu e aceitou a versão vigente dos Termos exibida
-          no momento do cadastro.
+          Ao criar uma conta, você confirma que leu e aceitou a versão vigente dos Termos exibida no
+          momento do cadastro.
         </p>
       </div>
     </main>

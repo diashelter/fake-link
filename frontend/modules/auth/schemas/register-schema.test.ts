@@ -57,9 +57,11 @@ describe('registerSchema (RGR-06, RGR-07, RGR-10)', () => {
     const result = registerSchema.safeParse({ ...VALID, accept_terms: false });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'Você precisa aceitar os Termos de uso.')).toBe(
-        true,
-      );
+      expect(
+        result.error.issues.some(
+          (issue) => issue.message === 'Você precisa aceitar os Termos de uso.',
+        ),
+      ).toBe(true);
     }
   });
 
@@ -68,9 +70,11 @@ describe('registerSchema (RGR-06, RGR-07, RGR-10)', () => {
     const result = registerSchema.safeParse(withoutTerms);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'Você precisa aceitar os Termos de uso.')).toBe(
-        true,
-      );
+      expect(
+        result.error.issues.some(
+          (issue) => issue.message === 'Você precisa aceitar os Termos de uso.',
+        ),
+      ).toBe(true);
     }
   });
 
@@ -81,7 +85,9 @@ describe('registerSchema (RGR-06, RGR-07, RGR-10)', () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      const issue = result.error.issues.find((item) => item.path.join('.') === 'password_confirmation');
+      const issue = result.error.issues.find(
+        (item) => item.path.join('.') === 'password_confirmation',
+      );
       expect(issue?.message).toBe('As senhas não coincidem.');
     }
   });
@@ -95,7 +101,9 @@ describe('registerSchema (RGR-06, RGR-07, RGR-10)', () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(
-        result.error.issues.some((issue) => issue.message === 'A senha deve ter pelo menos 12 caracteres.'),
+        result.error.issues.some(
+          (issue) => issue.message === 'A senha deve ter pelo menos 12 caracteres.',
+        ),
       ).toBe(true);
     }
   });

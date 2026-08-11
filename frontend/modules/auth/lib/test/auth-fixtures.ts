@@ -1,8 +1,22 @@
-export const FIXTURE_USER = {
+import type { UserStatus } from '../auth-api-types';
+
+export type FixtureUser = {
+  id: string;
+  name: string;
+  email: string;
+  status: UserStatus;
+  email_verified_at: string | null;
+  terms_version: string;
+  terms_accepted_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export const FIXTURE_USER: FixtureUser = {
   id: '019082da-0000-7000-8000-000000000001',
   name: 'Test User',
   email: 'user@example.com',
-  status: 'active' as const,
+  status: 'active',
   email_verified_at: '2026-01-01T00:00:00.000Z',
   terms_version: '1.0',
   terms_accepted_at: '2026-01-01T00:00:00.000Z',
@@ -16,7 +30,7 @@ export function buildUpstreamAuthPayload(
   overrides: Partial<{
     token: string;
     token_kind: 'session' | 'verification' | 'unknown';
-    user: typeof FIXTURE_USER;
+    user: FixtureUser;
   }> = {},
 ) {
   return {

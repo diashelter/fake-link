@@ -37,7 +37,17 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     }
 
     const loginPage = path.join(appDir, 'login', 'page.tsx');
+    const registerPage = path.join(appDir, 'register', 'page.tsx');
+    const termsPage = path.join(appDir, 'terms', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
+    expect(statSync(registerPage).isFile()).toBe(true);
+    expect(statSync(termsPage).isFile()).toBe(true);
+
+    const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
+    const relativePages = pages.map((file) => path.relative(appDir, file));
+    for (const segment of forbiddenInRoutes) {
+      expect(relativePages.some((page) => page.includes(`${segment}${path.sep}`))).toBe(false);
+    }
   });
 
   it('auth barrel exports types only (no session facade or bearer helpers)', () => {

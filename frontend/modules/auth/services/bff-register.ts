@@ -6,11 +6,7 @@ import { buildUpstreamUrl, type AllowlistEntry } from '../bff/allowlist';
 import { issueCsrfForSession } from '../bff/csrf';
 import { assertMutationGuard } from '../bff/mutation-guard';
 import { jsonWithPrivateCache } from '../bff/private-response';
-import {
-  parseUpstreamAuthResponse,
-  toPublicUser,
-  type BffPublicUser,
-} from '../lib/auth-api-types';
+import { parseUpstreamAuthResponse, toPublicUser, type BffPublicUser } from '../lib/auth-api-types';
 import {
   applySessionCookie,
   createSession,

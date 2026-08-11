@@ -8,10 +8,7 @@ import { useForm } from 'react-hook-form';
 
 import { formatRetryAfter, messageForAuthError } from '@/modules/auth/lib/auth-messages';
 import { readClientCookie } from '@/modules/auth/lib/client-cookie';
-import {
-  registerSchema,
-  type RegisterFormValues,
-} from '@/modules/auth/schemas/register-schema';
+import { registerSchema, type RegisterFormValues } from '@/modules/auth/schemas/register-schema';
 import { Button } from '@/modules/shared/components/ui/button';
 import { FormField } from '@/modules/shared/components/ui/form-field';
 import { Input } from '@/modules/shared/components/ui/input';

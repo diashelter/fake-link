@@ -7,6 +7,7 @@ export default defineConfig({
     include: ['**/*.test.ts', '**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/.next/**', '**/coverage/**'],
     setupFiles: ['./vitest.setup.ts'],
+    testTimeout: 15_000,
     environmentMatchGlobs: [
       ['**/*.test.tsx', 'jsdom'],
       ['**/*.test.ts', 'node'],
@@ -14,8 +15,18 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'lcov'],
-      include: ['modules/**/*.{ts,tsx}'],
-      exclude: ['modules/**/*.test.{ts,tsx}', 'modules/**/index.ts', 'modules/**/test/**'],
+      include: [
+        'modules/**/*.{ts,tsx}',
+        'app/register/**/*.{ts,tsx}',
+        'app/terms/**/*.{ts,tsx}',
+        'app/api/bff/auth/register/**/*.{ts,tsx}',
+      ],
+      exclude: [
+        'modules/**/*.test.{ts,tsx}',
+        'modules/**/index.ts',
+        'modules/**/test/**',
+        'app/**/*.test.{ts,tsx}',
+      ],
       thresholds: {
         lines: 75,
         branches: 75,

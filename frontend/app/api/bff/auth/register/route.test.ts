@@ -60,10 +60,9 @@ function makePostRequest(token?: string, csrfSid?: string): Request {
 describe('POST /api/bff/auth/register', () => {
   it('returns 201 with session cookie and body without token on happy path (RGR-01, RGR-03)', async () => {
     const fetchMock = vi.fn(async () =>
-      Response.json(
-        buildUpstreamAuthPayload({ token_kind: 'verification', user: PENDING_USER }),
-        { status: 201 },
-      ),
+      Response.json(buildUpstreamAuthPayload({ token_kind: 'verification', user: PENDING_USER }), {
+        status: 201,
+      }),
     );
     vi.stubGlobal('fetch', fetchMock);
 

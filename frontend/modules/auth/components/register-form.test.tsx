@@ -39,10 +39,14 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('checkbox'));
 }
 
+function setupUser() {
+  return userEvent.setup({ delay: null });
+}
+
 describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () => {
   it('blocks invalid submit without calling fetch', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const user = userEvent.setup();
+    const user = setupUser();
 
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -56,7 +60,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
 
   it('blocks submit when Terms checkbox is unchecked without calling fetch', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
-    const user = userEvent.setup();
+    const user = setupUser();
 
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await user.type(screen.getByLabelText(/^Nome$/i), 'Ada Lovelace');
@@ -82,7 +86,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -111,7 +115,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
         ),
       );
 
-      const user = userEvent.setup();
+      const user = setupUser();
       render(<RegisterForm termsVersion={TERMS_VERSION} />);
       await fillValidForm(user);
       await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -142,7 +146,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -167,7 +171,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -186,7 +190,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       ),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -210,7 +214,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       }),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -234,7 +238,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       }),
     );
 
-    const user = userEvent.setup();
+    const user = setupUser();
     render(<RegisterForm termsVersion={TERMS_VERSION} />);
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Criar conta' }));
@@ -260,7 +264,10 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Termos de uso/i })).toHaveAttribute('href', '/terms');
-    expect(screen.getByRole('link', { name: /Termos de uso/i })).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('link', { name: /Termos de uso/i })).toHaveAttribute(
+      'target',
+      '_blank',
+    );
     expect(screen.getByRole('link', { name: 'Já tenho conta' })).toHaveAttribute('href', '/login');
   });
 });
