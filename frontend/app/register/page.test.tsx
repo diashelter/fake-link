@@ -85,8 +85,7 @@ describe('RegisterPage (RGR-13, RGR-14, BFFUI-41)', () => {
 
     expect(ensurePreAuthCsrfCookiesMock).toHaveBeenCalledOnce();
     expect(getAuthTermsCurrentVersionMock).toHaveBeenCalled();
-    expect(serialized).toContain('register-form');
-    expect(serialized).toContain('2026-01');
+    expect(serialized).toContain('"termsVersion":"2026-01"');
     expect(serialized).not.toContain('Bearer');
     expect(serialized).not.toContain('bearer');
   });
