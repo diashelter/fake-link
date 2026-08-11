@@ -222,6 +222,7 @@ describe('RegisterForm (RGR-05–09, RGR-11, RGR-13, BFFUI-41, BFFUI-32)', () =>
     await waitFor(() => {
       expect(capturedRequest).not.toBeNull();
     });
+    expect(capturedRequest!.headers.get('Content-Type')).toBe('application/json');
     expect(capturedRequest!.headers.get('X-CSRF-Token')).toBe('test-csrf-token');
     expect(capturedRequest!.credentials).toBe('include');
   });

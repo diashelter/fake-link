@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 
 import {
+  deriveCsrfToken,
   derivePreAuthCsrfToken,
   CSRF_SID_COOKIE,
   CSRF_TOKEN_COOKIE,
@@ -127,6 +128,7 @@ describe('performBffRegister', () => {
     expect(body.data.user.status).toBe('pending_verification');
     expect(body.data.user.email_verified_at).toBeNull();
     expect(body.data.user.terms_version).toBe('2026-01');
+    expect(body.data.user.terms_accepted_at).toBe('2026-08-11T12:00:00.000Z');
     expect(body.data.redirect_to).toBe('/verify-email');
     expect(result.response.headers.get('Cache-Control')).toBe('private, no-store');
 
@@ -136,6 +138,10 @@ describe('performBffRegister', () => {
     const sessionCookie = setCookies.find((value) => value.includes('__Host-fl_session='));
     const sessionId = sessionCookie?.split(';')[0]?.split('=')[1];
     expect(sessionId).toBeTruthy();
+    const expectedCsrf = deriveCsrfToken(sessionId!);
+    expect(
+      setCookies.some((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=${expectedCsrf}`)),
+    ).toBe(true);
     const sessionResult = await import('./bff-session').then((mod) =>
       mod.getSession(`${config.cookieName}=${sessionId}`, {
         config,
@@ -158,6 +164,7 @@ describe('performBffRegister', () => {
     const body = await result.response.json();
     const serialized = JSON.stringify(body);
     expect(serialized).not.toContain(FIXTURE_BEARER);
+    expect(serialized).not.toContain('token');
     expect(serialized).not.toContain('token_kind');
     expect(serialized).not.toContain('token_type');
     expect(serialized).not.toContain('expires_at');
