@@ -340,9 +340,9 @@ T18 → T19
 
 **Done when**:
 
-- [ ] verify: 204; 403 INVALID_VERIFICATION_TOKEN (message exato OpenAPI)
-- [ ] resend: 202; 403 TOKEN_RESTRICTED
-- [ ] Gate check passes: `make test-backend`
+- [x] verify: 204; 403 INVALID_VERIFICATION_TOKEN (message exato OpenAPI)
+- [x] resend: 202; 403 TOKEN_RESTRICTED
+- [x] Gate check passes: `make test-backend`
 
 **Tests**: feature (contract)  
 **Gate**: full
