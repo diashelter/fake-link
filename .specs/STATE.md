@@ -23,13 +23,13 @@
 
 ## Handoff
 
-- **Feature**: `auth/module-closure` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅
-- **Phase / Task**: Complete (T1–T19 + Verifier PASS)
-- **Completed**: Auth Backend module closed — OpenAPI Spectral lint, Auth contract tests (11 endpoints), P2 gaps, docs/AD-016
+- **Feature**: `bff-auth/session-core` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ PASS
+- **Phase / Task**: Re-validation iteration 1 complete — Ready
+- **Completed**: T1–T16; Fix 1 (`899d855` claim DEL before create + concurrent rotate test); SC-01…SC-18 + concurrent edge Verified; sensor 3/3 killed; gate 91/0
 - **In-progress**: none
-- **Next step**: `bff-auth/session-core` (conforme `.specs/features/bff-auth/README.md`)
+- **Next step**: Feature ready (merge/handoff); no further fix→re-verify iterations
 - **Blockers**: none
-- **Artifacts**: `.specs/features/auth/module-closure/{spec,design,tasks,validation}.md`
-- **Branch**: `feature/auth-module-closure`
-- **Gate**: `make lint` ✅ · `make test-backend-coverage` ✅ (Auth 93.74% lines / 86.10% methods)
-- **Tip commits**: `4b53a5a`…`b1012d9` + verifier docs commit
+- **Artifacts**: `.specs/features/bff-auth/session-core/{spec,design,tasks,validation}.md`
+- **Branch**: `feature/bff-auth-session-core`
+- **Gate**: `make lint-frontend && make test-frontend` — 91 passed, 0 failed
+- **Validation**: PASS — see `.specs/features/bff-auth/session-core/validation.md` (diff `fa24b26^..899d855`)

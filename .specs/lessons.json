@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 43,
+  "next_id": 44,
   "lessons": [
     {
       "id": "L-001",
@@ -761,6 +761,24 @@
       ],
       "created": "2026-08-11T13:34:56Z",
       "last_seen": "2026-08-11T13:34:56Z"
+    },
+    {
+      "id": "L-043",
+      "key": "ac_gap::when a spec lists a concurrency edge for session rotation add an explicit concurrent call test asserting the old id is invalid and at most one successor remains valid",
+      "text": "When a spec lists a concurrency edge for session rotation, add an explicit concurrent-call test asserting the old id is invalid and at most one successor remains valid",
+      "signal": "ac_gap",
+      "scope": "auth/session",
+      "status": "candidate",
+      "features": [
+        "bff-auth/session-core"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md edge: concurrent rotateSession — no file:line (auth/session)"
+      ],
+      "created": "2026-08-11T16:35:24Z",
+      "last_seen": "2026-08-11T16:35:24Z"
     }
   ]
 }
