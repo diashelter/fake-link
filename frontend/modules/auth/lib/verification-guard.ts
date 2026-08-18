@@ -1,8 +1,7 @@
 export const VERIFICATION_ALLOWED_PATHS = ['/verify-email', '/login', '/terms'] as const;
 
 export type VerificationGuardDecision =
-  | { action: 'allow' }
-  | { action: 'redirect'; to: '/verify-email' | '/login' | '/' };
+  { action: 'allow' } | { action: 'redirect'; to: '/verify-email' | '/login' | '/' };
 
 /**
  * Minimal restricted-session guard for the email-verification slice.

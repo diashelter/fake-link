@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  resolveVerificationSessionGuard,
-  VERIFICATION_ALLOWED_PATHS,
-} from './verification-guard';
+import { resolveVerificationSessionGuard, VERIFICATION_ALLOWED_PATHS } from './verification-guard';
 
 describe('VERIFICATION_ALLOWED_PATHS (EV-17)', () => {
   it('exports the restricted-session allowlist for session-shell', () => {

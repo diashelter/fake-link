@@ -19,35 +19,40 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('allows login and register product routes and keeps other auth segments gated', () => {
+  it('allows login, register, and email verification product routes and keeps password gated', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
     expect(relative.sort()).toEqual([
       'api/_test/session/route.ts',
       'api/bff/_probe/mutate/route.ts',
+      'api/bff/auth/email/resend/route.ts',
+      'api/bff/auth/email/verify/route.ts',
       'api/bff/auth/login/route.ts',
       'api/bff/auth/register/route.ts',
       'health/route.ts',
     ]);
 
-    const forbiddenInRoutes = ['verify', 'password'];
-    for (const segment of forbiddenInRoutes) {
-      expect(relative.some((route) => route.includes(segment))).toBe(false);
-    }
+    expect(relative.some((route) => route.includes('password'))).toBe(false);
+    expect(relative.filter((route) => route.includes('verify'))).toEqual([
+      'api/bff/auth/email/verify/route.ts',
+    ]);
 
     const loginPage = path.join(appDir, 'login', 'page.tsx');
     const registerPage = path.join(appDir, 'register', 'page.tsx');
     const termsPage = path.join(appDir, 'terms', 'page.tsx');
+    const verifyEmailPage = path.join(appDir, 'verify-email', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
     expect(statSync(registerPage).isFile()).toBe(true);
     expect(statSync(termsPage).isFile()).toBe(true);
+    expect(statSync(verifyEmailPage).isFile()).toBe(true);
 
     const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
     const relativePages = pages.map((file) => path.relative(appDir, file));
-    for (const segment of forbiddenInRoutes) {
-      expect(relativePages.some((page) => page.includes(`${segment}${path.sep}`))).toBe(false);
-    }
+    expect(relativePages.some((page) => page.includes(`password${path.sep}`))).toBe(false);
+    expect(relativePages.filter((page) => page.includes('verify'))).toEqual([
+      `verify-email${path.sep}page.tsx`,
+    ]);
   });
 
   it('auth barrel exports types only (no session facade or bearer helpers)', () => {

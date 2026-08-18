@@ -9,13 +9,14 @@ import { FIXTURE_BEARER } from '@/modules/auth/lib/test/auth-fixtures';
 const TEST_KEY = Buffer.alloc(32, 2).toString('base64');
 const ACCEPTED_ENVELOPE = { message: 'Accepted.' };
 
-const resendHarness = vi.hoisted(() => ({
-  mock: vi.fn(),
-  actual: null as null | ((
-    request: Request,
-    deps?: unknown,
-  ) => Promise<{ ok: boolean; response: NextResponse }>),
-}));
+const resendHarness = vi.hoisted(() => {
+  type Perform =
+    typeof import('@/modules/auth/services/bff-resend-verification').performBffResendVerification;
+  return {
+    mock: vi.fn<Perform>(),
+    actual: null as Perform | null,
+  };
+});
 
 vi.mock('@/modules/auth/services/bff-resend-verification', async (importOriginal) => {
   const actual =
@@ -42,7 +43,7 @@ beforeEach(() => {
   vi.stubEnv('BFF_CSRF_HMAC_KEY', TEST_KEY);
   vi.stubEnv('LARAVEL_INTERNAL_URL', 'http://nginx/api/v1');
   resendHarness.mock.mockReset();
-  resendHarness.mock.mockImplementation((request: Request, deps?: unknown) => {
+  resendHarness.mock.mockImplementation((request, deps) => {
     const actual = resendHarness.actual;
     if (!actual) {
       throw new Error('performBffResendVerification actual implementation was not loaded');

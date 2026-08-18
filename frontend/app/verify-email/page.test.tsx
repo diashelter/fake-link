@@ -33,7 +33,7 @@ vi.mock('@/modules/auth/services/bff-session', () => ({
 
 vi.mock('@/modules/auth/components/verify-email-form', () => ({
   VerifyEmailForm: ({ initialToken }: { initialToken?: string }): ReactElement => (
-    <div data-testid="verify-email-form" initialToken={initialToken} />
+    <div data-testid="verify-email-form" data-initial-token={initialToken ?? ''} />
   ),
 }));
 

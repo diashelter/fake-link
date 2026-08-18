@@ -47,11 +47,14 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
   }
 
   async function createKindSession(kind: 'session' | 'verification') {
-    return createSession({ bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id }, {
-      config,
-      store,
-      now: () => fixedNow,
-    });
+    return createSession(
+      { bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id },
+      {
+        config,
+        store,
+        now: () => fixedNow,
+      },
+    );
   }
 
   function makeRequest(
@@ -75,7 +78,9 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
     const body =
       options.rawBody !== undefined
         ? options.rawBody
-        : JSON.stringify(options.body === undefined ? { token: EMAIL_TOKEN_SENTINEL } : options.body);
+        : JSON.stringify(
+            options.body === undefined ? { token: EMAIL_TOKEN_SENTINEL } : options.body,
+          );
 
     return new Request('https://app.localhost/api/bff/auth/email/verify', {
       method: 'POST',

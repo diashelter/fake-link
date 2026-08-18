@@ -46,11 +46,14 @@ describe('performBffResendVerification (EV-05–07, EV-11)', () => {
   }
 
   async function createKindSession(kind: 'session' | 'verification') {
-    return createSession({ bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id }, {
-      config,
-      store,
-      now: () => fixedNow,
-    });
+    return createSession(
+      { bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id },
+      {
+        config,
+        store,
+        now: () => fixedNow,
+      },
+    );
   }
 
   function makeRequest(
@@ -90,7 +93,9 @@ describe('performBffResendVerification (EV-05–07, EV-11)', () => {
   it('passes through upstream 202 Accepted without clearing the session cookie (EV-05, EV-07)', async () => {
     const created = await createKindSession('verification');
     const del = vi.spyOn(store, 'del');
-    const fetchMock = vi.fn(async () => Response.json(ACCEPTED_ENVELOPE, { status: 202 }));
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      Response.json(ACCEPTED_ENVELOPE, { status: 202 }),
+    );
 
     const result = await performBffResendVerification(
       makeRequest({ sessionId: created.sessionId }),
@@ -207,5 +212,78 @@ describe('performBffResendVerification (EV-05–07, EV-11)', () => {
       ),
     );
     expect(JSON.stringify(await error.response.json())).not.toContain(FIXTURE_BEARER);
+  });
+
+  it('returns generic pt-BR for upstream 500 without destroying the session (EV-10)', async () => {
+    const created = await createKindSession('verification');
+    const del = vi.spyOn(store, 'del');
+    const fetchMock = vi.fn(async () =>
+      Response.json({ message: 'Internal stack trace' }, { status: 500 }),
+    );
+
+    const result = await performBffResendVerification(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(500);
+    expect(await result.response.json()).toEqual({
+      message: 'Algo deu errado. Tente novamente.',
+    });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it('returns generic pt-BR for upstream 503 without destroying the session (EV-10)', async () => {
+    const created = await createKindSession('verification');
+    const del = vi.spyOn(store, 'del');
+    const fetchMock = vi.fn(async () =>
+      Response.json({ message: 'Service unavailable' }, { status: 503 }),
+    );
+
+    const result = await performBffResendVerification(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(503);
+    expect(await result.response.json()).toEqual({
+      message: 'Algo deu errado. Tente novamente.',
+    });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it('returns 504 gateway message when upstream fetch aborts without destroying the session (EV-10)', async () => {
+    const created = await createKindSession('verification');
+    const del = vi.spyOn(store, 'del');
+    const fetchMock = vi.fn(async () => {
+      throw new Error('aborted');
+    });
+
+    const result = await performBffResendVerification(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(504);
+    expect(await result.response.json()).toEqual({
+      message: 'Não foi possível conectar ao serviço. Tente novamente.',
+    });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it('returns a generic invalid-body message when upstream error JSON cannot be parsed (EV-10)', async () => {
+    const created = await createKindSession('verification');
+    const fetchMock = vi.fn(
+      async () =>
+        new Response('not-json', { status: 403, headers: { 'Content-Type': 'text/plain' } }),
+    );
+
+    const result = await performBffResendVerification(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toEqual({ message: 'Requisição inválida.' });
   });
 });

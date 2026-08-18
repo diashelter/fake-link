@@ -55,18 +55,17 @@ describe('loadVerificationMutationContext (EV-04, EV-11)', () => {
   }
 
   async function createKindSession(kind: 'session' | 'verification') {
-    return createSession(
-      { bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id },
-      deps(),
-    );
+    return createSession({ bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id }, deps());
   }
 
-  function makeRequest(options: {
-    sessionId?: string;
-    origin?: string;
-    csrfToken?: string;
-    includeSessionCookie?: boolean;
-  } = {}): Request {
+  function makeRequest(
+    options: {
+      sessionId?: string;
+      origin?: string;
+      csrfToken?: string;
+      includeSessionCookie?: boolean;
+    } = {},
+  ): Request {
     const sessionId = options.sessionId ?? 'unused-session';
     const csrfToken = options.csrfToken ?? deriveCsrfToken(sessionId);
     const cookieParts = [`${CSRF_TOKEN_COOKIE}=${csrfToken}`];

@@ -219,4 +219,65 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     expect(capturedRequest!.headers.get('Content-Type')).toContain('application/json');
     await expect(capturedRequest!.json()).resolves.toEqual({ token: 'opaque-token' });
   });
+
+  it('navigates to /login when resend returns EMAIL_ALREADY_VERIFIED (EV-09)', async () => {
+    server.use(
+      http.post('/api/bff/auth/email/resend', () =>
+        HttpResponse.json(
+          { code: 'EMAIL_ALREADY_VERIFIED', message: 'Already verified.' },
+          { status: 403 },
+        ),
+      ),
+    );
+
+    const user = setupUser();
+    render(<VerifyEmailForm />);
+    await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith('/login');
+    });
+  });
+
+  it('shows throttle message when resend returns 429 with Retry-After (EV-10)', async () => {
+    server.use(
+      http.post('/api/bff/auth/email/resend', () =>
+        HttpResponse.json(
+          { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' },
+          { status: 429, headers: { 'Retry-After': '90' } },
+        ),
+      ),
+    );
+
+    const user = setupUser();
+    render(<VerifyEmailForm />);
+    await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Aguarde cerca de 2 minutos antes de tentar novamente.',
+      );
+    });
+  });
+
+  it('shows session expired message when resend returns 401 UNAUTHENTICATED (EV-10)', async () => {
+    server.use(
+      http.post('/api/bff/auth/email/resend', () =>
+        HttpResponse.json(
+          { code: 'UNAUTHENTICATED', message: 'Unauthenticated.' },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    const user = setupUser();
+    render(<VerifyEmailForm />);
+    await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Sua sessão expirou. Faça login novamente.',
+      );
+    });
+  });
 });

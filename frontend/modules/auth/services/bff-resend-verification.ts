@@ -13,14 +13,16 @@ const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 const GATEWAY_ERROR_MESSAGE = 'Não foi possível conectar ao serviço. Tente novamente.';
 
 export type BffResendVerificationResult =
-  | { ok: true; response: NextResponse }
-  | { ok: false; response: NextResponse };
+  { ok: true; response: NextResponse } | { ok: false; response: NextResponse };
 
 export type BffResendVerificationDependencies = BffSessionDependencies & {
   fetchImpl?: typeof fetch;
 };
 
-async function forwardUpstreamResponse(upstream: Response, bodyText: string): Promise<NextResponse> {
+async function forwardUpstreamResponse(
+  upstream: Response,
+  bodyText: string,
+): Promise<NextResponse> {
   if (upstream.status === 500 || upstream.status === 503) {
     return jsonWithPrivateCache({ message: GENERIC_ERROR_MESSAGE }, { status: upstream.status });
   }

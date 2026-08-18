@@ -421,11 +421,11 @@ T13
 
 **Done when**:
 
-- [ ] Gate lista `api/bff/auth/email/verify/route.ts`, `api/bff/auth/email/resend/route.ts`, `verify-email/page.tsx`
-- [ ] Segmento `password` ainda proibido em prod routes/pages
-- [ ] `make lint-frontend` verde
-- [ ] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
-- [ ] Nenhum teste silenciosamente removido vs baseline register (289+)
+- [x] Gate lista `api/bff/auth/email/verify/route.ts`, `api/bff/auth/email/resend/route.ts`, `verify-email/page.tsx`
+- [x] Segmento `password` ainda proibido em prod routes/pages
+- [x] `make lint-frontend` verde
+- [x] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
+- [x] Nenhum teste silenciosamente removido vs baseline register (289+)
 
 **Tests**: unit (foundation) + none (coverage gate)  
 **Gate**: build  

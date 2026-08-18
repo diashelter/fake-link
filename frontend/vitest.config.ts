@@ -20,6 +20,9 @@ export default defineConfig({
         'app/register/**/*.{ts,tsx}',
         'app/terms/**/*.{ts,tsx}',
         'app/api/bff/auth/register/**/*.{ts,tsx}',
+        'app/verify-email/**/*.{ts,tsx}',
+        'app/api/bff/auth/email/**/*.{ts,tsx}',
+        'app/page.tsx',
       ],
       exclude: [
         'modules/**/*.test.{ts,tsx}',
