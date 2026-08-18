@@ -234,10 +234,10 @@ T13
 
 **Done when**:
 
-- [ ] Upstream `202` → repasse envelope Accepted
-- [ ] Upstream `429` + `Retry-After` repassados
-- [ ] `destroySession` **nunca** chamado
-- [ ] Gate: `make test-frontend` passa
+- [x] Upstream `202` → repasse envelope Accepted
+- [x] Upstream `429` + `Retry-After` repassados
+- [x] `destroySession` **nunca** chamado
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
