@@ -42,6 +42,8 @@ export const RESEND_VERIFICATION_ALLOWLIST_ENTRY: AllowlistEntry = {
 export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [
   LOGIN_ALLOWLIST_ENTRY,
   REGISTER_ALLOWLIST_ENTRY,
+  VERIFY_EMAIL_ALLOWLIST_ENTRY,
+  RESEND_VERIFICATION_ALLOWLIST_ENTRY,
 ];
 
 export function lookupAllowlistEntry(

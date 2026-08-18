@@ -260,10 +260,10 @@ T13
 
 **Done when**:
 
-- [ ] Lookup resolve ambos paths BFF
-- [ ] `requireSession: true`, `requireCsrf: true` em ambos
-- [ ] Login/register entries inalteradas
-- [ ] Gate: `make test-frontend` passa
+- [x] Lookup resolve ambos paths BFF
+- [x] `requireSession: true`, `requireCsrf: true` em ambos
+- [x] Login/register entries inalteradas
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

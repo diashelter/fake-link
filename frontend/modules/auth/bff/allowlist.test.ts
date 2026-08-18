@@ -5,6 +5,8 @@ import {
   buildUpstreamUrl,
   LOGIN_ALLOWLIST_ENTRY,
   REGISTER_ALLOWLIST_ENTRY,
+  RESEND_VERIFICATION_ALLOWLIST_ENTRY,
+  VERIFY_EMAIL_ALLOWLIST_ENTRY,
   lookupAllowlistEntry,
   type AllowlistEntry,
 } from './allowlist';
@@ -25,10 +27,15 @@ const TEST_TABLE: readonly AllowlistEntry[] = [
 ];
 
 describe('AUTH_BFF_ALLOWLIST', () => {
-  it('exports login and register production entries (LOG-14, RGR-18)', () => {
-    expect(AUTH_BFF_ALLOWLIST).toHaveLength(2);
+  it('exports login, register, verify, and resend production entries (LOG-14, RGR-18, EV-20)', () => {
+    expect(AUTH_BFF_ALLOWLIST).toHaveLength(4);
     expect(AUTH_BFF_ALLOWLIST).toEqual(
-      expect.arrayContaining([LOGIN_ALLOWLIST_ENTRY, REGISTER_ALLOWLIST_ENTRY]),
+      expect.arrayContaining([
+        LOGIN_ALLOWLIST_ENTRY,
+        REGISTER_ALLOWLIST_ENTRY,
+        VERIFY_EMAIL_ALLOWLIST_ENTRY,
+        RESEND_VERIFICATION_ALLOWLIST_ENTRY,
+      ]),
     );
   });
 });
@@ -51,6 +58,28 @@ describe('REGISTER_ALLOWLIST_ENTRY', () => {
     expect(entry?.requireSession).toBe(false);
     expect(entry?.requireCsrf).toBe(true);
     expect(entry?.upstreamPath).toBe('/auth/register');
+  });
+});
+
+describe('VERIFY_EMAIL_ALLOWLIST_ENTRY (EV-20)', () => {
+  it('resolves verify BFF path with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/email/verify');
+
+    expect(entry).toEqual(VERIFY_EMAIL_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/email/verify');
+  });
+});
+
+describe('RESEND_VERIFICATION_ALLOWLIST_ENTRY (EV-20)', () => {
+  it('resolves resend BFF path with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/email/resend');
+
+    expect(entry).toEqual(RESEND_VERIFICATION_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/email/verification-notification');
   });
 });
 
