@@ -91,6 +91,20 @@ describe('VerifyEmailPage (EV-12, EV-15)', () => {
     expect(serialized).not.toContain('bearer');
   });
 
+  it('decodes a URL-encoded query token once before hydrating the form', async () => {
+    getSessionFromRequestMock.mockResolvedValue({
+      sessionId: 'sid',
+      kind: 'verification',
+      userId: 'uid',
+    });
+
+    const page = await VerifyEmailPage({
+      searchParams: Promise.resolve({ token: 'hello%2Fworld' }),
+    });
+
+    expect(JSON.stringify(page)).toContain('"initialToken":"hello/world"');
+  });
+
   it('does not fetch verify or resend during render (EV-15)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     getSessionFromRequestMock.mockResolvedValue({

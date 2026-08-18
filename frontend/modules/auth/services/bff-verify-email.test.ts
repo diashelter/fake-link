@@ -2,11 +2,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { CSRF_TOKEN_COOKIE, deriveCsrfToken } from '@/modules/auth/bff/csrf';
+import {
+  CSRF_SID_COOKIE,
+  CSRF_TOKEN_COOKIE,
+  deriveCsrfToken,
+  derivePreAuthCsrfToken,
+} from '@/modules/auth/bff/csrf';
 import type { BffSessionConfig } from '@/modules/auth/lib/session/config';
 import { FakeSessionStore } from '@/modules/auth/lib/session/test/fake-session-store';
-import { FIXTURE_BEARER, FIXTURE_USER } from '@/modules/auth/lib/test/auth-fixtures';
+import {
+  FIXTURE_BEARER,
+  FIXTURE_USER,
+  buildUpstreamAuthPayload,
+} from '@/modules/auth/lib/test/auth-fixtures';
 
+import { performBffLogin } from './bff-login';
 import { createSession, getSession } from './bff-session';
 import { performBffVerifyEmail } from './bff-verify-email';
 
@@ -216,6 +226,7 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
     expect(result.response.status).toBe(403);
     expect(await result.response.json()).toEqual(payload);
     expect(del).not.toHaveBeenCalled();
+    expect(sessionCookieHeader(result.response)).not.toMatch(/Max-Age=0/i);
   });
 
   it('forwards 403 EMAIL_ALREADY_VERIFIED without destroying the session (EV-09)', async () => {
@@ -250,6 +261,7 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
     expect(result.response.status).toBe(401);
     expect(await result.response.json()).toEqual(payload);
     expect(del).not.toHaveBeenCalled();
+    expect(sessionCookieHeader(result.response)).not.toMatch(/Max-Age=0/i);
   });
 
   it('forwards upstream 422 errors without destroying the session (EV-10)', async () => {
@@ -369,6 +381,43 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('returns 400 for invalid Content-Type without calling Laravel (EV-18)', async () => {
+    const created = await createKindSession('verification');
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffVerifyEmail(
+      makeRequest({
+        sessionId: created.sessionId,
+        contentType: 'text/plain',
+        rawBody: JSON.stringify({ token: EMAIL_TOKEN_SENTINEL }),
+      }),
+      deps(fetchMock),
+    );
+
+    expect(result.ok).toBe(false);
+    expect(result.response.status).toBe(400);
+    expect(await result.response.json()).toEqual({ message: 'Requisição inválida.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('forwards surrounding whitespace in the token to Laravel without trimming (EV-18)', async () => {
+    const created = await createKindSession('verification');
+    const paddedToken = '  opaque-token  ';
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    await performBffVerifyEmail(
+      makeRequest({ sessionId: created.sessionId, body: { token: paddedToken } }),
+      deps(fetchMock),
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://nginx/api/v1/auth/email/verify',
+      expect.objectContaining({
+        body: JSON.stringify({ token: paddedToken }),
+      }),
+    );
+  });
+
   it('returns 400 for missing or empty token without calling Laravel (EV-18)', async () => {
     const created = await createKindSession('verification');
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
@@ -456,5 +505,47 @@ describe('performBffVerifyEmail (EV-01–04, EV-08–11, EV-18–19)', () => {
     expect(result.response.status).toBe(403);
     expect(await result.response.json()).toEqual(payload);
     expect(del).not.toHaveBeenCalled();
+  });
+
+  it('after successful verify, a subsequent login issues a session-kind cookie (BFFUI-52)', async () => {
+    const created = await createKindSession('verification');
+    const verifyFetch = vi.fn(async () => new Response(null, { status: 204 }));
+
+    await performBffVerifyEmail(makeRequest({ sessionId: created.sessionId }), deps(verifyFetch));
+
+    const csrfSid = 'post-verify-login-sid';
+    const csrfToken = derivePreAuthCsrfToken(csrfSid);
+    const loginRequest = new Request('https://app.localhost/api/bff/auth/login', {
+      method: 'POST',
+      headers: {
+        Origin: 'https://app.localhost',
+        'X-CSRF-Token': csrfToken,
+        cookie: `${CSRF_TOKEN_COOKIE}=${csrfToken}; ${CSRF_SID_COOKIE}=${csrfSid}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: 'user@example.com', password: 'secret' }),
+    });
+
+    const loginFetch = vi.fn(async () =>
+      Response.json(buildUpstreamAuthPayload({ token_kind: 'session' }), { status: 200 }),
+    );
+    const loginResult = await performBffLogin(loginRequest, deps(loginFetch));
+
+    expect(loginResult.ok).toBe(true);
+    if (!loginResult.ok) {
+      return;
+    }
+
+    expect(loginResult.success.redirectTo).toBe('/');
+    const cookieHeader = sessionCookieHeader(loginResult.response);
+    const sessionIdMatch = cookieHeader.match(/__Host-fl_session=([^;]+)/);
+    expect(sessionIdMatch?.[1]).toBeTruthy();
+
+    const after = await getSession(`${config.cookieName}=${sessionIdMatch?.[1] ?? ''}`, {
+      config,
+      store,
+      now: () => fixedNow,
+    });
+    expect(after.context?.kind).toBe('session');
   });
 });

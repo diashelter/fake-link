@@ -9,6 +9,18 @@ type VerifyEmailPageProps = {
   searchParams: Promise<{ token?: string }>;
 };
 
+function decodeEmailToken(token: string | undefined): string | undefined {
+  if (!token) {
+    return undefined;
+  }
+
+  try {
+    return decodeURIComponent(token);
+  } catch {
+    return token;
+  }
+}
+
 export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageProps) {
   const params = await searchParams;
   const hdrs = await headers();
@@ -33,7 +45,7 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
         Enviamos um link para o seu e-mail. Cole o código abaixo ou use o link recebido.
       </p>
       <div className="mt-8">
-        <VerifyEmailForm initialToken={params.token} />
+        <VerifyEmailForm initialToken={decodeEmailToken(params.token)} />
       </div>
     </main>
   );

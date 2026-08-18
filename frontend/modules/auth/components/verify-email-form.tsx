@@ -18,6 +18,7 @@ import { Input } from '@/modules/shared/components/ui/input';
 import { focusFirstError, shouldBlockSubmit } from '@/modules/shared/lib/form-defaults';
 
 const CSRF_COOKIE = '__Host-fl_csrf';
+const VERIFY_SUCCESS_MESSAGE = 'E-mail confirmado. Faça login para continuar.';
 const RESEND_SUCCESS_MESSAGE =
   'Se o e-mail estiver cadastrado e pendente, você receberá um novo link.';
 
@@ -28,7 +29,7 @@ export type VerifyEmailFormProps = {
 export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
   const router = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
-  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isResending, setIsResending] = useState(false);
 
   const {
@@ -50,7 +51,7 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
 
   async function onValidSubmit(values: VerifyEmailFormValues) {
     setFormError(null);
-    setResendSuccess(null);
+    setStatusMessage(null);
     const csrf = readClientCookie(CSRF_COOKIE);
 
     const response = await fetch('/api/bff/auth/email/verify', {
@@ -63,7 +64,11 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
       body: JSON.stringify({ token: values.token }),
     });
 
-    let payload: { code?: string; message?: string; data?: { redirect_to?: string } } = {};
+    let payload: {
+      code?: string;
+      message?: string;
+      data?: { redirect_to?: string; message?: string };
+    } = {};
     try {
       payload = (await response.json()) as typeof payload;
     } catch {
@@ -71,11 +76,13 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
     }
 
     if (response.ok) {
+      setStatusMessage(payload.data?.message ?? VERIFY_SUCCESS_MESSAGE);
       router.push(payload.data?.redirect_to ?? '/login');
       return;
     }
 
     if (payload.code === 'EMAIL_ALREADY_VERIFIED') {
+      setFormError(messageForAuthError(payload.code, response.status));
       router.push('/login');
       return;
     }
@@ -100,7 +107,7 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
 
   async function onResend() {
     setFormError(null);
-    setResendSuccess(null);
+    setStatusMessage(null);
     setIsResending(true);
     const csrf = readClientCookie(CSRF_COOKIE);
 
@@ -121,11 +128,12 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
       }
 
       if (response.status === 202) {
-        setResendSuccess(RESEND_SUCCESS_MESSAGE);
+        setStatusMessage(RESEND_SUCCESS_MESSAGE);
         return;
       }
 
       if (payload.code === 'EMAIL_ALREADY_VERIFIED') {
+        setFormError(messageForAuthError(payload.code, response.status));
         router.push('/login');
         return;
       }
@@ -176,9 +184,9 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
         </p>
       ) : null}
 
-      {resendSuccess ? (
+      {statusMessage ? (
         <p role="status" className="text-sm text-foreground">
-          {resendSuccess}
+          {statusMessage}
         </p>
       ) : null}
 

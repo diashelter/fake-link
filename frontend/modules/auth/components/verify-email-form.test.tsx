@@ -59,7 +59,7 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     replaceSpy.mockRestore();
   });
 
-  it('navigates to /login on 200 with redirect_to (EV-13)', async () => {
+  it('shows success message and navigates to /login on 200 with redirect_to (EV-13)', async () => {
     server.use(
       http.post('/api/bff/auth/email/verify', () =>
         HttpResponse.json({
@@ -77,8 +77,11 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     await user.click(screen.getByRole('button', { name: 'Confirmar e-mail' }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/login');
+      expect(screen.getByRole('status').textContent).toBe(
+        'E-mail confirmado. Faça login para continuar.',
+      );
     });
+    expect(pushMock).toHaveBeenCalledWith('/login');
   });
 
   it('shows resend confirmation on 202 (EV-14)', async () => {
@@ -93,9 +96,28 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
 
     await waitFor(() => {
-      expect(screen.getByText(RESEND_SUCCESS_MESSAGE)).toBeInTheDocument();
+      expect(screen.getByRole('status').textContent).toBe(RESEND_SUCCESS_MESSAGE);
     });
     expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it('sends CSRF header on resend (EV-14)', async () => {
+    let capturedRequest: Request | null = null;
+    server.use(
+      http.post('/api/bff/auth/email/resend', ({ request }) => {
+        capturedRequest = request;
+        return HttpResponse.json({ message: 'Accepted.' }, { status: 202 });
+      }),
+    );
+
+    const user = setupUser();
+    render(<VerifyEmailForm />);
+    await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
+
+    await waitFor(() => {
+      expect(capturedRequest).not.toBeNull();
+    });
+    expect(capturedRequest!.headers.get('X-CSRF-Token')).toBe('test-csrf-token');
   });
 
   it('shows uniform message for 403 INVALID_VERIFICATION_TOKEN (EV-08)', async () => {
@@ -121,7 +143,7 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
-  it('navigates to /login on 403 EMAIL_ALREADY_VERIFIED (EV-09)', async () => {
+  it('shows pt-BR copy and navigates to /login on 403 EMAIL_ALREADY_VERIFIED (EV-09)', async () => {
     server.use(
       http.post('/api/bff/auth/email/verify', () =>
         HttpResponse.json(
@@ -137,8 +159,11 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     await user.click(screen.getByRole('button', { name: 'Confirmar e-mail' }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/login');
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Este e-mail já foi confirmado. Faça login para continuar.',
+      );
     });
+    expect(pushMock).toHaveBeenCalledWith('/login');
   });
 
   it('shows rate limit message with Retry-After guidance for 429 (EV-10)', async () => {
@@ -159,6 +184,25 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert').textContent).toBe(
         'Aguarde cerca de 2 minutos antes de tentar novamente.',
+      );
+    });
+  });
+
+  it('shows generic rate-limit copy when 429 has no Retry-After (EV-10)', async () => {
+    server.use(
+      http.post('/api/bff/auth/email/verify', () =>
+        HttpResponse.json({ code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' }, { status: 429 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<VerifyEmailForm />);
+    await user.type(screen.getByLabelText('Código de verificação'), 'valid-token');
+    await user.click(screen.getByRole('button', { name: 'Confirmar e-mail' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Muitas tentativas. Aguarde antes de tentar novamente.',
       );
     });
   });
@@ -235,8 +279,11 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     await user.click(screen.getByRole('button', { name: 'Reenviar e-mail' }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/login');
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Este e-mail já foi confirmado. Faça login para continuar.',
+      );
     });
+    expect(pushMock).toHaveBeenCalledWith('/login');
   });
 
   it('shows throttle message when resend returns 429 with Retry-After (EV-10)', async () => {
