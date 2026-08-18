@@ -311,9 +311,9 @@ T13
 
 **Done when**:
 
-- [ ] POST repassa `202` upstream
-- [ ] Guard failure → 403 sem upstream
-- [ ] Gate: `make test-frontend` passa
+- [x] POST repassa `202` upstream
+- [x] Guard failure → 403 sem upstream
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
