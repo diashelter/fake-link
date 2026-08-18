@@ -8,7 +8,11 @@
 
 Corroborated across multiple features. Safe to apply as guidance.
 
-_none_
+### L-026 — When an AC requires infrastructure behavior outside the app test suite, mark it explicitly as ops-verified or add a contract testable seam in-repo
+- signal: `spec_precision_gap` · recurrence: 2 feature(s) · scope: `security,observability` · harmful: 0
+- features: auth/email-verification, bff-auth/email-verification
+- evidence: AUTH-25 AC2 access-log redaction (security,observability) (+1 more)
+- last seen: 2026-08-18T18:03:26Z
 
 ## Candidates (under observation — do NOT load as guidance yet)
 
@@ -164,12 +168,6 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: AUTH-23 resend AC4-AC5 / EV-04 (auth,routes)
 - last seen: 2026-07-27T17:58:29Z
 
-### L-026 — When an AC requires infrastructure behavior outside the app test suite, mark it explicitly as ops-verified or add a contract testable seam in-repo
-- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `security,observability` · harmful: 0
-- features: auth/email-verification
-- evidence: AUTH-25 AC2 access-log redaction (security,observability)
-- last seen: 2026-07-27T17:58:29Z
-
 ### L-027 — When the spec requires queue retry or permanent-failure side effects, assert tries/backoff or that failure leaves domain state unchanged
 - signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth,jobs` · harmful: 0
 - features: auth/email-verification
@@ -295,6 +293,42 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - features: bff-auth/register
 - evidence: Success AC3 / bff-register.test.ts:160 — bare token substring (frontend/modules/auth)
 - last seen: 2026-08-11T20:38:51Z
+
+### L-048 — When a spec forbids trim on an opaque token, assert the exact upstream request body including surrounding whitespace, not only a trimmed sentinel
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: mutant 8 parseVerifyBody trim / bff-verify-email.ts:42 (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
+
+### L-049 — When a spec requires rejecting invalid Content-Type before upstream, assert 400 with fetch not called for a non-JSON content type
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: mutant 9 Content-Type guard / bff-verify-email.ts:79 (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
+
+### L-050 — When a spec forbids clearing the session cookie on error, assert Set-Cookie Max-Age=0 is absent on error responses, not only that destroySession was not called
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: mutant 10 clearSessionCookie on error / bff-verify-email.test.ts:218 (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
+
+### L-051 — When a spec requires the UI to display a message and navigate, assert the visible copy, not only the router destination
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: P1 UI AC7 / EV-09 verify-email-form.tsx:73-80 (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
+
+### L-052 — When a spec names a cross-flow integration test, add that chained test in the feature suite rather than relying on a prior slice
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: P1 UX AC4 login-after-verify MSW (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
+
+### L-053 — When a spec edge distinguishes rate-limit UI with and without Retry-After, assert both copies
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification
+- evidence: Edge: 429 without Retry-After (frontend/modules/auth)
+- last seen: 2026-08-18T18:03:26Z
 
 ## Quarantined (failed when applied — ignore)
 
