@@ -321,11 +321,11 @@ T19
 
 **Done when**:
 
-- [ ] Happy path `204` → destroy + clear + `redirect_to: /login`
-- [ ] `401 INVALID_CREDENTIALS` → repasse; sessão intacta
-- [ ] `422 PASSWORD_REUSED` → repasse; sessão intacta
-- [ ] `kind !== session` → 403 sem upstream
-- [ ] Gate: `make test-frontend` passa
+- [x] Happy path `204` → destroy + clear + `redirect_to: /login`
+- [x] `401 INVALID_CREDENTIALS` → repasse; sessão intacta
+- [x] `422 PASSWORD_REUSED` → repasse; sessão intacta
+- [x] `kind !== session` → 403 sem upstream
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
