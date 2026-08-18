@@ -140,9 +140,9 @@ T19
 
 **Done when**:
 
-- [ ] `token` minLength 1; whitespace-only falha; **sem** trim
-- [ ] `password_confirmation` mismatch → erro de campo
-- [ ] Gate: `make test-frontend` passa
+- [x] `token` minLength 1; whitespace-only falha; **sem** trim
+- [x] `password_confirmation` mismatch → erro de campo
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
