@@ -165,9 +165,9 @@ T19
 
 **Done when**:
 
-- [ ] `current_password` required, max 128; sem composição
-- [ ] Política de senha e confirmação cobertas
-- [ ] Gate: `make test-frontend` passa
+- [x] `current_password` required, max 128; sem composição
+- [x] Política de senha e confirmação cobertas
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
