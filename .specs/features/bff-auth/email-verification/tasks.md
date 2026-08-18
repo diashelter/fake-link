@@ -206,12 +206,12 @@ T13
 
 **Done when**:
 
-- [ ] Happy path upstream `204` → `200` + `redirect_to: /login` + cookie cleared
-- [ ] Upstream `403 INVALID_VERIFICATION_TOKEN` → repasse; **zero** destroySession
-- [ ] Upstream `401/422/429/5xx` → matriz sem destroy
-- [ ] Body malformado → `400` sem fetch
-- [ ] `JSON.stringify` resposta sucesso não contém Bearer sentinel nem token submetido
-- [ ] Gate: `make test-frontend` passa; ≥16 casos no service test
+- [x] Happy path upstream `204` → `200` + `redirect_to: /login` + cookie cleared
+- [x] Upstream `403 INVALID_VERIFICATION_TOKEN` → repasse; **zero** destroySession
+- [x] Upstream `401/422/429/5xx` → matriz sem destroy
+- [x] Body malformado → `400` sem fetch
+- [x] `JSON.stringify` resposta sucesso não contém Bearer sentinel nem token submetido
+- [x] Gate: `make test-frontend` passa; ≥16 casos no service test
 
 **Tests**: unit  
 **Gate**: quick  
