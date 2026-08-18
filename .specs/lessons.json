@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 48,
+  "next_id": 54,
   "lessons": [
     {
       "id": "L-001",
@@ -461,17 +461,19 @@
       "text": "When an AC requires infrastructure behavior outside the app test suite, mark it explicitly as ops-verified or add a contract testable seam in-repo",
       "signal": "spec_precision_gap",
       "scope": "security,observability",
-      "status": "candidate",
+      "status": "confirmed",
       "features": [
-        "auth/email-verification"
+        "auth/email-verification",
+        "bff-auth/email-verification"
       ],
-      "recurrence": 1,
+      "recurrence": 2,
       "harmful": 0,
       "evidence": [
-        "AUTH-25 AC2 access-log redaction (security,observability)"
+        "AUTH-25 AC2 access-log redaction (security,observability)",
+        "EV-19 AC1 console.log / validation.md (security,observability)"
       ],
       "created": "2026-07-27T17:58:29Z",
-      "last_seen": "2026-07-27T17:58:29Z"
+      "last_seen": "2026-08-18T18:03:26Z"
     },
     {
       "id": "L-027",
@@ -851,6 +853,114 @@
       ],
       "created": "2026-08-11T20:38:51Z",
       "last_seen": "2026-08-11T20:38:51Z"
+    },
+    {
+      "id": "L-048",
+      "key": "surviving_mutant::when a spec forbids trim on an opaque token assert the exact upstream request body including surrounding whitespace not only a trimmed sentinel",
+      "text": "When a spec forbids trim on an opaque token, assert the exact upstream request body including surrounding whitespace, not only a trimmed sentinel",
+      "signal": "surviving_mutant",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 8 parseVerifyBody trim / bff-verify-email.ts:42 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
+    },
+    {
+      "id": "L-049",
+      "key": "surviving_mutant::when a spec requires rejecting invalid content type before upstream assert 400 with fetch not called for a non json content type",
+      "text": "When a spec requires rejecting invalid Content-Type before upstream, assert 400 with fetch not called for a non-JSON content type",
+      "signal": "surviving_mutant",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 9 Content-Type guard / bff-verify-email.ts:79 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
+    },
+    {
+      "id": "L-050",
+      "key": "surviving_mutant::when a spec forbids clearing the session cookie on error assert set cookie max age 0 is absent on error responses not only that destroysession was not called",
+      "text": "When a spec forbids clearing the session cookie on error, assert Set-Cookie Max-Age=0 is absent on error responses, not only that destroySession was not called",
+      "signal": "surviving_mutant",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "mutant 10 clearSessionCookie on error / bff-verify-email.test.ts:218 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
+    },
+    {
+      "id": "L-051",
+      "key": "ac_gap::when a spec requires the ui to display a message and navigate assert the visible copy not only the router destination",
+      "text": "When a spec requires the UI to display a message and navigate, assert the visible copy, not only the router destination",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 UI AC7 / EV-09 verify-email-form.tsx:73-80 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
+    },
+    {
+      "id": "L-052",
+      "key": "ac_gap::when a spec names a cross flow integration test add that chained test in the feature suite rather than relying on a prior slice",
+      "text": "When a spec names a cross-flow integration test, add that chained test in the feature suite rather than relying on a prior slice",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 UX AC4 login-after-verify MSW (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
+    },
+    {
+      "id": "L-053",
+      "key": "ac_gap::when a spec edge distinguishes rate limit ui with and without retry after assert both copies",
+      "text": "When a spec edge distinguishes rate-limit UI with and without Retry-After, assert both copies",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/email-verification"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "Edge: 429 without Retry-After (frontend/modules/auth)"
+      ],
+      "created": "2026-08-18T18:03:26Z",
+      "last_seen": "2026-08-18T18:03:26Z"
     }
   ]
 }

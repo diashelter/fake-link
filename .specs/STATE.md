@@ -24,13 +24,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/register` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validation ✅ PASS
-- **Phase / Task**: Complete
-- **Completed**: T1–T11 + coverage fix `ee9bb24`; validation PASS (48/48 ACs, sensor 9/9 killed)
+- **Feature**: `bff-auth/email-verification` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verified PASS
+- **Phase / Task**: Execute complete (T1–T13 + fix `65311c7` + Verifier PASS)
+- **Completed**: T1–T13 on `feature/bff-auth-email-verification`; verifier iteration 1 PASS (380 tests, 6/6 mutants killed)
 - **In-progress**: none
-- **Next step**: Fatia 6 `email-verification` (Specify deepen) ou PR desta branch
+- **Next step**: Open PR for `feature/bff-auth-email-verification`
 - **Blockers**: none
-- **Commits**: `e06325d`..`ee9bb24` (branch `feature/bff-auth-register`)
-- **Gate**: `make lint-frontend` ✅ · `make test-frontend` ✅ (289) · coverage slice ≥75%
-- **Report**: `.specs/features/bff-auth/register/validation.md`
-- **Artifacts**: `spec.md`, `design.md`, `tasks.md`, `validation.md`
+- **Branch**: `feature/bff-auth-email-verification`
+- **Report**: `.specs/features/bff-auth/email-verification/validation.md`
+- **Prior feature**: `bff-auth/register` — Verified PASS
+- **Artifacts**: `.specs/features/bff-auth/email-verification/{spec,design,tasks}.md`
