@@ -396,9 +396,9 @@ T13
 
 **Done when**:
 
-- [ ] Sessão `verification` mock → redirect `/verify-email`
-- [ ] Sem sessão ou `session` kind → render landing inalterada
-- [ ] Gate: `make test-frontend` passa
+- [x] Sessão `verification` mock → redirect `/verify-email`
+- [x] Sem sessão ou `session` kind → render landing inalterada
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: full  
