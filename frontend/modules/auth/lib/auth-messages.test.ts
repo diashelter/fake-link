@@ -52,6 +52,28 @@ describe('messageForAuthError', () => {
     expect(messageForAuthError(undefined, 500)).toBe('Algo deu errado. Tente novamente.');
     expect(messageForAuthError(undefined, 503)).toBe('Algo deu errado. Tente novamente.');
   });
+
+  it('maps INVALID_VERIFICATION_TOKEN to uniform pt-BR message (EV-08)', () => {
+    expect(messageForAuthError('INVALID_VERIFICATION_TOKEN', 403)).toBe(
+      'Link de verificação inválido ou expirado.',
+    );
+  });
+
+  it('maps EMAIL_ALREADY_VERIFIED to pt-BR login guidance (EV-09)', () => {
+    expect(messageForAuthError('EMAIL_ALREADY_VERIFIED', 403)).toBe(
+      'Este e-mail já foi confirmado. Faça login para continuar.',
+    );
+  });
+
+  it('maps UNAUTHENTICATED to expired-session pt-BR message (EV-10)', () => {
+    expect(messageForAuthError('UNAUTHENTICATED', 401)).toBe(
+      'Sua sessão expirou. Faça login novamente.',
+    );
+  });
+
+  it('maps missing code with 401 status to the same expired-session message (EV-10)', () => {
+    expect(messageForAuthError(undefined, 401)).toBe('Sua sessão expirou. Faça login novamente.');
+  });
 });
 
 describe('formatRetryAfter', () => {

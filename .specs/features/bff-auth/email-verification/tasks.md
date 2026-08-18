@@ -128,9 +128,9 @@ T13
 
 **Done when**:
 
-- [ ] Mensagens conforme design.md (copy pt-BR)
-- [ ] Códigos login/register inalterados (regressão)
-- [ ] Gate: `make test-frontend` passa
+- [x] Mensagens conforme design.md (copy pt-BR)
+- [x] Códigos login/register inalterados (regressão)
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

@@ -12,8 +12,18 @@ export function messageForAuthError(code: string | undefined, status: number): s
       return 'Verifique os campos informados.';
     case 'REGISTRATION_NOT_ALLOWED':
       return 'Não foi possível concluir o cadastro. Verifique seus dados ou entre em contato com o suporte.';
+    case 'INVALID_VERIFICATION_TOKEN':
+      return 'Link de verificação inválido ou expirado.';
+    case 'EMAIL_ALREADY_VERIFIED':
+      return 'Este e-mail já foi confirmado. Faça login para continuar.';
+    case 'UNAUTHENTICATED':
+      return 'Sua sessão expirou. Faça login novamente.';
     default:
       break;
+  }
+
+  if (status === 401) {
+    return 'Sua sessão expirou. Faça login novamente.';
   }
 
   if (status === 504) {
