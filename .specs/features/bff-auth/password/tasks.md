@@ -294,11 +294,11 @@ T19
 
 **Done when**:
 
-- [ ] Happy path `204` + cookie mock → `200` + destroy + clear cookie
-- [ ] Upstream `422` token / `PASSWORD_REUSED` → repasse; **zero** destroy
-- [ ] `JSON.stringify` sucesso não contém senha/token/Bearer sentinel
-- [ ] Redis destroy fail pós-`204` → ainda clear cookie + `200`
-- [ ] Gate: `make test-frontend` passa
+- [x] Happy path `204` + cookie mock → `200` + destroy + clear cookie
+- [x] Upstream `422` token / `PASSWORD_REUSED` → repasse; **zero** destroy
+- [x] `JSON.stringify` sucesso não contém senha/token/Bearer sentinel
+- [x] Redis destroy fail pós-`204` → ainda clear cookie + `200`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
