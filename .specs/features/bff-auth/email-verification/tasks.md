@@ -336,15 +336,15 @@ T13
 
 **Done when**:
 
-- [ ] Mount com `initialToken` **não** chama fetch verify/resend (scanner-safe)
-- [ ] `replaceState` remove `?token=` após mount (spy)
-- [ ] Submit válido MSW `200` → `router.push('/login')`
-- [ ] Resend MSW `202` → mensagem confirmação pt-BR
-- [ ] `403 INVALID_VERIFICATION_TOKEN` → mensagem uniforme
-- [ ] `403 EMAIL_ALREADY_VERIFIED` → redirect login
-- [ ] `429` + Retry-After → throttle message
-- [ ] Token vazio bloqueia submit client-side
-- [ ] Link "Ir para login" presente
+- [x] Mount com `initialToken` **não** chama fetch verify/resend (scanner-safe)
+- [x] `replaceState` remove `?token=` após mount (spy)
+- [x] Submit válido MSW `200` → `router.push('/login')`
+- [x] Resend MSW `202` → mensagem confirmação pt-BR
+- [x] `403 INVALID_VERIFICATION_TOKEN` → mensagem uniforme
+- [x] `403 EMAIL_ALREADY_VERIFIED` → redirect login
+- [x] `429` + Retry-After → throttle message
+- [x] Token vazio bloqueia submit client-side
+- [x] Link "Ir para login" presente
 - [ ] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
