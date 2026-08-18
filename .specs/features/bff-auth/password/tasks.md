@@ -190,10 +190,10 @@ T19
 
 **Done when**:
 
-- [ ] `PASSWORD_REUSED` → pt-BR no campo `password`
-- [ ] Qualquer erro em `token` → mensagem uniforme pt-BR
-- [ ] Suporta `FieldError` objeto e string legada
-- [ ] Gate: `make test-frontend` passa
+- [x] `PASSWORD_REUSED` → pt-BR no campo `password`
+- [x] Qualquer erro em `token` → mensagem uniforme pt-BR
+- [x] Suporta `FieldError` objeto e string legada
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
