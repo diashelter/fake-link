@@ -348,10 +348,10 @@ T19
 
 **Done when**:
 
-- [ ] Lookup resolve os três paths BFF
-- [ ] `requireSession` false/true conforme spec
-- [ ] Entradas anteriores inalteradas
-- [ ] Gate: `make test-frontend` passa
+- [x] Lookup resolve os três paths BFF
+- [x] `requireSession` false/true conforme spec
+- [x] Entradas anteriores inalteradas
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

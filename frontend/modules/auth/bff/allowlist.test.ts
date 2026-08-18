@@ -4,6 +4,9 @@ import {
   AUTH_BFF_ALLOWLIST,
   buildUpstreamUrl,
   LOGIN_ALLOWLIST_ENTRY,
+  PASSWORD_CHANGE_ALLOWLIST_ENTRY,
+  PASSWORD_RESET_ALLOWLIST_ENTRY,
+  PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY,
   REGISTER_ALLOWLIST_ENTRY,
   RESEND_VERIFICATION_ALLOWLIST_ENTRY,
   VERIFY_EMAIL_ALLOWLIST_ENTRY,
@@ -27,14 +30,17 @@ const TEST_TABLE: readonly AllowlistEntry[] = [
 ];
 
 describe('AUTH_BFF_ALLOWLIST', () => {
-  it('exports login, register, verify, and resend production entries (LOG-14, RGR-18, EV-20)', () => {
-    expect(AUTH_BFF_ALLOWLIST).toHaveLength(4);
+  it('exports login, register, verify, resend, and password production entries (PW-24)', () => {
+    expect(AUTH_BFF_ALLOWLIST).toHaveLength(7);
     expect(AUTH_BFF_ALLOWLIST).toEqual(
       expect.arrayContaining([
         LOGIN_ALLOWLIST_ENTRY,
         REGISTER_ALLOWLIST_ENTRY,
         VERIFY_EMAIL_ALLOWLIST_ENTRY,
         RESEND_VERIFICATION_ALLOWLIST_ENTRY,
+        PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY,
+        PASSWORD_RESET_ALLOWLIST_ENTRY,
+        PASSWORD_CHANGE_ALLOWLIST_ENTRY,
       ]),
     );
   });
@@ -80,6 +86,39 @@ describe('RESEND_VERIFICATION_ALLOWLIST_ENTRY (EV-20)', () => {
     expect(entry?.requireSession).toBe(true);
     expect(entry?.requireCsrf).toBe(true);
     expect(entry?.upstreamPath).toBe('/auth/email/verification-notification');
+  });
+});
+
+describe('PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY (PW-24)', () => {
+  it('resolves reset-request path with pre-auth CSRF and no session requirement', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/password/reset-request');
+
+    expect(entry).toEqual(PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(false);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/password/reset-request');
+  });
+});
+
+describe('PASSWORD_RESET_ALLOWLIST_ENTRY (PW-24)', () => {
+  it('resolves reset path with pre-auth CSRF and no session requirement', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/password/reset');
+
+    expect(entry).toEqual(PASSWORD_RESET_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(false);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/password/reset');
+  });
+});
+
+describe('PASSWORD_CHANGE_ALLOWLIST_ENTRY (PW-24)', () => {
+  it('resolves change path with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/password/change');
+
+    expect(entry).toEqual(PASSWORD_CHANGE_ALLOWLIST_ENTRY);
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
+    expect(entry?.upstreamPath).toBe('/auth/password/change');
   });
 });
 
