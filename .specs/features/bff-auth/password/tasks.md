@@ -398,9 +398,9 @@ T19
 
 **Done when**:
 
-- [ ] POST happy path `200` + clear cookie
-- [ ] Guards bloqueiam sem upstream
-- [ ] Gate: `make test-frontend` passa
+- [x] POST happy path `200` + clear cookie
+- [x] Guards bloqueiam sem upstream
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
