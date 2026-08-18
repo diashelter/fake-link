@@ -153,11 +153,11 @@ T13
 
 **Done when**:
 
-- [ ] `verification` + `/` → redirect `/verify-email`
-- [ ] `verification` + `/verify-email` → allow
-- [ ] `null` + `/verify-email` → redirect `/login` (helper usado pela page)
-- [ ] `session` + `/verify-email` → redirect `/`
-- [ ] Gate: `make test-frontend` passa
+- [x] `verification` + `/` → redirect `/verify-email`
+- [x] `verification` + `/verify-email` → allow
+- [x] `null` + `/verify-email` → redirect `/login` (helper usado pela page)
+- [x] `session` + `/verify-email` → redirect `/`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
