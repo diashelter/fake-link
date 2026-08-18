@@ -268,10 +268,10 @@ T19
 
 **Done when**:
 
-- [ ] Upstream `202` → repasse envelope idêntico (dois cenários e-mail)
-- [ ] `422`/`429`/`504` matriz; **zero** `destroySession`/`getSession` em todos os casos
-- [ ] Body malformado → `400` sem fetch
-- [ ] Gate: `make test-frontend` passa
+- [x] Upstream `202` → repasse envelope idêntico (dois cenários e-mail)
+- [x] `422`/`429`/`504` matriz; **zero** `destroySession`/`getSession` em todos os casos
+- [x] Body malformado → `400` sem fetch
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

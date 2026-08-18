@@ -39,6 +39,15 @@ export const RESEND_VERIFICATION_ALLOWLIST_ENTRY: AllowlistEntry = {
   requireCsrf: true,
 };
 
+export const PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'POST',
+  bffPath: '/api/bff/auth/password/reset-request',
+  upstreamMethod: 'POST',
+  upstreamPath: '/auth/password/reset-request',
+  requireSession: false,
+  requireCsrf: true,
+};
+
 export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [
   LOGIN_ALLOWLIST_ENTRY,
   REGISTER_ALLOWLIST_ENTRY,
