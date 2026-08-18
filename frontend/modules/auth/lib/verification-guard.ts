@@ -1,4 +1,10 @@
-export const VERIFICATION_ALLOWED_PATHS = ['/verify-email', '/login', '/terms'] as const;
+export const VERIFICATION_ALLOWED_PATHS = [
+  '/verify-email',
+  '/login',
+  '/terms',
+  '/forgot-password',
+  '/reset-password',
+] as const;
 
 export type VerificationGuardDecision =
   { action: 'allow' } | { action: 'redirect'; to: '/verify-email' | '/login' | '/' };

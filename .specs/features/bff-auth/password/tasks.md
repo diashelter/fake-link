@@ -216,10 +216,10 @@ T19
 
 **Done when**:
 
-- [ ] `verification` + `/forgot-password` → allow
-- [ ] `verification` + `/reset-password` → allow
-- [ ] Regressão: paths anteriores inalterados
-- [ ] Gate: `make test-frontend` passa
+- [x] `verification` + `/forgot-password` → allow
+- [x] `verification` + `/reset-password` → allow
+- [x] Regressão: paths anteriores inalterados
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
