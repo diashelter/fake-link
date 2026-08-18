@@ -242,10 +242,10 @@ T19
 
 **Done when**:
 
-- [ ] `kind: verification` → 403 sem upstream
-- [ ] `kind: session` → retorna ctx com bearer
-- [ ] Guard CSRF/Origin/sessão ausente → 403
-- [ ] Gate: `make test-frontend` passa
+- [x] `kind: verification` → 403 sem upstream
+- [x] `kind: session` → retorna ctx com bearer
+- [x] Guard CSRF/Origin/sessão ausente → 403
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
