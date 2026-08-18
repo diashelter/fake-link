@@ -19,7 +19,7 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('allows login, register, and email verification product routes and keeps password gated', () => {
+  it('allows login, register, email verification, and password product routes', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
@@ -29,11 +29,14 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/bff/auth/email/resend/route.ts',
       'api/bff/auth/email/verify/route.ts',
       'api/bff/auth/login/route.ts',
+      'api/bff/auth/password/reset-request/route.ts',
       'api/bff/auth/register/route.ts',
       'health/route.ts',
     ]);
 
-    expect(relative.some((route) => route.includes('password'))).toBe(false);
+    expect(relative.filter((route) => route.includes('password'))).toEqual([
+      'api/bff/auth/password/reset-request/route.ts',
+    ]);
     expect(relative.filter((route) => route.includes('verify'))).toEqual([
       'api/bff/auth/email/verify/route.ts',
     ]);

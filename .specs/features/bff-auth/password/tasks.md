@@ -374,8 +374,8 @@ T19
 
 **Done when**:
 
-- [ ] POST `202` pass-through; guards `403` sem upstream mock
-- [ ] Gate: `make test-frontend` passa
+- [x] POST `202` pass-through; guards `403` sem upstream mock
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
