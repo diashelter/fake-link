@@ -345,7 +345,7 @@ T13
 - [x] `429` + Retry-After → throttle message
 - [x] Token vazio bloqueia submit client-side
 - [x] Link "Ir para login" presente
-- [ ] Gate: `make test-frontend` passa
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
 **Gate**: full  
@@ -368,12 +368,12 @@ T13
 
 **Done when**:
 
-- [ ] Sem sessão → redirect `/login`
-- [ ] Sessão `session` → redirect `/`
-- [ ] Sessão `verification` → renderiza `VerifyEmailForm` com token da query
-- [ ] Render não dispara fetch verify/resend (spy global fetch count 0)
-- [ ] HTML/props não contêm Bearer
-- [ ] Gate: `make test-frontend` passa
+- [x] Sem sessão → redirect `/login`
+- [x] Sessão `session` → redirect `/`
+- [x] Sessão `verification` → renderiza `VerifyEmailForm` com token da query
+- [x] Render não dispara fetch verify/resend (spy global fetch count 0)
+- [x] HTML/props não contêm Bearer
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: full  
