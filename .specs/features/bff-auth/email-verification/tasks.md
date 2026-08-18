@@ -180,10 +180,10 @@ T13
 
 **Done when**:
 
-- [ ] Guard Origin/CSRF/sessão ausente → 403 sem upstream mock
-- [ ] `kind: session` → 403 sem upstream
-- [ ] `kind: verification` → retorna ctx com bearerPlaintext
-- [ ] Gate: `make test-frontend` passa
+- [x] Guard Origin/CSRF/sessão ausente → 403 sem upstream mock
+- [x] `kind: session` → 403 sem upstream
+- [x] `kind: verification` → retorna ctx com bearerPlaintext
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
