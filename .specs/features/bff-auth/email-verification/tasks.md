@@ -286,9 +286,9 @@ T13
 
 **Done when**:
 
-- [ ] POST happy path retorna `200` + clear cookie + body sem Bearer
-- [ ] CSRF/Origin failure → 403; upstream mock não invocado
-- [ ] Gate: `make test-frontend` passa
+- [x] POST happy path retorna `200` + clear cookie + body sem Bearer
+- [x] CSRF/Origin failure → 403; upstream mock não invocado
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
