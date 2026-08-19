@@ -173,6 +173,33 @@ describe('performBffPasswordResetRequest (PW-01–03, PW-19–21)', () => {
     expectNoSessionSideEffects();
   });
 
+  it('forwards upstream 403 ACCOUNT_SUSPENDED without session side effects (PW-21)', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json({ code: 'ACCOUNT_SUSPENDED', message: 'Suspended.' }, { status: 403 }),
+    );
+
+    const result = await performBffPasswordResetRequest(makeRequest(), deps(fetchMock));
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_SUSPENDED' });
+    expectNoSessionSideEffects();
+  });
+
+  it('forwards upstream 403 ACCOUNT_PENDING_DELETION without session side effects (PW-21)', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json(
+        { code: 'ACCOUNT_PENDING_DELETION', message: 'Pending deletion.' },
+        { status: 403 },
+      ),
+    );
+
+    const result = await performBffPasswordResetRequest(makeRequest(), deps(fetchMock));
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_PENDING_DELETION' });
+    expectNoSessionSideEffects();
+  });
+
   it('forwards upstream 429 with Retry-After (PW-20)', async () => {
     const fetchMock = vi.fn(async () =>
       Response.json(

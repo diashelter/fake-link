@@ -154,6 +154,38 @@ describe('performBffPasswordChange (PW-12–14, PW-19–22)', () => {
     expect(sessionCookieHeader(result.response)).not.toMatch(/Max-Age=0/i);
   });
 
+  it('forwards 403 ACCOUNT_SUSPENDED without destroying the session (PW-21)', async () => {
+    const created = await createKindSession('session');
+    const payload = { code: 'ACCOUNT_SUSPENDED', message: 'Suspended.' };
+    const fetchMock = vi.fn(async () => Response.json(payload, { status: 403 }));
+
+    const result = await performBffPasswordChange(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_SUSPENDED' });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('forwards 403 ACCOUNT_PENDING_DELETION without destroying the session (PW-21)', async () => {
+    const created = await createKindSession('session');
+    const payload = { code: 'ACCOUNT_PENDING_DELETION', message: 'Pending deletion.' };
+    const fetchMock = vi.fn(async () => Response.json(payload, { status: 403 }));
+
+    const result = await performBffPasswordChange(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toMatchObject({ code: 'ACCOUNT_PENDING_DELETION' });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
   it('forwards 422 PASSWORD_REUSED without destroying the session (PW-14)', async () => {
     const created = await createKindSession('session');
     const payload = {

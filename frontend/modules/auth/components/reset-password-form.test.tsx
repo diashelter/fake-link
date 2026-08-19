@@ -148,6 +148,43 @@ describe('ResetPasswordForm (PW-09–11, PW-20, PW-22)', () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it('shows account suspended message for 403 ACCOUNT_SUSPENDED (PW-21)', async () => {
+    server.use(
+      http.post('/api/bff/auth/password/reset', () =>
+        HttpResponse.json({ code: 'ACCOUNT_SUSPENDED', message: 'Suspended.' }, { status: 403 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<ResetPasswordForm />);
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: 'Redefinir senha' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Esta conta está suspensa.');
+    });
+  });
+
+  it('shows pending deletion message for 403 ACCOUNT_PENDING_DELETION (PW-21)', async () => {
+    server.use(
+      http.post('/api/bff/auth/password/reset', () =>
+        HttpResponse.json(
+          { code: 'ACCOUNT_PENDING_DELETION', message: 'Pending deletion.' },
+          { status: 403 },
+        ),
+      ),
+    );
+
+    const user = setupUser();
+    render(<ResetPasswordForm />);
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: 'Redefinir senha' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe('Esta conta está em processo de exclusão.');
+    });
+  });
+
   it('shows rate limit message with Retry-After guidance for 429 (PW-20)', async () => {
     server.use(
       http.post('/api/bff/auth/password/reset', () =>
