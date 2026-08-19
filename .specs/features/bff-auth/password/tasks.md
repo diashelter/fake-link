@@ -10,7 +10,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 
 **Design**: `.specs/features/bff-auth/password/design.md`  
 **Spec**: `.specs/features/bff-auth/password/spec.md`  
-**Status**: Approved — 2026-08-18
+**Status**: Verified — 2026-08-18
 
 > **Sub-agent note:** 18 tasks → ~3 batches (Batch 1: T1–T7 ~7 tasks; Batch 2: T8–T14 ~7 tasks; Batch 3: T15–T18 ~4 tasks). Execute MUST offer batch sub-agents before implementation if user accepts.
 

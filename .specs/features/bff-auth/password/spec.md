@@ -1,6 +1,6 @@
 # BFF Auth — Senha
 
-**Status:** Approved — 2026-08-18  
+**Status:** Verified — 2026-08-18  
 **Fatia:** 7 de 9 — ver [índice](../README.md)  
 **Requirement IDs (catálogo):** BFFUI-60 … BFFUI-63  
 **Requirement IDs (fatia):** PW-01 … PW-24  
@@ -9,17 +9,17 @@
 
 ## Problem Statement
 
-Usuários precisam recuperar acesso (forgot/reset) e alterar a senha autenticados, sempre pelo browser oficial (`https://app.localhost`) sem jamais receber Bearer. A API Laravel já entrega reset-request com anti-enumeração (`202` uniforme), reset com token de uso único (30 min) e revogação total de Bearers, e change com confirmação da senha atual — mas o frontend ainda não tem Route Handlers BFF nem UI para esses fluxos.
+Usuários precisam recuperar acesso (forgot/reset) e alterar a senha autenticados, sempre pelo browser oficial (`https://app.localhost`) sem jamais receber Bearer. A API Laravel entrega reset-request com anti-enumeração (`202` uniforme), reset com token de uso único (30 min) e revogação total de Bearers, e change com confirmação da senha atual.
 
-Esta fatia entrega três mutations BFF allowlisted (`reset-request`, `reset`, `change`), páginas server-first em pt-BR (`/forgot-password`, `/reset-password`, `/settings/password`), encerramento da sessão BFF local após reset/change bem-sucedidos (API revoga todos os Bearers upstream), e testes Vitest/RTL que provam anti-enumeração, scanner-safe GET no reset, ausência de Bearer/senhas/tokens em respostas e storage.
+Esta fatia **entregou** três mutations BFF allowlisted (`reset-request`, `reset`, `change`), páginas server-first em pt-BR (`/forgot-password`, `/reset-password`, `/settings/password`), encerramento da sessão BFF local após reset/change bem-sucedidos (API revoga todos os Bearers upstream), e testes Vitest/RTL que provam anti-enumeração, scanner-safe GET no reset, ausência de Bearer/senhas/tokens em respostas e storage. Validação: [validation.md](./validation.md).
 
 ## Goals
 
-- [ ] Route Handlers BFF `POST /api/bff/auth/password/reset-request`, `…/reset` e `…/change` registrados na `AUTH_BFF_ALLOWLIST`, com guards Origin/CSRF adequados (pré-auth nos fluxos públicos; sessão `session` no change), Bearer somente server-side e encerramento da sessão BFF após reset/change bem-sucedidos.
-- [ ] Páginas UI server-first: forgot com feedback uniforme em `202`; reset com token hidratado de `?token=` e submit explícito POST; change com sessão `session` + CSRF session-mode.
-- [ ] Política de senha (`passwordSchema`) e código `PASSWORD_REUSED` mapeados na UI; erros `422`/`401`/`429`/`5xx` alinhados à API com mensagens pt-BR.
-- [ ] Vitest cobre handlers (happy path, erros, destroy/clear cookie, Bearer absent), RTL dos três formulários, scanner-safe GET em reset e ausência de credenciais sensíveis em JSON/HTML/storage simulado.
-- [ ] Cobertura ≥75% linhas/branches nos arquivos introduzidos nesta fatia (`docs/testing.md` §4).
+- [x] Route Handlers BFF `POST /api/bff/auth/password/reset-request`, `…/reset` e `…/change` registrados na `AUTH_BFF_ALLOWLIST`, com guards Origin/CSRF adequados (pré-auth nos fluxos públicos; sessão `session` no change), Bearer somente server-side e encerramento da sessão BFF após reset/change bem-sucedidos.
+- [x] Páginas UI server-first: forgot com feedback uniforme em `202`; reset com token hidratado de `?token=` e submit explícito POST; change com sessão `session` + CSRF session-mode.
+- [x] Política de senha (`passwordSchema`) e código `PASSWORD_REUSED` mapeados na UI; erros `422`/`401`/`429`/`5xx` alinhados à API com mensagens pt-BR.
+- [x] Vitest cobre handlers (happy path, erros, destroy/clear cookie, Bearer absent), RTL dos três formulários, scanner-safe GET em reset e ausência de credenciais sensíveis em JSON/HTML/storage simulado.
+- [x] Cobertura ≥75% linhas/branches nos arquivos introduzidos nesta fatia (`docs/testing.md` §4).
 
 ## Out of Scope
 
@@ -460,14 +460,14 @@ Handlers reset/change **não** podem repassar `204` cru sem encerrar sessão BFF
 
 ## Success Criteria
 
-- [ ] Usuário completa forgot em `/forgot-password` e vê mensagem uniforme em `202` sem indício de enumeração.
-- [ ] Usuário completa reset em `/reset-password` com token do e-mail, chega a `/login` **sem** Bearer no browser e **sem** cookie de sessão BFF ativo.
-- [ ] Usuário autenticado altera senha em `/settings/password`, é deslogado e redirecionado a `/login` com confirmação pt-BR.
-- [ ] Abrir `GET /reset-password?token=…` não chama reset até clique explícito.
-- [ ] `PASSWORD_REUSED` e token inválido exibem erros pt-BR nos campos corretos.
-- [ ] Guards CSRF/Origin bloqueiam sem chamar Laravel; change bloqueia kind `verification`.
-- [ ] `make test-frontend` passa com cobertura ≥75% nos arquivos novos da fatia.
-- [ ] Nenhum teste Vitest/RTL falha se `JSON.stringify(resposta)` ou HTML contiver Bearer de fixture ou senha/token sentinela de teste.
+- [x] Usuário completa forgot em `/forgot-password` e vê mensagem uniforme em `202` sem indício de enumeração.
+- [x] Usuário completa reset em `/reset-password` com token do e-mail, chega a `/login` **sem** Bearer no browser e **sem** cookie de sessão BFF ativo.
+- [x] Usuário autenticado altera senha em `/settings/password`, é deslogado e redirecionado a `/login` com confirmação pt-BR.
+- [x] Abrir `GET /reset-password?token=…` não chama reset até clique explícito.
+- [x] `PASSWORD_REUSED` e token inválido exibem erros pt-BR nos campos corretos.
+- [x] Guards CSRF/Origin bloqueiam sem chamar Laravel; change bloqueia kind `verification`.
+- [x] `make test-frontend` passa com cobertura ≥75% nos arquivos novos da fatia.
+- [x] Nenhum teste Vitest/RTL falha se `JSON.stringify(resposta)` ou HTML contiver Bearer de fixture ou senha/token sentinela de teste.
 
 ---
 

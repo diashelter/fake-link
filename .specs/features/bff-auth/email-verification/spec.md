@@ -1,6 +1,6 @@
 # BFF Auth — Verificação de e-mail
 
-**Status:** Approved — 2026-08-18  
+**Status:** Verified — 2026-08-18  
 **Fatia:** 6 de 9 — ver [índice](../README.md)  
 **Requirement IDs (catálogo):** BFFUI-50 … BFFUI-52  
 **Requirement IDs (fatia):** EV-01 … EV-22  
@@ -9,18 +9,18 @@
 
 ## Problem Statement
 
-Usuários recém-cadastrados chegam a `/verify-email` com sessão BFF restrita (`verification`) e precisam confirmar posse do e-mail por ação explícita no browser — sem que prefetch, scanners ou `GET` com side-effect consumam o token. A API Laravel já entrega verify/resend com Bearer `verification`, rate limits e revogação pós-verify (AUTH-12), mas o frontend ainda não tem Route Handlers BFF nem UI de verificação.
+Usuários recém-cadastrados chegam a `/verify-email` com sessão BFF restrita (`verification`) e precisam confirmar posse do e-mail por ação explícita no browser — sem que prefetch, scanners ou `GET` com side-effect consumam o token. A API Laravel entrega verify/resend com Bearer `verification`, rate limits e revogação pós-verify (AUTH-12).
 
-Esta fatia entrega `POST /api/bff/auth/email/verify` e `POST /api/bff/auth/email/resend` (proxy allowlisted com sessão + CSRF), a página `/verify-email` server-first em pt-BR, guards mínimos de sessão restrita e testes Vitest/RTL que provam que abrir o link do e-mail **não** verifica automaticamente.
+Esta fatia **entregou** `POST /api/bff/auth/email/verify` e `POST /api/bff/auth/email/resend` (proxy allowlisted com sessão + CSRF), a página `/verify-email` server-first em pt-BR, guards mínimos de sessão restrita e testes Vitest/RTL que provam que abrir o link do e-mail **não** verifica automaticamente. Validação: [validation.md](./validation.md).
 
 ## Goals
 
-- [ ] Route Handlers BFF verify + resend registrados na `AUTH_BFF_ALLOWLIST`, com guards Origin/CSRF **autenticados** (`requireSession: true`), Bearer somente server-side e encerramento da sessão BFF após verify bem-sucedido.
-- [ ] Página UI `/verify-email` server-first: hidrata token da query `?token=` apenas no formulário; submit explícito via POST BFF; reenvio com feedback de `202`/`429`.
-- [ ] UX restrita: usuário com sessão `verification` não acessa shell autenticado (`/` e rotas futuras redirecionam para `/verify-email`); pós-verify redireciona para `/login` com mensagem pt-BR.
-- [ ] Matriz de erros alinhada à API (`403 INVALID_VERIFICATION_TOKEN`, `403 EMAIL_ALREADY_VERIFIED`, `401`, `422`, `429`, `5xx`) com mensagens pt-BR; token de e-mail ausente de logs e respostas sanitizadas.
-- [ ] Vitest cobre handlers (happy path, erros, destroy cookie, Bearer absent), RTL (render, submit, resend, scanner-safe GET) e guards de sessão restrita.
-- [ ] Cobertura ≥75% linhas/branches nos arquivos introduzidos nesta fatia (`docs/testing.md` §4).
+- [x] Route Handlers BFF verify + resend registrados na `AUTH_BFF_ALLOWLIST`, com guards Origin/CSRF **autenticados** (`requireSession: true`), Bearer somente server-side e encerramento da sessão BFF após verify bem-sucedido.
+- [x] Página UI `/verify-email` server-first: hidrata token da query `?token=` apenas no formulário; submit explícito via POST BFF; reenvio com feedback de `202`/`429`.
+- [x] UX restrita: usuário com sessão `verification` não acessa shell autenticado (`/` e rotas futuras redirecionam para `/verify-email`); pós-verify redireciona para `/login` com mensagem pt-BR.
+- [x] Matriz de erros alinhada à API (`403 INVALID_VERIFICATION_TOKEN`, `403 EMAIL_ALREADY_VERIFIED`, `401`, `422`, `429`, `5xx`) com mensagens pt-BR; token de e-mail ausente de logs e respostas sanitizadas.
+- [x] Vitest cobre handlers (happy path, erros, destroy cookie, Bearer absent), RTL (render, submit, resend, scanner-safe GET) e guards de sessão restrita.
+- [x] Cobertura ≥75% linhas/branches nos arquivos introduzidos nesta fatia (`docs/testing.md` §4).
 
 ## Out of Scope
 
@@ -381,14 +381,14 @@ Handlers verify **não** podem repassar `204` cru sem encerrar sessão BFF — d
 
 ## Success Criteria
 
-- [ ] Usuário com sessão `verification` completa verify em `/verify-email`, vê confirmação pt-BR e chega a `/login` **sem** Bearer no browser e **sem** cookie de sessão BFF ativo.
-- [ ] Abrir `GET /verify-email?token=…` não chama verify/resend até clique explícito.
-- [ ] Reenvio respeita `202`/`429` com feedback pt-BR; sessão BFF permanece até verify bem-sucedido.
-- [ ] Token inválido/expirado exibe mensagem uniforme; conta já verificada orienta login.
-- [ ] Usuário `verification` em `/` é redirecionado para `/verify-email`.
-- [ ] Guards CSRF/Origin bloqueiam sem chamar Laravel.
-- [ ] `make test-frontend` passa com cobertura ≥75% nos arquivos novos da fatia.
-- [ ] Nenhum teste Vitest/RTL falha se `JSON.stringify(resposta)` ou HTML contiver Bearer de fixture ou token sentinela de teste.
+- [x] Usuário com sessão `verification` completa verify em `/verify-email`, vê confirmação pt-BR e chega a `/login` **sem** Bearer no browser e **sem** cookie de sessão BFF ativo.
+- [x] Abrir `GET /verify-email?token=…` não chama verify/resend até clique explícito.
+- [x] Reenvio respeita `202`/`429` com feedback pt-BR; sessão BFF permanece até verify bem-sucedido.
+- [x] Token inválido/expirado exibe mensagem uniforme; conta já verificada orienta login.
+- [x] Usuário `verification` em `/` é redirecionado para `/verify-email`.
+- [x] Guards CSRF/Origin bloqueiam sem chamar Laravel.
+- [x] `make test-frontend` passa com cobertura ≥75% nos arquivos novos da fatia.
+- [x] Nenhum teste Vitest/RTL falha se `JSON.stringify(resposta)` ou HTML contiver Bearer de fixture ou token sentinela de teste.
 
 ---
 
