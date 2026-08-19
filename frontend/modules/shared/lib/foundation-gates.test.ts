@@ -29,6 +29,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/bff/auth/email/resend/route.ts',
       'api/bff/auth/email/verify/route.ts',
       'api/bff/auth/login/route.ts',
+      'api/bff/auth/password/change/route.ts',
       'api/bff/auth/password/reset-request/route.ts',
       'api/bff/auth/password/reset/route.ts',
       'api/bff/auth/register/route.ts',
@@ -36,6 +37,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     ]);
 
     expect(relative.filter((route) => route.includes('password'))).toEqual([
+      'api/bff/auth/password/change/route.ts',
       'api/bff/auth/password/reset-request/route.ts',
       'api/bff/auth/password/reset/route.ts',
     ]);

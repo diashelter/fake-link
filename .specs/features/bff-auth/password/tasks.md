@@ -423,9 +423,9 @@ T19
 
 **Done when**:
 
-- [ ] POST happy path `200` + clear cookie
-- [ ] Kind guard via service; guards `403`
-- [ ] Gate: `make test-frontend` passa
+- [x] POST happy path `200` + clear cookie
+- [x] Kind guard via service; guards `403`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (Route Handler)  
 **Gate**: full  
