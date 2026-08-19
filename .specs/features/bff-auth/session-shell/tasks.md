@@ -270,14 +270,14 @@ T21
 
 **Done when**:
 
-- [ ] 204 → 200 envelope + clear cookies
-- [ ] 401 INVALID_CREDENTIALS → sem destroy
-- [ ] kind verification → 403 zero fetch
-- [ ] extras/malformed → 400 zero fetch
-- [ ] 429 pass-through + Retry-After; 5xx sem destroy
-- [ ] destroy fail após 204 ainda clear cookie
-- [ ] Senha sentinela ausente do JSON
-- [ ] Gate: `make test-frontend` passa
+- [x] 204 → 200 envelope + clear cookies
+- [x] 401 INVALID_CREDENTIALS → sem destroy
+- [x] kind verification → 403 zero fetch
+- [x] extras/malformed → 400 zero fetch
+- [x] 429 pass-through + Retry-After; 5xx sem destroy
+- [x] destroy fail após 204 ainda clear cookie
+- [x] Senha sentinela ausente do JSON
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
