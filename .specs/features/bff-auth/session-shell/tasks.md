@@ -455,8 +455,8 @@ T21
 
 **Done when**:
 
-- [ ] Links corretos; inclui Sair
-- [ ] Gate: `make test-frontend` passa
+- [x] Links corretos; inclui Sair
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
