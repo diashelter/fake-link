@@ -17,6 +17,7 @@ import { Input } from '@/modules/shared/components/ui/input';
 import { focusFirstError, shouldBlockSubmit } from '@/modules/shared/lib/form-defaults';
 
 const CSRF_COOKIE = '__Host-fl_csrf';
+const FORBIDDEN_MESSAGE = 'Você não tem permissão para concluir esta ação.';
 const PROFILE_FIELD_KEYS = ['name'] as const satisfies ReadonlyArray<keyof UpdateProfileFormValues>;
 
 export type ProfileFormProps = {
@@ -92,6 +93,11 @@ export function ProfileForm({ name, email }: ProfileFormProps) {
 
     if (payload.code) {
       setFormError(messageForAuthError(payload.code, response.status));
+      return;
+    }
+
+    if (response.status === 403) {
+      setFormError(FORBIDDEN_MESSAGE);
       return;
     }
 

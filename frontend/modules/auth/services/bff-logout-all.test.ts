@@ -179,6 +179,38 @@ describe('performBffLogoutAll (SH-06–09, SH-21)', () => {
     expect(clearSessionCookieSpy).not.toHaveBeenCalled();
   });
 
+  it('returns 403 without Laravel when Origin is invalid (SH-08)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffLogoutAll(
+      makeRequest({ sessionId: created.sessionId, origin: 'https://evil.com' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toEqual({ message: 'Forbidden.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 without Laravel when CSRF is invalid (SH-08)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffLogoutAll(
+      makeRequest({ sessionId: created.sessionId, csrfToken: 'not-the-session-token' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toEqual({ message: 'Forbidden.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
   it('returns 400 for extra body fields without upstream fetch (SH-08)', async () => {
     const created = await createKindSession('session');
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));

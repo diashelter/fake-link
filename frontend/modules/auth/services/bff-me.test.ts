@@ -297,4 +297,69 @@ describe('performBffMeGet / performBffMePatch (SH-10–13, SH-21)', () => {
     expect(serialized).not.toContain(FIXTURE_BEARER);
     expect(serialized).not.toContain('Bearer');
   });
+
+  it('returns 504 generic pt-BR when GET upstream fetch aborts (SH-22)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => {
+      throw new Error('timeout');
+    });
+
+    const result = await performBffMeGet(
+      makeGetRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+    const body = await result.response.json();
+
+    expect(result.response.status).toBe(504);
+    expect(body).toEqual({
+      message: 'Não foi possível conectar ao serviço. Tente novamente.',
+    });
+    expect(JSON.stringify(body)).not.toContain(FIXTURE_BEARER);
+    expect(JSON.stringify(body)).not.toContain(FIXTURE_USER.email);
+  });
+
+  it('returns 504 generic pt-BR when PATCH upstream fetch aborts (SH-22)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => {
+      throw new Error('timeout');
+    });
+
+    const result = await performBffMePatch(
+      makePatchRequest({ sessionId: created.sessionId, body: { name: 'Novo Nome' } }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(504);
+    expect(await result.response.json()).toEqual({
+      message: 'Não foi possível conectar ao serviço. Tente novamente.',
+    });
+  });
+
+  it('returns 403 without Laravel when PATCH Origin is invalid (SH-13)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => Response.json(USER_ENVELOPE, { status: 200 }));
+
+    const result = await performBffMePatch(
+      makePatchRequest({ sessionId: created.sessionId, origin: 'https://evil.com' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toEqual({ message: 'Forbidden.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 403 without Laravel when PATCH CSRF is invalid (SH-13)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => Response.json(USER_ENVELOPE, { status: 200 }));
+
+    const result = await performBffMePatch(
+      makePatchRequest({ sessionId: created.sessionId, csrfToken: 'not-the-session-token' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(403);
+    expect(await result.response.json()).toEqual({ message: 'Forbidden.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

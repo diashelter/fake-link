@@ -174,4 +174,25 @@ describe('ProfileForm (SH-14, SH-15, SH-22, SH-23, L-046, L-053)', () => {
       );
     });
   });
+
+  it('shows generic permission copy on 403 without saying CSRF or Origin (SH-23)', async () => {
+    server.use(
+      http.patch('/api/bff/auth/me', () =>
+        HttpResponse.json({ message: 'Forbidden.' }, { status: 403 }),
+      ),
+    );
+
+    const user = setupUser();
+    renderForm();
+    await user.click(screen.getByRole('button', { name: 'Salvar nome' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Você não tem permissão para concluir esta ação.',
+      );
+    });
+    expect(screen.queryByText('Forbidden.')).not.toBeInTheDocument();
+    expect(document.body.innerHTML).not.toMatch(/CSRF/);
+    expect(document.body.innerHTML).not.toMatch(/Origin/);
+  });
 });

@@ -74,22 +74,29 @@ describe('performBffLogout (SH-01–05, SH-21)', () => {
       origin?: string;
       csrfToken?: string;
       includeSessionCookie?: boolean;
+      includeCsrf?: boolean;
     } = {},
   ): Request {
     const sessionId = options.sessionId ?? 'unused-session';
-    const csrfToken = options.csrfToken ?? deriveCsrfToken(sessionId);
-    const cookieParts = [`${CSRF_TOKEN_COOKIE}=${csrfToken}`];
+    const headers: Record<string, string> = {
+      Origin: options.origin ?? 'https://app.localhost',
+    };
+    const cookieParts: string[] = [];
+    if (options.includeCsrf !== false) {
+      const csrfToken = options.csrfToken ?? deriveCsrfToken(sessionId);
+      headers['X-CSRF-Token'] = csrfToken;
+      cookieParts.push(`${CSRF_TOKEN_COOKIE}=${csrfToken}`);
+    }
     if (options.includeSessionCookie !== false && options.sessionId) {
       cookieParts.push(`${config.cookieName}=${options.sessionId}`);
+    }
+    if (cookieParts.length > 0) {
+      headers.cookie = cookieParts.join('; ');
     }
 
     return new Request('https://app.localhost/api/bff/auth/logout', {
       method: 'POST',
-      headers: {
-        Origin: options.origin ?? 'https://app.localhost',
-        'X-CSRF-Token': csrfToken,
-        cookie: cookieParts.join('; '),
-      },
+      headers,
     });
   }
 
@@ -232,6 +239,18 @@ describe('performBffLogout (SH-01–05, SH-21)', () => {
       /Max-Age=0/i,
     );
     expect(cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`))).toMatch(/Max-Age=0/i);
+  });
+
+  it('returns 200 on miss with valid Origin even without CSRF (SH-04)', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffLogout(makeRequest({ includeCsrf: false }), deps(fetchMock));
+
+    expect(result.response.status).toBe(200);
+    expect(await result.response.json()).toEqual(LOGOUT_SUCCESS_BODY);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).toHaveBeenCalled();
   });
 
   it('returns 403 without clearing cookies when Origin is invalid (SH-05)', async () => {

@@ -19,6 +19,7 @@ import { focusFirstError, shouldBlockSubmit } from '@/modules/shared/lib/form-de
 
 const CSRF_COOKIE = '__Host-fl_csrf';
 const CURRENT_PASSWORD_INVALID_MESSAGE = 'Senha atual incorreta.';
+const FORBIDDEN_MESSAGE = 'Você não tem permissão para concluir esta ação.';
 const LOGOUT_ALL_FIELD_KEYS = ['current_password'] as const satisfies ReadonlyArray<
   keyof LogoutAllFormValues
 >;
@@ -102,6 +103,11 @@ export function LogoutAllForm() {
 
     if (payload.code) {
       setFormError(messageForAuthError(payload.code, response.status));
+      return;
+    }
+
+    if (response.status === 403) {
+      setFormError(FORBIDDEN_MESSAGE);
       return;
     }
 

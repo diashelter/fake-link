@@ -179,4 +179,27 @@ describe('LogoutAllForm (SH-17, SH-22, SH-23, L-046, L-053)', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     fetchSpy.mockRestore();
   });
+
+  it('shows generic permission copy on 403 without saying CSRF or Origin (SH-23)', async () => {
+    server.use(
+      http.post('/api/bff/auth/logout-all', () =>
+        HttpResponse.json({ message: 'Forbidden.' }, { status: 403 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<LogoutAllForm />);
+    await fillPassword(user);
+    await user.click(screen.getByRole('button', { name: /Encerrar todas as sessões/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Você não tem permissão para concluir esta ação.',
+      );
+    });
+    expect(screen.queryByText('Forbidden.')).not.toBeInTheDocument();
+    expect(document.body.innerHTML).not.toMatch(/CSRF/);
+    expect(document.body.innerHTML).not.toMatch(/Origin/);
+    expect(pushMock).not.toHaveBeenCalled();
+  });
 });
