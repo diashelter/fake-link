@@ -476,10 +476,10 @@ T21
 
 **Done when**:
 
-- [ ] Guest → `/login`; verification → `/verify-email`
-- [ ] Session renderiza perfil + logout-all + link `/settings/password`
-- [ ] ACCOUNT_* → destroy/clear + `/login`
-- [ ] Gate: `make test-frontend` passa
+- [x] Guest → `/login`; verification → `/verify-email`
+- [x] Session renderiza perfil + logout-all + link `/settings/password`
+- [x] ACCOUNT_* → destroy/clear + `/login`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  

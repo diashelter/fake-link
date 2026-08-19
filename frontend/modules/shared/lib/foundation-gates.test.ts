@@ -54,6 +54,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     const verifyEmailPage = path.join(appDir, 'verify-email', 'page.tsx');
     const forgotPasswordPage = path.join(appDir, 'forgot-password', 'page.tsx');
     const resetPasswordPage = path.join(appDir, 'reset-password', 'page.tsx');
+    const settingsPage = path.join(appDir, 'settings', 'page.tsx');
     const settingsPasswordPage = path.join(appDir, 'settings', 'password', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
     expect(statSync(registerPage).isFile()).toBe(true);
@@ -61,6 +62,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     expect(statSync(verifyEmailPage).isFile()).toBe(true);
     expect(statSync(forgotPasswordPage).isFile()).toBe(true);
     expect(statSync(resetPasswordPage).isFile()).toBe(true);
+    expect(statSync(settingsPage).isFile()).toBe(true);
     expect(statSync(settingsPasswordPage).isFile()).toBe(true);
 
     const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
@@ -71,6 +73,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'page.tsx',
       `register${path.sep}page.tsx`,
       `reset-password${path.sep}page.tsx`,
+      `settings${path.sep}page.tsx`,
       `settings${path.sep}password${path.sep}page.tsx`,
       `terms${path.sep}page.tsx`,
       `verify-email${path.sep}page.tsx`,
