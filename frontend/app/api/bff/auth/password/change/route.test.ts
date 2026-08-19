@@ -20,7 +20,8 @@ const VALID_BODY = {
 };
 
 const changeHarness = vi.hoisted(() => {
-  type Perform = typeof import('@/modules/auth/services/bff-password-change').performBffPasswordChange;
+  type Perform =
+    typeof import('@/modules/auth/services/bff-password-change').performBffPasswordChange;
   return {
     mock: vi.fn<Perform>(),
     actual: null as Perform | null,
@@ -28,7 +29,8 @@ const changeHarness = vi.hoisted(() => {
 });
 
 vi.mock('@/modules/auth/services/bff-password-change', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/modules/auth/services/bff-password-change')>();
+  const actual =
+    await importOriginal<typeof import('@/modules/auth/services/bff-password-change')>();
   changeHarness.actual = actual.performBffPasswordChange;
   return {
     ...actual,

@@ -4,11 +4,7 @@ import { NextResponse } from 'next/server';
 
 import { PASSWORD_CHANGE_ALLOWLIST_ENTRY, buildUpstreamUrl } from '../bff/allowlist';
 import { jsonWithPrivateCache } from '../bff/private-response';
-import {
-  clearSessionCookie,
-  destroySession,
-  type BffSessionDependencies,
-} from './bff-session';
+import { clearSessionCookie, destroySession, type BffSessionDependencies } from './bff-session';
 import { loadSessionMutationContext } from './bff-password-shared';
 
 const UPSTREAM_TIMEOUT_MS = 10_000;

@@ -72,8 +72,8 @@ describe('performBffPasswordResetRequest (PW-01–03, PW-19–21)', () => {
     vi.stubEnv('BFF_APP_ORIGIN', 'https://app.localhost');
     vi.stubEnv('BFF_CSRF_HMAC_KEY', TEST_KEY);
     vi.stubEnv('LARAVEL_INTERNAL_URL', 'http://nginx/api/v1');
-    getSessionSpy = vi.spyOn(bffSession, 'getSession');
-    destroySessionSpy = vi.spyOn(bffSession, 'destroySession');
+    getSessionSpy = vi.spyOn(bffSession, 'getSession') as typeof getSessionSpy;
+    destroySessionSpy = vi.spyOn(bffSession, 'destroySession') as typeof destroySessionSpy;
   });
 
   afterEach(() => {
@@ -139,7 +139,9 @@ describe('performBffPasswordResetRequest (PW-01–03, PW-19–21)', () => {
   });
 
   it('forwards only the email field and drops extra body keys (PW-18)', async () => {
-    const fetchMock = vi.fn(async () => Response.json(ACCEPTED_ENVELOPE, { status: 202 }));
+    const fetchMock = vi.fn<typeof fetch>(async () =>
+      Response.json(ACCEPTED_ENVELOPE, { status: 202 }),
+    );
 
     await performBffPasswordResetRequest(
       makeRequest({ body: { email: 'user@example.com', token: 'drop-me', extra: true } }),

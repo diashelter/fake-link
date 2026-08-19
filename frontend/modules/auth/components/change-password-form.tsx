@@ -122,7 +122,11 @@ export function ChangePasswordForm() {
       onSubmit={handleSubmit(onValidSubmit, focusFirstError)}
       noValidate
     >
-      <FormField name="current_password" label="Senha atual" error={errors.current_password?.message}>
+      <FormField
+        name="current_password"
+        label="Senha atual"
+        error={errors.current_password?.message}
+      >
         <Input
           id="current_password"
           type="password"

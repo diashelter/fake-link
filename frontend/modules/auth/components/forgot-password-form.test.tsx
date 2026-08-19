@@ -12,10 +12,7 @@ vi.mock('@/modules/auth/lib/client-cookie', () => ({
   readClientCookie: vi.fn(() => 'test-csrf-token'),
 }));
 
-import {
-  FORGOT_PASSWORD_SUCCESS_MESSAGE,
-  ForgotPasswordForm,
-} from './forgot-password-form';
+import { FORGOT_PASSWORD_SUCCESS_MESSAGE, ForgotPasswordForm } from './forgot-password-form';
 
 const server = setupServer();
 

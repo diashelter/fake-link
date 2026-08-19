@@ -52,9 +52,12 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
     vi.stubEnv('BFF_APP_ORIGIN', 'https://app.localhost');
     vi.stubEnv('BFF_CSRF_HMAC_KEY', TEST_KEY);
     vi.stubEnv('LARAVEL_INTERNAL_URL', 'http://nginx/api/v1');
-    getSessionSpy = vi.spyOn(bffSession, 'getSession');
-    destroySessionSpy = vi.spyOn(bffSession, 'destroySession');
-    clearSessionCookieSpy = vi.spyOn(bffSession, 'clearSessionCookie');
+    getSessionSpy = vi.spyOn(bffSession, 'getSession') as typeof getSessionSpy;
+    destroySessionSpy = vi.spyOn(bffSession, 'destroySession') as typeof destroySessionSpy;
+    clearSessionCookieSpy = vi.spyOn(
+      bffSession,
+      'clearSessionCookie',
+    ) as typeof clearSessionCookieSpy;
   });
 
   afterEach(() => {
@@ -67,11 +70,14 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
   }
 
   async function createKindSession(kind: 'session' | 'verification') {
-    return createSession({ bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id }, {
-      config,
-      store,
-      now: () => fixedNow,
-    });
+    return createSession(
+      { bearer: FIXTURE_BEARER, kind, userId: FIXTURE_USER.id },
+      {
+        config,
+        store,
+        now: () => fixedNow,
+      },
+    );
   }
 
   function makeRequest(
@@ -114,7 +120,7 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
 
   it('translates upstream 204 into 200, destroys session, and clears cookie (PW-06, PW-07)', async () => {
     const created = await createKindSession('session');
-    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 204 }));
 
     const result = await performBffPasswordReset(
       makeRequest({ sessionId: created.sessionId }),

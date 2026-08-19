@@ -23,9 +23,9 @@ describe('changePasswordSchema (PW-18, PW-24)', () => {
 
   it('accepts current_password at max length 128', () => {
     const current_password = 'a'.repeat(128);
-    expect(
-      changePasswordSchema.parse({ ...VALID, current_password }).current_password,
-    ).toBe(current_password);
+    expect(changePasswordSchema.parse({ ...VALID, current_password }).current_password).toBe(
+      current_password,
+    );
   });
 
   it('rejects current_password longer than 128 characters', () => {
@@ -41,9 +41,9 @@ describe('changePasswordSchema (PW-18, PW-24)', () => {
 
   it('does not require composition rules on current_password', () => {
     const current_password = 'a'.repeat(12);
-    expect(
-      changePasswordSchema.parse({ ...VALID, current_password }).current_password,
-    ).toBe(current_password);
+    expect(changePasswordSchema.parse({ ...VALID, current_password }).current_password).toBe(
+      current_password,
+    );
   });
 
   it('rejects weak new password via shared passwordSchema', () => {

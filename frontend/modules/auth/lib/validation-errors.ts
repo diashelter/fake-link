@@ -17,9 +17,7 @@ export function messageForTokenFieldError(field: 'token'): string {
 }
 
 export function applyServerFieldErrors<TField extends string>(
-  errors:
-    | Record<string, FieldErrorItem[] | FieldErrorItem | string[] | string>
-    | undefined,
+  errors: Record<string, FieldErrorItem[] | FieldErrorItem | string[] | string> | undefined,
   allowedFields: readonly TField[],
   setError: (field: TField, error: { type: string; message: string }) => void,
 ): boolean {

@@ -78,6 +78,29 @@ describe('ResetPasswordPage (PW-09, PW-10, PW-23)', () => {
     expect(JSON.stringify(page)).toContain('"initialToken":"hello/world"');
   });
 
+  it('renders the form without initialToken when the query token is absent (PW-09)', async () => {
+    getSessionFromRequestMock.mockResolvedValue(null);
+
+    const page = await ResetPasswordPage({
+      searchParams: Promise.resolve({}),
+    });
+    const serialized = JSON.stringify(page);
+
+    expect(ensurePreAuthCsrfCookiesMock).toHaveBeenCalledOnce();
+    expect(serialized).toContain('Redefinir senha');
+    expect(serialized).not.toContain('"initialToken"');
+  });
+
+  it('keeps a malformed query token when decodeURIComponent throws', async () => {
+    getSessionFromRequestMock.mockResolvedValue(null);
+
+    const page = await ResetPasswordPage({
+      searchParams: Promise.resolve({ token: '%' }),
+    });
+
+    expect(JSON.stringify(page)).toContain('"initialToken":"%"');
+  });
+
   it('does not fetch reset during render when ?token= is present (PW-10)', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     getSessionFromRequestMock.mockResolvedValue(null);

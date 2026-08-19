@@ -21,9 +21,7 @@ describe('messageForFieldError (PW-11, PW-17)', () => {
 
 describe('messageForTokenFieldError (PW-11)', () => {
   it('returns uniform pt-BR message for token field', () => {
-    expect(messageForTokenFieldError('token')).toBe(
-      'Link de redefinição inválido ou expirado.',
-    );
+    expect(messageForTokenFieldError('token')).toBe('Link de redefinição inválido ou expirado.');
   });
 });
 
@@ -107,11 +105,7 @@ describe('applyServerFieldErrors (PW-11, PW-17, PW-18)', () => {
 
   it('returns false when no allowed field errors apply', () => {
     const setError = vi.fn();
-    const applied = applyServerFieldErrors(
-      { other: 'ignored' },
-      ['password'] as const,
-      setError,
-    );
+    const applied = applyServerFieldErrors({ other: 'ignored' }, ['password'] as const, setError);
 
     expect(applied).toBe(false);
     expect(setError).not.toHaveBeenCalled();

@@ -24,7 +24,11 @@ beforeEach(() => {
   vi.stubEnv('LARAVEL_INTERNAL_URL', 'http://nginx/api/v1');
 });
 
-function makePostRequest(options?: { csrfToken?: string; origin?: string; email?: string }): Request {
+function makePostRequest(options?: {
+  csrfToken?: string;
+  origin?: string;
+  email?: string;
+}): Request {
   const csrfSid = 'reset-request-route-sid';
   const csrfToken = options?.csrfToken ?? derivePreAuthCsrfToken(csrfSid);
 

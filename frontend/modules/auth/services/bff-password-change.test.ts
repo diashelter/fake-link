@@ -46,8 +46,11 @@ describe('performBffPasswordChange (PW-12–14, PW-19–22)', () => {
     vi.stubEnv('BFF_APP_ORIGIN', 'https://app.localhost');
     vi.stubEnv('BFF_CSRF_HMAC_KEY', TEST_KEY);
     vi.stubEnv('LARAVEL_INTERNAL_URL', 'http://nginx/api/v1');
-    destroySessionSpy = vi.spyOn(bffSession, 'destroySession');
-    clearSessionCookieSpy = vi.spyOn(bffSession, 'clearSessionCookie');
+    destroySessionSpy = vi.spyOn(bffSession, 'destroySession') as typeof destroySessionSpy;
+    clearSessionCookieSpy = vi.spyOn(
+      bffSession,
+      'clearSessionCookie',
+    ) as typeof clearSessionCookieSpy;
   });
 
   afterEach(() => {

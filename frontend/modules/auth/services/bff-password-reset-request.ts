@@ -13,8 +13,7 @@ const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 const GATEWAY_ERROR_MESSAGE = 'Não foi possível conectar ao serviço. Tente novamente.';
 
 export type BffPasswordResetRequestResult =
-  | { ok: true; response: NextResponse }
-  | { ok: false; response: NextResponse };
+  { ok: true; response: NextResponse } | { ok: false; response: NextResponse };
 
 export type BffPasswordResetRequestDependencies = BffSessionDependencies & {
   fetchImpl?: typeof fetch;

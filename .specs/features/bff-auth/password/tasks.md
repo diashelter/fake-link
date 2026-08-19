@@ -580,10 +580,10 @@ T19
 
 **Done when**:
 
-- [ ] Gate lista 3 route handlers + 3 pages password
-- [ ] `make lint-frontend` verde
-- [ ] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
-- [ ] Nenhum teste silenciosamente removido vs baseline email-verification
+- [x] Gate lista 3 route handlers + 3 pages password
+- [x] `make lint-frontend` verde
+- [x] `make test-frontend-coverage` verde com ≥75% nos arquivos novos da fatia
+- [x] Nenhum teste silenciosamente removido vs baseline email-verification
 
 **Tests**: unit (foundation) + none (coverage gate)  
 **Gate**: build  
