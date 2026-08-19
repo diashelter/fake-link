@@ -24,13 +24,13 @@
 
 ## Handoff
 
-- **Feature**: `bff-auth/email-verification` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verified PASS
-- **Phase / Task**: Execute complete (T1–T13 + fix `65311c7` + Verifier PASS)
-- **Completed**: T1–T13 on `feature/bff-auth-email-verification`; verifier iteration 1 PASS (380 tests, 6/6 mutants killed)
+- **Feature**: `bff-auth/password` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ PASS
+- **Phase / Task**: Verified (re-run 2); Interactive UAT pending
+- **Completed**: T1–T19 + F1–F5 + Prettier wrap (`8dc7891`…`e150887`); 509 tests; sensor 6/6 killed
 - **In-progress**: none
-- **Next step**: Open PR for `feature/bff-auth-email-verification`
+- **Next step**: Interactive UAT of forgot/reset/change pages; optionally commit spec/design/validation docs
 - **Blockers**: none
-- **Branch**: `feature/bff-auth-email-verification`
-- **Report**: `.specs/features/bff-auth/email-verification/validation.md`
-- **Prior feature**: `bff-auth/register` — Verified PASS
-- **Artifacts**: `.specs/features/bff-auth/email-verification/{spec,design,tasks}.md`
+- **Branch**: `feature/bff-auth-password`
+- **Report**: `.specs/features/bff-auth/password/validation.md` PASS (5 carry-forward spec-precision ⚠️ types)
+- **Prior feature**: `bff-auth/email-verification` — Verified PASS
+- **Artifacts**: `.specs/features/bff-auth/password/{spec,design,tasks,validation}.md`

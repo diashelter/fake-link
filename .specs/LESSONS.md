@@ -14,6 +14,18 @@ Corroborated across multiple features. Safe to apply as guidance.
 - evidence: AUTH-25 AC2 access-log redaction (security,observability) (+1 more)
 - last seen: 2026-08-18T18:03:26Z
 
+### L-046 — For client BFF submits, assert Content-Type and CSRF header together with the request body shape
+- signal: `ac_gap` · recurrence: 2 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/register, bff-auth/password
+- evidence: UI AC3 / register-form.test.tsx — Content-Type (frontend/modules/auth) (+1 more)
+- last seen: 2026-08-19T00:36:55Z
+
+### L-053 — When a spec edge distinguishes rate-limit UI with and without Retry-After, assert both copies
+- signal: `ac_gap` · recurrence: 2 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/email-verification, bff-auth/password
+- evidence: Edge: 429 without Retry-After (frontend/modules/auth)
+- last seen: 2026-08-19T00:36:55Z
+
 ## Candidates (under observation — do NOT load as guidance yet)
 
 Seen once or not yet corroborated. Tracked, not trusted.
@@ -282,12 +294,6 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: Terms AC5 / bff-register.test.ts:129 — terms_accepted_at (frontend/modules/auth)
 - last seen: 2026-08-11T20:38:51Z
 
-### L-046 — For client BFF submits, assert Content-Type and CSRF header together with the request body shape
-- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
-- features: bff-auth/register
-- evidence: UI AC3 / register-form.test.tsx — Content-Type (frontend/modules/auth)
-- last seen: 2026-08-11T20:38:51Z
-
 ### L-047 — When stripping Bearer from BFF JSON, assert absence of the bare substring token, not only token_* field names
 - signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
 - features: bff-auth/register
@@ -324,11 +330,65 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: P1 UX AC4 login-after-verify MSW (frontend/modules/auth)
 - last seen: 2026-08-18T18:03:26Z
 
-### L-053 — When a spec edge distinguishes rate-limit UI with and without Retry-After, assert both copies
-- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
-- features: bff-auth/email-verification
-- evidence: Edge: 429 without Retry-After (frontend/modules/auth)
-- last seen: 2026-08-18T18:03:26Z
+### L-054 — When a spec requires 429 Retry-After pass-through on every BFF mutation handler, assert the header on each service, not only one sibling
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `auth, bff` · harmful: 0
+- features: bff-auth/password
+- evidence: mutant 8 / bff-password-reset.ts 4xx Retry-After (auth, bff)
+- last seen: 2026-08-19T00:36:55Z
+
+### L-055 — Each BFF auth slice that lists ACCOUNT_SUSPENDED pass-through needs a handler and UI test in that slice, not only login or verify coverage
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth, bff` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-20 AC4 / ACCOUNT_SUSPENDED (auth, bff)
+- last seen: 2026-08-19T00:36:55Z
+
+### L-056 — When a spec requires dropping extra body keys on every BFF mutation, assert the upstream JSON for each handler, not only one
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth, bff` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-18 AC5 change extra fields (auth, bff)
+- last seen: 2026-08-19T00:36:55Z
+
+### L-057 — When BFF services duplicate 400 Content-Type, timeout 504, or 500/503 handling, assert those outcomes on each service, not only a representative sibling
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `auth, bff` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-18 AC4 / PW-21 reset+change (auth, bff)
+- last seen: 2026-08-19T00:36:55Z
+
+### L-058 — When UI copy is specified only as generic pt-BR on a field, freeze the exact string in the spec before tests assert a specific sentence
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth, forms` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-17 / INVALID_CREDENTIALS current_password copy (auth, forms)
+- last seen: 2026-08-19T01:02:39Z
+
+### L-059 — Keep new assertion strings within Prettier printWidth; format:check is part of make lint-frontend
+- signal: `gate_fail` · recurrence: 1 feature(s) · scope: `frontend-tests` · harmful: 0
+- features: bff-auth/password
+- evidence: forgot-password-form.test.tsx:113 (frontend-tests)
+- last seen: 2026-08-19T00:53:18Z
+
+### L-060 — When a spec requires pass-through of 422 errors, assert the errors field, not only status and code
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth, bff` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-01 / bff-password-reset-request.test.ts:171 (auth, bff)
+- last seen: 2026-08-19T01:02:39Z
+
+### L-061 — When a spec requires using shared UI primitives, name the components or a rendered contract so tests can assert them
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth, forms` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-04 / PW-09 / PW-16 shared primitives (auth, forms)
+- last seen: 2026-08-19T01:02:39Z
+
+### L-062 — When a spec requires sentinel scans of rendered HTML, assert password and token sentinels are absent, not only Bearer
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `auth, forms` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-17 / change-password-form.test.tsx:67 (auth, forms)
+- last seen: 2026-08-19T01:02:39Z
+
+### L-063 — When a spec forbids logging secrets, spy on console.log or the app logger rather than treating source-grep absence as coverage
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `security,observability` · harmful: 0
+- features: bff-auth/password
+- evidence: PW-22 AC1 console.log / validation.md (security,observability)
+- last seen: 2026-08-19T01:02:39Z
 
 ## Quarantined (failed when applied — ignore)
 

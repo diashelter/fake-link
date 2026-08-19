@@ -31,7 +31,7 @@
 | 4 | Login | [login](./login/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | csrf-proxy | BFF login + UI login |
 | 5 | Cadastro | [register](./register/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | BFF register + UI + Terms |
 | 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ | register | BFF verify/resend + UI |
-| 7 | Senha | [password](./password/spec.md) | Seed | login | Forgot / reset / change |
+| 7 | Senha | [password](./password/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ | login | Forgot / reset / change |
 | 8 | Sessão e shell | [session-shell](./session-shell/spec.md) | Seed | login | Logout, me, perfil, guards |
 | 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Seed | 4–8 | Playwright + ausência de Bearer |
 
