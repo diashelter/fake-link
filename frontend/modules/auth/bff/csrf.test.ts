@@ -8,6 +8,7 @@ import {
   deriveCsrfToken,
   derivePreAuthCsrfToken,
   ensurePreAuthCsrfCookies,
+  clearCsrfCookies,
   issueCsrfForSession,
   issuePreAuthCsrf,
   readPreAuthCsrfSid,
@@ -214,5 +215,38 @@ describe('writePreAuthCsrfCookies / ensurePreAuthCsrfCookies', () => {
     expect(store.get(CSRF_TOKEN_COOKIE)?.value).toBe(
       derivePreAuthCsrfToken(store.get(CSRF_SID_COOKIE)!.value),
     );
+  });
+});
+
+describe('clearCsrfCookies (SH-01)', () => {
+  it('expires both CSRF cookies with Max-Age=0', () => {
+    const response = clearCsrfCookies(NextResponse.json({ ok: true }));
+    const cookies = response.headers.getSetCookie();
+    const tokenCookie = cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`));
+    const sidCookie = cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`));
+
+    expect(tokenCookie).toBeDefined();
+    expect(tokenCookie).toMatch(/Max-Age=0/i);
+    expect(sidCookie).toBeDefined();
+    expect(sidCookie).toMatch(/Max-Age=0/i);
+  });
+
+  it('uses the same __Host- attributes as the issue helpers', () => {
+    const response = clearCsrfCookies(NextResponse.json({ ok: true }));
+    const cookies = response.headers.getSetCookie();
+    const tokenCookie = cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`));
+    const sidCookie = cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`));
+
+    expect(tokenCookie).toMatch(/Secure/i);
+    expect(tokenCookie).toMatch(/Path=\//i);
+    expect(tokenCookie).toMatch(/SameSite=Lax/i);
+    expect(tokenCookie).not.toMatch(/HttpOnly/i);
+    expect(tokenCookie).not.toMatch(/Domain=/i);
+
+    expect(sidCookie).toMatch(/Secure/i);
+    expect(sidCookie).toMatch(/Path=\//i);
+    expect(sidCookie).toMatch(/SameSite=Lax/i);
+    expect(sidCookie).toMatch(/HttpOnly/i);
+    expect(sidCookie).not.toMatch(/Domain=/i);
   });
 });

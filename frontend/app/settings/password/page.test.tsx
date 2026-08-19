@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReactElement } from 'react';
 
@@ -12,6 +12,7 @@ const getSessionFromRequestMock = vi.fn();
 
 vi.mock('next/navigation', () => ({
   redirect: (url: string) => redirectMock(url),
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock('next/headers', () => ({
@@ -28,6 +29,10 @@ vi.mock('@/modules/auth/bff/csrf', () => ({
   ensurePreAuthCsrfCookies: (...args: unknown[]) => ensurePreAuthCsrfCookiesMock(...args),
 }));
 
+vi.mock('@/modules/auth/lib/client-cookie', () => ({
+  readClientCookie: vi.fn(() => 'test-csrf-token'),
+}));
+
 vi.mock('@/modules/auth/services/bff-session', () => ({
   getSessionFromRequest: (...args: unknown[]) => getSessionFromRequestMock(...args),
 }));
@@ -38,9 +43,10 @@ vi.mock('@/modules/auth/components/change-password-form', () => ({
 
 import { FIXTURE_BEARER } from '@/modules/auth/lib/test/auth-fixtures';
 
+import SettingsLayout from '../layout';
 import SettingsPasswordPage from './page';
 
-describe('SettingsPasswordPage (PW-15)', () => {
+describe('SettingsPasswordPage (PW-15) with account shell (SH-19)', () => {
   beforeEach(() => {
     redirectMock.mockClear();
     ensurePreAuthCsrfCookiesMock.mockClear();
@@ -48,6 +54,7 @@ describe('SettingsPasswordPage (PW-15)', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 
@@ -65,6 +72,22 @@ describe('SettingsPasswordPage (PW-15)', () => {
     });
 
     await expect(SettingsPasswordPage()).rejects.toThrow('REDIRECT:/verify-email');
+  });
+
+  it('layout redirects guests to /login', async () => {
+    getSessionFromRequestMock.mockResolvedValue(null);
+
+    await expect(SettingsLayout({ children: <div /> })).rejects.toThrow('REDIRECT:/login');
+  });
+
+  it('layout redirects verification sessions to /verify-email', async () => {
+    getSessionFromRequestMock.mockResolvedValue({
+      sessionId: 'sid',
+      kind: 'verification',
+      userId: 'uid',
+    });
+
+    await expect(SettingsLayout({ children: <div /> })).rejects.toThrow('REDIRECT:/verify-email');
   });
 
   it('renders the change password form for session kind without pre-auth CSRF (PW-15)', async () => {
@@ -86,5 +109,22 @@ describe('SettingsPasswordPage (PW-15)', () => {
 
     render(page);
     expect(screen.getByTestId('change-password-form')).toBeTruthy();
+  });
+
+  it('layout wrapping password page shows Conta, Sair, and the change form (SH-19)', async () => {
+    getSessionFromRequestMock.mockResolvedValue({
+      sessionId: 'sid',
+      kind: 'session',
+      userId: 'uid',
+    });
+
+    const page = await SettingsPasswordPage();
+    const layout = await SettingsLayout({ children: page });
+    render(layout);
+
+    expect(screen.getByRole('link', { name: 'Conta' }).getAttribute('href')).toBe('/settings');
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeTruthy();
+    expect(screen.getByTestId('change-password-form')).toBeTruthy();
+    expect(screen.getByText('Alterar senha')).toBeTruthy();
   });
 });

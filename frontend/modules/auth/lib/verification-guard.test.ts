@@ -12,6 +12,10 @@ describe('VERIFICATION_ALLOWED_PATHS (EV-17)', () => {
       '/reset-password',
     ]);
   });
+
+  it('does not include /settings (SH-18, SH-19)', () => {
+    expect(VERIFICATION_ALLOWED_PATHS).not.toContain('/settings');
+  });
 });
 
 describe('resolveVerificationSessionGuard (EV-16, EV-17)', () => {

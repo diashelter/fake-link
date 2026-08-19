@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+import { AuthenticatedShell } from '@/modules/auth/components/authenticated-shell';
 import { resolveVerificationSessionGuard } from '@/modules/auth/lib/verification-guard';
 import { getSessionFromRequest } from '@/modules/auth/services/bff-session';
 
@@ -18,6 +19,17 @@ export default async function HomePage() {
 
   if (decision.action === 'redirect') {
     redirect(decision.to);
+  }
+
+  if (session?.kind === 'session') {
+    return (
+      <AuthenticatedShell>
+        <main className="mx-auto w-full max-w-3xl px-6 py-16">
+          <h1 className="font-display text-3xl tracking-tight text-foreground">Início</h1>
+          <p className="mt-4 text-lg text-muted">Seus links estarão aqui em breve.</p>
+        </main>
+      </AuthenticatedShell>
+    );
   }
 
   return (

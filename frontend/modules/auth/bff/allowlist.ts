@@ -66,6 +66,42 @@ export const PASSWORD_CHANGE_ALLOWLIST_ENTRY: AllowlistEntry = {
   requireCsrf: true,
 };
 
+export const LOGOUT_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'POST',
+  bffPath: '/api/bff/auth/logout',
+  upstreamMethod: 'POST',
+  upstreamPath: '/auth/logout',
+  requireSession: true,
+  requireCsrf: true,
+};
+
+export const LOGOUT_ALL_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'POST',
+  bffPath: '/api/bff/auth/logout-all',
+  upstreamMethod: 'POST',
+  upstreamPath: '/auth/logout-all',
+  requireSession: true,
+  requireCsrf: true,
+};
+
+export const ME_GET_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'GET',
+  bffPath: '/api/bff/auth/me',
+  upstreamMethod: 'GET',
+  upstreamPath: '/me',
+  requireSession: true,
+  requireCsrf: false,
+};
+
+export const ME_PATCH_ALLOWLIST_ENTRY: AllowlistEntry = {
+  method: 'PATCH',
+  bffPath: '/api/bff/auth/me',
+  upstreamMethod: 'PATCH',
+  upstreamPath: '/me',
+  requireSession: true,
+  requireCsrf: true,
+};
+
 export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [
   LOGIN_ALLOWLIST_ENTRY,
   REGISTER_ALLOWLIST_ENTRY,
@@ -74,6 +110,10 @@ export const AUTH_BFF_ALLOWLIST: readonly AllowlistEntry[] = [
   PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY,
   PASSWORD_RESET_ALLOWLIST_ENTRY,
   PASSWORD_CHANGE_ALLOWLIST_ENTRY,
+  LOGOUT_ALLOWLIST_ENTRY,
+  LOGOUT_ALL_ALLOWLIST_ENTRY,
+  ME_GET_ALLOWLIST_ENTRY,
+  ME_PATCH_ALLOWLIST_ENTRY,
 ];
 
 export function lookupAllowlistEntry(

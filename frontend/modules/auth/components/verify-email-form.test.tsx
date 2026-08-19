@@ -47,6 +47,12 @@ describe('VerifyEmailForm (EV-08–15, BFFUI-51)', () => {
     fetchSpy.mockRestore();
   });
 
+  it('renders Sair logout action (SH-17)', () => {
+    render(<VerifyEmailForm />);
+
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
+  });
+
   it('removes token query param via replaceState after mount (EV-12)', () => {
     window.history.pushState({}, '', `/verify-email?token=${INITIAL_TOKEN}`);
     const replaceSpy = vi.spyOn(window.history, 'replaceState');

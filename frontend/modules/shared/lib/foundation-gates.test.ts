@@ -19,7 +19,7 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('allows login, register, email verification, and password product routes', () => {
+  it('allows login, register, email verification, password, and session-shell product routes', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
@@ -29,6 +29,9 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/bff/auth/email/resend/route.ts',
       'api/bff/auth/email/verify/route.ts',
       'api/bff/auth/login/route.ts',
+      'api/bff/auth/logout-all/route.ts',
+      'api/bff/auth/logout/route.ts',
+      'api/bff/auth/me/route.ts',
       'api/bff/auth/password/change/route.ts',
       'api/bff/auth/password/reset-request/route.ts',
       'api/bff/auth/password/reset/route.ts',
@@ -44,6 +47,13 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     expect(relative.filter((route) => route.includes('verify'))).toEqual([
       'api/bff/auth/email/verify/route.ts',
     ]);
+    expect(relative.filter((route) => route.includes('logout'))).toEqual([
+      'api/bff/auth/logout-all/route.ts',
+      'api/bff/auth/logout/route.ts',
+    ]);
+    expect(relative.filter((route) => route.includes(`${path.sep}me${path.sep}`))).toEqual([
+      'api/bff/auth/me/route.ts',
+    ]);
 
     const loginPage = path.join(appDir, 'login', 'page.tsx');
     const registerPage = path.join(appDir, 'register', 'page.tsx');
@@ -51,6 +61,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     const verifyEmailPage = path.join(appDir, 'verify-email', 'page.tsx');
     const forgotPasswordPage = path.join(appDir, 'forgot-password', 'page.tsx');
     const resetPasswordPage = path.join(appDir, 'reset-password', 'page.tsx');
+    const settingsPage = path.join(appDir, 'settings', 'page.tsx');
     const settingsPasswordPage = path.join(appDir, 'settings', 'password', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
     expect(statSync(registerPage).isFile()).toBe(true);
@@ -58,6 +69,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     expect(statSync(verifyEmailPage).isFile()).toBe(true);
     expect(statSync(forgotPasswordPage).isFile()).toBe(true);
     expect(statSync(resetPasswordPage).isFile()).toBe(true);
+    expect(statSync(settingsPage).isFile()).toBe(true);
     expect(statSync(settingsPasswordPage).isFile()).toBe(true);
 
     const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
@@ -68,6 +80,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'page.tsx',
       `register${path.sep}page.tsx`,
       `reset-password${path.sep}page.tsx`,
+      `settings${path.sep}page.tsx`,
       `settings${path.sep}password${path.sep}page.tsx`,
       `terms${path.sep}page.tsx`,
       `verify-email${path.sep}page.tsx`,
@@ -79,6 +92,10 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     ]);
     expect(relativePages.filter((page) => page.includes('verify'))).toEqual([
       `verify-email${path.sep}page.tsx`,
+    ]);
+    expect(relativePages.filter((page) => page.startsWith(`settings${path.sep}`)).sort()).toEqual([
+      `settings${path.sep}page.tsx`,
+      `settings${path.sep}password${path.sep}page.tsx`,
     ]);
   });
 
