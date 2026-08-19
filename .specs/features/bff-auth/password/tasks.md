@@ -529,9 +529,9 @@ T19
 
 **Done when**:
 
-- [ ] Forgot: bootstrap CSRF; renderiza form
-- [ ] Reset: `initialToken` de query; render sem fetch; verification session não redireciona
-- [ ] Gate: `make test-frontend` passa
+- [x] Forgot: bootstrap CSRF; renderiza form
+- [x] Reset: `initialToken` de query; render sem fetch; verification session não redireciona
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: full  

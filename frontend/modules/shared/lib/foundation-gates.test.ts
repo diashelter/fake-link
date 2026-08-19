@@ -56,7 +56,10 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
 
     const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
     const relativePages = pages.map((file) => path.relative(appDir, file));
-    expect(relativePages.some((page) => page.includes(`password${path.sep}`))).toBe(false);
+    expect(relativePages.filter((page) => page.includes(`password${path.sep}`)).sort()).toEqual([
+      `forgot-password${path.sep}page.tsx`,
+      `reset-password${path.sep}page.tsx`,
+    ]);
     expect(relativePages.filter((page) => page.includes('verify'))).toEqual([
       `verify-email${path.sep}page.tsx`,
     ]);
