@@ -76,6 +76,8 @@ describe('performBffPasswordChange (PW-12–14, PW-19–22)', () => {
       origin?: string;
       csrfToken?: string;
       includeSessionCookie?: boolean;
+      contentType?: string | null;
+      rawBody?: string;
     } = {},
   ): Request {
     const sessionId = options.sessionId ?? 'unused-session';
@@ -85,15 +87,19 @@ describe('performBffPasswordChange (PW-12–14, PW-19–22)', () => {
       cookieParts.push(`${config.cookieName}=${options.sessionId}`);
     }
 
+    const headers = new Headers({
+      Origin: options.origin ?? 'https://app.localhost',
+      'X-CSRF-Token': csrfToken,
+      cookie: cookieParts.join('; '),
+    });
+    if (options.contentType !== null) {
+      headers.set('Content-Type', options.contentType ?? 'application/json');
+    }
+
     return new Request('https://app.localhost/api/bff/auth/password/change', {
       method: 'POST',
-      headers: {
-        Origin: options.origin ?? 'https://app.localhost',
-        'X-CSRF-Token': csrfToken,
-        cookie: cookieParts.join('; '),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(options.body ?? VALID_BODY),
+      headers,
+      body: options.rawBody ?? JSON.stringify(options.body ?? VALID_BODY),
     });
   }
 
@@ -283,6 +289,58 @@ describe('performBffPasswordChange (PW-12–14, PW-19–22)', () => {
     expect(await result.response.json()).toEqual({
       message: 'Algo deu errado. Tente novamente.',
     });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('forwards only schema fields and drops extra body keys (PW-18)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 204 }));
+
+    await performBffPasswordChange(
+      makeRequest({
+        sessionId: created.sessionId,
+        body: { ...VALID_BODY, extra: 'drop-me', token: 'also-drop' },
+      }),
+      deps(fetchMock),
+    );
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(init.body))).toEqual({
+      current_password: CURRENT_PASSWORD_SENTINEL,
+      password: PASSWORD_SENTINEL,
+      password_confirmation: PASSWORD_SENTINEL,
+    });
+  });
+
+  it('returns 400 for malformed JSON without upstream fetch (PW-18)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffPasswordChange(
+      makeRequest({ sessionId: created.sessionId, rawBody: '{ invalid' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(400);
+    expect(await result.response.json()).toEqual({ message: 'Requisição inválida.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 for missing Content-Type without upstream fetch (PW-18)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffPasswordChange(
+      makeRequest({ sessionId: created.sessionId, contentType: null }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(400);
+    expect(await result.response.json()).toEqual({ message: 'Requisição inválida.' });
+    expect(fetchMock).not.toHaveBeenCalled();
     expect(destroySessionSpy).not.toHaveBeenCalled();
     expect(clearSessionCookieSpy).not.toHaveBeenCalled();
   });

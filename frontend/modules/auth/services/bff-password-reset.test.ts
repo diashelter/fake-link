@@ -86,7 +86,7 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
       sessionId?: string;
       origin?: string;
       csrfToken?: string;
-      contentType?: string;
+      contentType?: string | null;
       rawBody?: string;
     } = {},
   ): Request {
@@ -97,14 +97,18 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
       cookieParts.push(`${config.cookieName}=${options.sessionId}`);
     }
 
+    const headers = new Headers({
+      Origin: options.origin ?? 'https://app.localhost',
+      'X-CSRF-Token': csrfToken,
+      cookie: cookieParts.join('; '),
+    });
+    if (options.contentType !== null) {
+      headers.set('Content-Type', options.contentType ?? 'application/json');
+    }
+
     return new Request('https://app.localhost/api/bff/auth/password/reset', {
       method: 'POST',
-      headers: {
-        Origin: options.origin ?? 'https://app.localhost',
-        'X-CSRF-Token': csrfToken,
-        cookie: cookieParts.join('; '),
-        'Content-Type': options.contentType ?? 'application/json',
-      },
+      headers,
       body: options.rawBody ?? JSON.stringify(options.body ?? VALID_BODY),
     });
   }
@@ -334,6 +338,20 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
 
     const result = await performBffPasswordReset(
       makeRequest({ rawBody: '{ invalid' }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(400);
+    expect(await result.response.json()).toEqual({ message: 'Requisição inválida.' });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 for missing Content-Type without upstream fetch (PW-18)', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+
+    const result = await performBffPasswordReset(
+      makeRequest({ contentType: null }),
       deps(fetchMock),
     );
 
