@@ -243,14 +243,14 @@ T21
 
 **Done when**:
 
-- [ ] Happy path 204 → 200 + clear session/CSRF + destroy
-- [ ] Redis fail + Laravel ok → 200 + redis counter
-- [ ] Laravel timeout/5xx → 200 + upstream counter
-- [ ] Miss → 200 sem fetch; Origin inválido → 403 sem clear
-- [ ] CSRF inválido com sessão → 403 sem clear
-- [ ] Laravel 401/429 → 200 local **sem** upstream counter
-- [ ] Bearer/sentinela ausentes do JSON
-- [ ] Gate: `make test-frontend` passa
+- [x] Happy path 204 → 200 + clear session/CSRF + destroy
+- [x] Redis fail + Laravel ok → 200 + redis counter
+- [x] Laravel timeout/5xx → 200 + upstream counter
+- [x] Miss → 200 sem fetch; Origin inválido → 403 sem clear
+- [x] CSRF inválido com sessão → 403 sem clear
+- [x] Laravel 401/429 → 200 local **sem** upstream counter
+- [x] Bearer/sentinela ausentes do JSON
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
