@@ -22,6 +22,10 @@ export default defineConfig({
         'app/api/bff/auth/register/**/*.{ts,tsx}',
         'app/verify-email/**/*.{ts,tsx}',
         'app/api/bff/auth/email/**/*.{ts,tsx}',
+        'app/forgot-password/**/*.{ts,tsx}',
+        'app/reset-password/**/*.{ts,tsx}',
+        'app/settings/password/**/*.{ts,tsx}',
+        'app/api/bff/auth/password/**/*.{ts,tsx}',
         'app/page.tsx',
       ],
       exclude: [

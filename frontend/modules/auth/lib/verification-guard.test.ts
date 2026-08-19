@@ -4,7 +4,13 @@ import { resolveVerificationSessionGuard, VERIFICATION_ALLOWED_PATHS } from './v
 
 describe('VERIFICATION_ALLOWED_PATHS (EV-17)', () => {
   it('exports the restricted-session allowlist for session-shell', () => {
-    expect(VERIFICATION_ALLOWED_PATHS).toEqual(['/verify-email', '/login', '/terms']);
+    expect(VERIFICATION_ALLOWED_PATHS).toEqual([
+      '/verify-email',
+      '/login',
+      '/terms',
+      '/forgot-password',
+      '/reset-password',
+    ]);
   });
 });
 
@@ -42,6 +48,24 @@ describe('resolveVerificationSessionGuard (EV-16, EV-17)', () => {
   it('allows a verification-kind visitor on /terms', () => {
     expect(
       resolveVerificationSessionGuard({ pathname: '/terms', sessionKind: 'verification' }),
+    ).toEqual({ action: 'allow' });
+  });
+
+  it('allows a verification-kind visitor on /forgot-password (PW-23)', () => {
+    expect(
+      resolveVerificationSessionGuard({
+        pathname: '/forgot-password',
+        sessionKind: 'verification',
+      }),
+    ).toEqual({ action: 'allow' });
+  });
+
+  it('allows a verification-kind visitor on /reset-password (PW-23)', () => {
+    expect(
+      resolveVerificationSessionGuard({
+        pathname: '/reset-password',
+        sessionKind: 'verification',
+      }),
     ).toEqual({ action: 'allow' });
   });
 

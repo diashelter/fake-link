@@ -19,7 +19,7 @@ function walkFiles(dir: string, predicate: (file: string) => boolean): string[] 
 }
 
 describe('foundation gates (FND-02, FND-07, FND-08)', () => {
-  it('allows login, register, and email verification product routes and keeps password gated', () => {
+  it('allows login, register, email verification, and password product routes', () => {
     const appDir = path.join(frontendRoot, 'app');
     const routes = walkFiles(appDir, (file) => file.endsWith(`${path.sep}route.ts`));
     const relative = routes.map((file) => path.relative(appDir, file));
@@ -29,11 +29,18 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/bff/auth/email/resend/route.ts',
       'api/bff/auth/email/verify/route.ts',
       'api/bff/auth/login/route.ts',
+      'api/bff/auth/password/change/route.ts',
+      'api/bff/auth/password/reset-request/route.ts',
+      'api/bff/auth/password/reset/route.ts',
       'api/bff/auth/register/route.ts',
       'health/route.ts',
     ]);
 
-    expect(relative.some((route) => route.includes('password'))).toBe(false);
+    expect(relative.filter((route) => route.includes('password'))).toEqual([
+      'api/bff/auth/password/change/route.ts',
+      'api/bff/auth/password/reset-request/route.ts',
+      'api/bff/auth/password/reset/route.ts',
+    ]);
     expect(relative.filter((route) => route.includes('verify'))).toEqual([
       'api/bff/auth/email/verify/route.ts',
     ]);
@@ -42,14 +49,34 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     const registerPage = path.join(appDir, 'register', 'page.tsx');
     const termsPage = path.join(appDir, 'terms', 'page.tsx');
     const verifyEmailPage = path.join(appDir, 'verify-email', 'page.tsx');
+    const forgotPasswordPage = path.join(appDir, 'forgot-password', 'page.tsx');
+    const resetPasswordPage = path.join(appDir, 'reset-password', 'page.tsx');
+    const settingsPasswordPage = path.join(appDir, 'settings', 'password', 'page.tsx');
     expect(statSync(loginPage).isFile()).toBe(true);
     expect(statSync(registerPage).isFile()).toBe(true);
     expect(statSync(termsPage).isFile()).toBe(true);
     expect(statSync(verifyEmailPage).isFile()).toBe(true);
+    expect(statSync(forgotPasswordPage).isFile()).toBe(true);
+    expect(statSync(resetPasswordPage).isFile()).toBe(true);
+    expect(statSync(settingsPasswordPage).isFile()).toBe(true);
 
     const pages = walkFiles(appDir, (file) => file.endsWith(`${path.sep}page.tsx`));
     const relativePages = pages.map((file) => path.relative(appDir, file));
-    expect(relativePages.some((page) => page.includes(`password${path.sep}`))).toBe(false);
+    expect(relativePages.sort()).toEqual([
+      `forgot-password${path.sep}page.tsx`,
+      `login${path.sep}page.tsx`,
+      'page.tsx',
+      `register${path.sep}page.tsx`,
+      `reset-password${path.sep}page.tsx`,
+      `settings${path.sep}password${path.sep}page.tsx`,
+      `terms${path.sep}page.tsx`,
+      `verify-email${path.sep}page.tsx`,
+    ]);
+    expect(relativePages.filter((page) => page.includes(`password${path.sep}`)).sort()).toEqual([
+      `forgot-password${path.sep}page.tsx`,
+      `reset-password${path.sep}page.tsx`,
+      `settings${path.sep}password${path.sep}page.tsx`,
+    ]);
     expect(relativePages.filter((page) => page.includes('verify'))).toEqual([
       `verify-email${path.sep}page.tsx`,
     ]);
