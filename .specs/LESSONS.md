@@ -390,6 +390,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: PW-22 AC1 console.log / validation.md (security,observability)
 - last seen: 2026-08-19T01:02:39Z
 
+### L-064 — Assert BFF timeout and 5xx mapping to 504 generic pt-BR on every new allowlisted handler, not only on a sibling mutation.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/session-shell
+- evidence: SH-22 AC4 GET/PATCH timeout 504 (frontend/modules/auth)
+- last seen: 2026-08-19T16:18:54Z
+
+### L-065 — When a spec says a request guard is not required on a branch, assert that branch without sending the guard.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/session-shell
+- evidence: SH-04 logout miss CSRF-optional (frontend/modules/auth)
+- last seen: 2026-08-19T16:18:58Z
+
+### L-066 — When a service reuses a mutation-guard helper, still assert Origin and CSRF 403 on the service under test so skipping the helper is killed.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/session-shell
+- evidence: SH-08/SH-13 Origin CSRF via shared helper only (frontend/modules/auth)
+- last seen: 2026-08-19T16:18:58Z
+
+### L-067 — Assert generic pt-BR forbidden copy without CSRF or Origin wording on every mutation form, not only on one sibling component.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `frontend/modules/auth` · harmful: 0
+- features: bff-auth/session-shell
+- evidence: SH-22 AC5 ProfileForm LogoutAllForm 403 (frontend/modules/auth)
+- last seen: 2026-08-19T16:18:58Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

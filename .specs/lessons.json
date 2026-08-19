@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 64,
+  "next_id": 68,
   "lessons": [
     {
       "id": "L-001",
@@ -1144,6 +1144,78 @@
       ],
       "created": "2026-08-19T01:02:39Z",
       "last_seen": "2026-08-19T01:02:39Z"
+    },
+    {
+      "id": "L-064",
+      "key": "ac_gap::assert bff timeout and 5xx mapping to 504 generic pt br on every new allowlisted handler not only on a sibling mutation",
+      "text": "Assert BFF timeout and 5xx mapping to 504 generic pt-BR on every new allowlisted handler, not only on a sibling mutation.",
+      "signal": "ac_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/session-shell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SH-22 AC4 GET/PATCH timeout 504 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-19T16:18:54Z",
+      "last_seen": "2026-08-19T16:18:54Z"
+    },
+    {
+      "id": "L-065",
+      "key": "spec_precision_gap::when a spec says a request guard is not required on a branch assert that branch without sending the guard",
+      "text": "When a spec says a request guard is not required on a branch, assert that branch without sending the guard.",
+      "signal": "spec_precision_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/session-shell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SH-04 logout miss CSRF-optional (frontend/modules/auth)"
+      ],
+      "created": "2026-08-19T16:18:58Z",
+      "last_seen": "2026-08-19T16:18:58Z"
+    },
+    {
+      "id": "L-066",
+      "key": "spec_precision_gap::when a service reuses a mutation guard helper still assert origin and csrf 403 on the service under test so skipping the helper is killed",
+      "text": "When a service reuses a mutation-guard helper, still assert Origin and CSRF 403 on the service under test so skipping the helper is killed.",
+      "signal": "spec_precision_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/session-shell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SH-08/SH-13 Origin CSRF via shared helper only (frontend/modules/auth)"
+      ],
+      "created": "2026-08-19T16:18:58Z",
+      "last_seen": "2026-08-19T16:18:58Z"
+    },
+    {
+      "id": "L-067",
+      "key": "spec_precision_gap::assert generic pt br forbidden copy without csrf or origin wording on every mutation form not only on one sibling component",
+      "text": "Assert generic pt-BR forbidden copy without CSRF or Origin wording on every mutation form, not only on one sibling component.",
+      "signal": "spec_precision_gap",
+      "scope": "frontend/modules/auth",
+      "status": "candidate",
+      "features": [
+        "bff-auth/session-shell"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "SH-22 AC5 ProfileForm LogoutAllForm 403 (frontend/modules/auth)"
+      ],
+      "created": "2026-08-19T16:18:58Z",
+      "last_seen": "2026-08-19T16:18:58Z"
     }
   ]
 }
