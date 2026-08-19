@@ -221,9 +221,9 @@ T21
 
 **Done when**:
 
-- [ ] Paths/upstream/requireSession/requireCsrf conforme spec
-- [ ] GET `/api/bff/auth/me` lookup funciona
-- [ ] Gate: `make test-frontend` passa
+- [x] Paths/upstream/requireSession/requireCsrf conforme spec
+- [x] GET `/api/bff/auth/me` lookup funciona
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

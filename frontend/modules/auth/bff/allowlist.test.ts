@@ -4,6 +4,10 @@ import {
   AUTH_BFF_ALLOWLIST,
   buildUpstreamUrl,
   LOGIN_ALLOWLIST_ENTRY,
+  LOGOUT_ALLOWLIST_ENTRY,
+  LOGOUT_ALL_ALLOWLIST_ENTRY,
+  ME_GET_ALLOWLIST_ENTRY,
+  ME_PATCH_ALLOWLIST_ENTRY,
   PASSWORD_CHANGE_ALLOWLIST_ENTRY,
   PASSWORD_RESET_ALLOWLIST_ENTRY,
   PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY,
@@ -30,8 +34,8 @@ const TEST_TABLE: readonly AllowlistEntry[] = [
 ];
 
 describe('AUTH_BFF_ALLOWLIST', () => {
-  it('exports login, register, verify, resend, and password production entries (PW-24)', () => {
-    expect(AUTH_BFF_ALLOWLIST).toHaveLength(7);
+  it('exports login, register, verify, resend, password, logout, and me production entries (SH-24)', () => {
+    expect(AUTH_BFF_ALLOWLIST).toHaveLength(11);
     expect(AUTH_BFF_ALLOWLIST).toEqual(
       expect.arrayContaining([
         LOGIN_ALLOWLIST_ENTRY,
@@ -41,6 +45,10 @@ describe('AUTH_BFF_ALLOWLIST', () => {
         PASSWORD_RESET_REQUEST_ALLOWLIST_ENTRY,
         PASSWORD_RESET_ALLOWLIST_ENTRY,
         PASSWORD_CHANGE_ALLOWLIST_ENTRY,
+        LOGOUT_ALLOWLIST_ENTRY,
+        LOGOUT_ALL_ALLOWLIST_ENTRY,
+        ME_GET_ALLOWLIST_ENTRY,
+        ME_PATCH_ALLOWLIST_ENTRY,
       ]),
     );
   });
@@ -119,6 +127,58 @@ describe('PASSWORD_CHANGE_ALLOWLIST_ENTRY (PW-24)', () => {
     expect(entry?.requireSession).toBe(true);
     expect(entry?.requireCsrf).toBe(true);
     expect(entry?.upstreamPath).toBe('/auth/password/change');
+  });
+});
+
+describe('LOGOUT_ALLOWLIST_ENTRY (SH-24)', () => {
+  it('resolves logout path with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/logout');
+
+    expect(entry).toEqual(LOGOUT_ALLOWLIST_ENTRY);
+    expect(entry?.method).toBe('POST');
+    expect(entry?.upstreamMethod).toBe('POST');
+    expect(entry?.upstreamPath).toBe('/auth/logout');
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
+  });
+});
+
+describe('LOGOUT_ALL_ALLOWLIST_ENTRY (SH-24)', () => {
+  it('resolves logout-all path with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('POST', '/api/bff/auth/logout-all');
+
+    expect(entry).toEqual(LOGOUT_ALL_ALLOWLIST_ENTRY);
+    expect(entry?.method).toBe('POST');
+    expect(entry?.upstreamMethod).toBe('POST');
+    expect(entry?.upstreamPath).toBe('/auth/logout-all');
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
+  });
+});
+
+describe('ME_GET_ALLOWLIST_ENTRY (SH-24)', () => {
+  it('resolves GET me without CSRF', () => {
+    const entry = lookupAllowlistEntry('GET', '/api/bff/auth/me');
+
+    expect(entry).toEqual(ME_GET_ALLOWLIST_ENTRY);
+    expect(entry?.method).toBe('GET');
+    expect(entry?.upstreamMethod).toBe('GET');
+    expect(entry?.upstreamPath).toBe('/me');
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(false);
+  });
+});
+
+describe('ME_PATCH_ALLOWLIST_ENTRY (SH-24)', () => {
+  it('resolves PATCH me with session and CSRF required', () => {
+    const entry = lookupAllowlistEntry('PATCH', '/api/bff/auth/me');
+
+    expect(entry).toEqual(ME_PATCH_ALLOWLIST_ENTRY);
+    expect(entry?.method).toBe('PATCH');
+    expect(entry?.upstreamMethod).toBe('PATCH');
+    expect(entry?.upstreamPath).toBe('/me');
+    expect(entry?.requireSession).toBe(true);
+    expect(entry?.requireCsrf).toBe(true);
   });
 });
 
