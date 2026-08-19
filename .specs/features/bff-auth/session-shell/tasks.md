@@ -344,8 +344,8 @@ T21
 
 **Done when**:
 
-- [ ] POST → `performBffLogoutAll`
-- [ ] Gate: `make test-frontend` passa
+- [x] POST → `performBffLogoutAll`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
