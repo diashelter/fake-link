@@ -431,11 +431,11 @@ T21
 
 **Done when**:
 
-- [ ] Email não é `<input>` editável (readonly ou texto)
-- [ ] PATCH headers L-046; 200 atualiza nome sem mudar email
-- [ ] Zod bloqueia submit inválido sem fetch
-- [ ] 429 com e sem Retry-After
-- [ ] Gate: `make test-frontend` passa
+- [x] Email não é `<input>` editável (readonly ou texto)
+- [x] PATCH headers L-046; 200 atualiza nome sem mudar email
+- [x] Zod bloqueia submit inválido sem fetch
+- [x] 429 com e sem Retry-After
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
