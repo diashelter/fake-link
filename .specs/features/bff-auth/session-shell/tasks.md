@@ -198,10 +198,10 @@ T21
 
 **Done when**:
 
-- [ ] Guest em `/settings` e `/settings/password` → `/login`
-- [ ] `verification` nesses paths → `/verify-email`
-- [ ] `/settings` **não** está em `VERIFICATION_ALLOWED_PATHS`
-- [ ] Gate: `make test-frontend` passa
+- [x] Guest em `/settings` e `/settings/password` → `/login`
+- [x] `verification` nesses paths → `/verify-email`
+- [x] `/settings` **não** está em `VERIFICATION_ALLOWED_PATHS`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
