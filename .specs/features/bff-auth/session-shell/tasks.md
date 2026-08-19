@@ -522,8 +522,8 @@ T21
 
 **Done when**:
 
-- [ ] RTL encontra Sair; GET da página ainda não chama verify
-- [ ] Gate: `make test-frontend` passa
+- [x] RTL encontra Sair; GET da página ainda não chama verify
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { LogoutButton } from '@/modules/auth/components/logout-button';
 import { formatRetryAfter, messageForAuthError } from '@/modules/auth/lib/auth-messages';
 import { readClientCookie } from '@/modules/auth/lib/client-cookie';
 import {
@@ -162,47 +163,51 @@ export function VerifyEmailForm({ initialToken }: VerifyEmailFormProps) {
   const blocked = shouldBlockSubmit(isSubmitting || isResending);
 
   return (
-    <form
-      className="flex w-full flex-col gap-4"
-      onSubmit={handleSubmit(onValidSubmit, focusFirstError)}
-      noValidate
-    >
-      <FormField name="token" label="Código de verificação" error={errors.token?.message}>
-        <Input
-          id="token"
-          type="text"
-          autoComplete="one-time-code"
-          invalid={Boolean(errors.token)}
-          aria-describedby={errors.token ? 'token-error' : undefined}
-          {...register('token')}
-        />
-      </FormField>
+    <div className="flex w-full flex-col gap-4">
+      <form
+        className="flex w-full flex-col gap-4"
+        onSubmit={handleSubmit(onValidSubmit, focusFirstError)}
+        noValidate
+      >
+        <FormField name="token" label="Código de verificação" error={errors.token?.message}>
+          <Input
+            id="token"
+            type="text"
+            autoComplete="one-time-code"
+            invalid={Boolean(errors.token)}
+            aria-describedby={errors.token ? 'token-error' : undefined}
+            {...register('token')}
+          />
+        </FormField>
 
-      {formError ? (
-        <p role="alert" className="text-sm text-red-700">
-          {formError}
-        </p>
-      ) : null}
+        {formError ? (
+          <p role="alert" className="text-sm text-red-700">
+            {formError}
+          </p>
+        ) : null}
 
-      {statusMessage ? (
-        <p role="status" className="text-sm text-foreground">
-          {statusMessage}
-        </p>
-      ) : null}
+        {statusMessage ? (
+          <p role="status" className="text-sm text-foreground">
+            {statusMessage}
+          </p>
+        ) : null}
 
-      <Button type="submit" disabled={blocked}>
-        Confirmar e-mail
-      </Button>
+        <Button type="submit" disabled={blocked}>
+          Confirmar e-mail
+        </Button>
 
-      <Button type="button" variant="secondary" disabled={blocked} onClick={onResend}>
-        Reenviar e-mail
-      </Button>
+        <Button type="button" variant="secondary" disabled={blocked} onClick={onResend}>
+          Reenviar e-mail
+        </Button>
 
-      <div className="flex flex-col gap-2 text-sm">
-        <Link href="/login" className="text-accent hover:underline">
-          Ir para login
-        </Link>
-      </div>
-    </form>
+        <div className="flex flex-col gap-2 text-sm">
+          <Link href="/login" className="text-accent hover:underline">
+            Ir para login
+          </Link>
+        </div>
+      </form>
+
+      <LogoutButton />
+    </div>
   );
 }
