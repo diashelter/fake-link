@@ -135,8 +135,8 @@ T21
 
 **Done when**:
 
-- [ ] Vazio e >128 falham; sem política de composição
-- [ ] Gate: `make test-frontend` passa
+- [x] Vazio e >128 falham; sem política de composição
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
