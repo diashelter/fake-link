@@ -249,6 +249,86 @@ describe('performBffPasswordReset (PW-06–08, PW-19–22)', () => {
     );
   });
 
+  it('forwards upstream 429 with Retry-After without destroying the session (PW-20)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () =>
+      Response.json(
+        { code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' },
+        { status: 429, headers: { 'Retry-After': '60' } },
+      ),
+    );
+
+    const result = await performBffPasswordReset(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(429);
+    expect(result.response.headers.get('Retry-After')).toBe('60');
+    expect(await result.response.json()).toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns 504 generic pt-BR when upstream fetch aborts (PW-21)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () => {
+      throw new Error('timeout');
+    });
+
+    const result = await performBffPasswordReset(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(504);
+    expect(await result.response.json()).toEqual({
+      message: 'Não foi possível conectar ao serviço. Tente novamente.',
+    });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns generic pt-BR message for upstream 500 without leaking Laravel body (PW-21)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () =>
+      Response.json({ message: 'Internal stack trace' }, { status: 500 }),
+    );
+
+    const result = await performBffPasswordReset(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(500);
+    const body = await result.response.json();
+    expect(body).toEqual({
+      message: 'Algo deu errado. Tente novamente.',
+    });
+    expect(JSON.stringify(body)).not.toContain('Internal stack trace');
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
+  it('returns generic pt-BR message for upstream 503 without destroying the session (PW-21)', async () => {
+    const created = await createKindSession('session');
+    const fetchMock = vi.fn(async () =>
+      Response.json({ message: 'Service unavailable' }, { status: 503 }),
+    );
+
+    const result = await performBffPasswordReset(
+      makeRequest({ sessionId: created.sessionId }),
+      deps(fetchMock),
+    );
+
+    expect(result.response.status).toBe(503);
+    expect(await result.response.json()).toEqual({
+      message: 'Algo deu errado. Tente novamente.',
+    });
+    expect(destroySessionSpy).not.toHaveBeenCalled();
+    expect(clearSessionCookieSpy).not.toHaveBeenCalled();
+  });
+
   it('returns 400 for malformed JSON without upstream fetch (PW-18)', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
 
