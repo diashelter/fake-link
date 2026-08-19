@@ -31,6 +31,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
       'api/bff/auth/login/route.ts',
       'api/bff/auth/logout-all/route.ts',
       'api/bff/auth/logout/route.ts',
+      'api/bff/auth/me/route.ts',
       'api/bff/auth/password/change/route.ts',
       'api/bff/auth/password/reset-request/route.ts',
       'api/bff/auth/password/reset/route.ts',

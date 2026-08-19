@@ -365,8 +365,8 @@ T21
 
 **Done when**:
 
-- [ ] GET e PATCH despacham o serviço; POST 405
-- [ ] Gate: `make test-frontend` passa
+- [x] GET e PATCH despacham o serviço; POST 405
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
