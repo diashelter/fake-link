@@ -42,15 +42,17 @@ describe('ChangePasswordForm (PW-16, PW-17, PW-20, PW-22)', () => {
   }
 
   it('shows success message and navigates to /login on 200 (PW-16)', async () => {
+    let capturedRequest: Request | null = null;
     server.use(
-      http.post('/api/bff/auth/password/change', () =>
-        HttpResponse.json({
+      http.post('/api/bff/auth/password/change', ({ request }) => {
+        capturedRequest = request;
+        return HttpResponse.json({
           data: {
             redirect_to: '/login',
             message: CHANGE_SUCCESS_MESSAGE,
           },
-        }),
-      ),
+        });
+      }),
     );
 
     const user = setupUser();
@@ -63,6 +65,15 @@ describe('ChangePasswordForm (PW-16, PW-17, PW-20, PW-22)', () => {
     });
     expect(pushMock).toHaveBeenCalledWith('/login');
     expect(document.body.innerHTML).not.toContain('Bearer');
+    expect(capturedRequest).not.toBeNull();
+    expect(capturedRequest!.headers.get('X-CSRF-Token')).toBe('test-csrf-token');
+    expect(capturedRequest!.headers.get('Content-Type')).toContain('application/json');
+    expect(capturedRequest!.credentials).toBe('include');
+    await expect(capturedRequest!.json()).resolves.toEqual({
+      current_password: CURRENT_PASSWORD,
+      password: VALID_PASSWORD,
+      password_confirmation: VALID_PASSWORD,
+    });
   });
 
   it('shows INVALID_CREDENTIALS error on current_password (PW-17)', async () => {

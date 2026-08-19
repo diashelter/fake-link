@@ -29,7 +29,7 @@ describe('ForgotPasswordForm (PW-04, PW-05, PW-20)', () => {
   }
 
   it('shows the same success copy for two different emails on 202 (PW-05)', async () => {
-    const emails = ['user@example.com', 'nobody@example.com'];
+    const emails = ['User@Example.COM', 'nobody@example.com'];
 
     for (const email of emails) {
       let capturedRequest: Request | null = null;
@@ -50,9 +50,12 @@ describe('ForgotPasswordForm (PW-04, PW-05, PW-20)', () => {
       });
       expect(capturedRequest).not.toBeNull();
       expect(capturedRequest!.headers.get('X-CSRF-Token')).toBe('test-csrf-token');
+      expect(capturedRequest!.headers.get('Content-Type')).toContain('application/json');
       expect(capturedRequest!.headers.get('Authorization')).toBeNull();
+      const body = await capturedRequest!.clone().json();
+      expect(body).toEqual({ email: email.toLowerCase() });
       expect(container.innerHTML).not.toContain('Bearer');
-      expect(JSON.stringify(await capturedRequest!.clone().json())).not.toContain('Bearer');
+      expect(JSON.stringify(body)).not.toContain('Bearer');
 
       cleanup();
       server.resetHandlers();

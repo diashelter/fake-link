@@ -29,8 +29,11 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText(/^E-mail$/i), 'user@example.com');
+async function fillValidForm(
+  user: ReturnType<typeof userEvent.setup>,
+  email = 'User@Example.COM',
+) {
+  await user.type(screen.getByLabelText(/^E-mail$/i), email);
   await user.type(screen.getByLabelText(/^Código de recuperação$/i), 'opaque-token');
   await user.type(screen.getByLabelText(/^Senha$/i), VALID_PASSWORD);
   await user.type(screen.getByLabelText(/Confirmar senha/i), VALID_PASSWORD);
@@ -68,15 +71,17 @@ describe('ResetPasswordForm (PW-09–11, PW-20, PW-22)', () => {
   });
 
   it('shows success message and navigates to /login on 200 with redirect_to (PW-09)', async () => {
+    let capturedRequest: Request | null = null;
     server.use(
-      http.post('/api/bff/auth/password/reset', () =>
-        HttpResponse.json({
+      http.post('/api/bff/auth/password/reset', ({ request }) => {
+        capturedRequest = request;
+        return HttpResponse.json({
           data: {
             redirect_to: '/login',
             message: RESET_SUCCESS_MESSAGE,
           },
-        }),
-      ),
+        });
+      }),
     );
 
     const user = setupUser();
@@ -88,6 +93,16 @@ describe('ResetPasswordForm (PW-09–11, PW-20, PW-22)', () => {
       expect(screen.getByRole('status').textContent).toBe(RESET_SUCCESS_MESSAGE);
     });
     expect(pushMock).toHaveBeenCalledWith('/login');
+    expect(capturedRequest).not.toBeNull();
+    expect(capturedRequest!.headers.get('X-CSRF-Token')).toBe('test-csrf-token');
+    expect(capturedRequest!.headers.get('Content-Type')).toContain('application/json');
+    expect(capturedRequest!.credentials).toBe('include');
+    await expect(capturedRequest!.json()).resolves.toEqual({
+      email: 'user@example.com',
+      token: 'opaque-token',
+      password: VALID_PASSWORD,
+      password_confirmation: VALID_PASSWORD,
+    });
   });
 
   it('shows uniform token field error on 422 (PW-11)', async () => {
