@@ -386,9 +386,9 @@ T21
 
 **Done when**:
 
-- [ ] Assert `Content-Type` + `X-CSRF-Token` + body JSON
-- [ ] 200 → push `/login`; 403 copy genérica sem dizer CSRF
-- [ ] Gate: `make test-frontend` passa
+- [x] Assert `Content-Type` + `X-CSRF-Token` + body JSON
+- [x] 200 → push `/login`; 403 copy genérica sem dizer CSRF
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
