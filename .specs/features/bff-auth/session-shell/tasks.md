@@ -156,8 +156,8 @@ T21
 
 **Done when**:
 
-- [ ] Incrementos isolados; getters refletem totais
-- [ ] Gate: `make test-frontend` passa
+- [x] Incrementos isolados; getters refletem totais
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

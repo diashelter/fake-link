@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { getDecryptFailCount, incrementDecryptFail } from './metrics';
+import {
+  getDecryptFailCount,
+  getLogoutRedisFailCount,
+  getLogoutUpstreamFailCount,
+  incrementDecryptFail,
+  incrementLogoutRedisFail,
+  incrementLogoutUpstreamFail,
+} from './metrics';
 import { FakeSessionStore } from './test/fake-session-store';
 import type { SessionRecord } from './types';
 
@@ -21,6 +28,41 @@ describe('session metrics (SC-07)', () => {
     incrementDecryptFail();
 
     expect(getDecryptFailCount()).toBe(before + 2);
+  });
+});
+
+describe('logout failure metrics (SH-25)', () => {
+  it('increments logout upstream-fail counter and getter reflects the total', () => {
+    const before = getLogoutUpstreamFailCount();
+
+    incrementLogoutUpstreamFail();
+    incrementLogoutUpstreamFail();
+
+    expect(getLogoutUpstreamFailCount()).toBe(before + 2);
+  });
+
+  it('increments logout redis-fail counter and getter reflects the total', () => {
+    const before = getLogoutRedisFailCount();
+
+    incrementLogoutRedisFail();
+    incrementLogoutRedisFail();
+
+    expect(getLogoutRedisFailCount()).toBe(before + 2);
+  });
+
+  it('keeps upstream and redis fail counters isolated', () => {
+    const upstreamBefore = getLogoutUpstreamFailCount();
+    const redisBefore = getLogoutRedisFailCount();
+
+    incrementLogoutUpstreamFail();
+
+    expect(getLogoutUpstreamFailCount()).toBe(upstreamBefore + 1);
+    expect(getLogoutRedisFailCount()).toBe(redisBefore);
+
+    incrementLogoutRedisFail();
+
+    expect(getLogoutUpstreamFailCount()).toBe(upstreamBefore + 1);
+    expect(getLogoutRedisFailCount()).toBe(redisBefore + 1);
   });
 });
 
