@@ -448,11 +448,11 @@ T19
 
 **Done when**:
 
-- [ ] Dois e-mails MSW `202` → mesma copy de sucesso
-- [ ] Email inválido bloqueia submit client-side
-- [ ] `429` exibe throttle com Retry-After
-- [ ] Link `/login` presente
-- [ ] Gate: `make test-frontend` passa
+- [x] Dois e-mails MSW `202` → mesma copy de sucesso
+- [x] Email inválido bloqueia submit client-side
+- [x] `429` exibe throttle com Retry-After
+- [x] Link `/login` presente
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
 **Gate**: full  
