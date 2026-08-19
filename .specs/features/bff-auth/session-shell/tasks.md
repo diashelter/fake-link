@@ -177,8 +177,8 @@ T21
 
 **Done when**:
 
-- [ ] `maxAge: 0` nos dois cookies; teste de Set-Cookie
-- [ ] Gate: `make test-frontend` passa
+- [x] `maxAge: 0` nos dois cookies; teste de Set-Cookie
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  

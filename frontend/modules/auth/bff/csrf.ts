@@ -59,6 +59,12 @@ export function issueCsrfForSession(sessionId: string, response: NextResponse): 
   return response;
 }
 
+export function clearCsrfCookies(response: NextResponse): NextResponse {
+  response.cookies.set(CSRF_TOKEN_COOKIE, '', { ...csrfTokenCookieDefaults, maxAge: 0 });
+  response.cookies.set(CSRF_SID_COOKIE, '', buildSessionCookieOptions({ maxAge: 0 }));
+  return response;
+}
+
 export function writePreAuthCsrfCookies(store: CookieWriter, csrfSid?: string): string {
   const sid = csrfSid ?? randomBytes(32).toString('base64url');
   const token = derivePreAuthCsrfToken(sid);
