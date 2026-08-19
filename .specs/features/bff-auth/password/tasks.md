@@ -475,11 +475,11 @@ T19
 
 **Done when**:
 
-- [ ] Mount com `initialToken` → zero fetch até submit
-- [ ] `replaceState` remove `?token=` (spy)
-- [ ] MSW `200` → `router.push('/login')`
-- [ ] `422` token / `PASSWORD_REUSED` → erros de campo pt-BR
-- [ ] Gate: `make test-frontend` passa
+- [x] Mount com `initialToken` → zero fetch até submit
+- [x] `replaceState` remove `?token=` (spy)
+- [x] MSW `200` → `router.push('/login')`
+- [x] `422` token / `PASSWORD_REUSED` → erros de campo pt-BR
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
 **Gate**: full  
