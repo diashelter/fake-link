@@ -502,11 +502,11 @@ T19
 
 **Done when**:
 
-- [ ] MSW `200` → redirect login
-- [ ] `401 INVALID_CREDENTIALS` → erro em `current_password`
-- [ ] `422 PASSWORD_REUSED` → erro em `password`
-- [ ] Validação client bloqueia submit inválido
-- [ ] Gate: `make test-frontend` passa
+- [x] MSW `200` → redirect login
+- [x] `401 INVALID_CREDENTIALS` → erro em `current_password`
+- [x] `422 PASSWORD_REUSED` → erro em `password`
+- [x] Validação client bloqueia submit inválido
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL)  
 **Gate**: full  
