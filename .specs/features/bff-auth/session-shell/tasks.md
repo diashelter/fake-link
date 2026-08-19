@@ -499,10 +499,10 @@ T21
 
 **Done when**:
 
-- [ ] Guest: landing (CTA Começar permanece)
-- [ ] Session: shell, **sem** CTA anônimo como único chrome
-- [ ] Verification: redirect `/verify-email`
-- [ ] Gate: `make test-frontend` passa
+- [x] Guest: landing (CTA Começar permanece)
+- [x] Session: shell, **sem** CTA anônimo como único chrome
+- [x] Verification: redirect `/verify-email`
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
