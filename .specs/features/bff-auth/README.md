@@ -6,7 +6,9 @@
 
 **Fase alvo:** Fase 1 (Auth + BFF) — complemento da API Auth.
 
-**Maturidade:** cada fatia começa como **SPEC-semente** (`Status: Seed`). Antes de Design/Tasks/Execute, a fatia deve passar por **Specify deepen** (fechamento de ACs, assumptions e dimensões implícitas).
+**Progresso (2026-08-19):** 8 de 9 fatias verificadas (foundation → session-shell). Pendente: seed `e2e-security-gate`.
+
+**Maturidade:** fatias 1–8 concluíram Specify → Design → Tasks → Execute → Validate. Fatia 9 permanece **SPEC-semente**.
 
 ---
 
@@ -30,9 +32,9 @@
 | 3 | CSRF e proxy | [csrf-proxy](./csrf-proxy/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | session-core | Origin, CSRF, allowlist, returnUrl |
 | 4 | Login | [login](./login/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | csrf-proxy | BFF login + UI login |
 | 5 | Cadastro | [register](./register/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | BFF register + UI + Terms |
-| 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ | register | BFF verify/resend + UI |
-| 7 | Senha | [password](./password/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ | login | Forgot / reset / change |
-| 8 | Sessão e shell | [session-shell](./session-shell/spec.md) | Seed | login | Logout, me, perfil, guards |
+| 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | register | BFF verify/resend + UI |
+| 7 | Senha | [password](./password/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Forgot / reset / change |
+| 8 | Sessão e shell | [session-shell](./session-shell/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Logout, me, perfil, guards |
 | 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Seed | 4–8 | Playwright + ausência de Bearer |
 
 ```mermaid
@@ -96,6 +98,60 @@ flowchart LR
 | BFFUI-81 | Playwright: CSRF, Origin, cookie, returnUrl | e2e-security-gate |
 | BFFUI-82 | Playwright: flush Redis / idle / absoluto | e2e-security-gate |
 | BFFUI-83 | axe WCAG 2.2 AA nos fluxos Auth críticos | e2e-security-gate |
+
+---
+
+## Inventário da implementação (`frontend/`)
+
+Resumo do que já existe no módulo Auth — atualizado em 2026-08-19.
+
+### Route Handlers BFF (`app/api/bff/auth/`)
+
+| Método | Path BFF | Upstream Laravel | Sessão | Fatia |
+| --- | --- | --- | --- | --- |
+| POST | `/login` | `/auth/login` | pré-auth | login |
+| POST | `/register` | `/auth/register` | pré-auth | register |
+| POST | `/email/verify` | `/auth/email/verify` | `verification` | email-verification |
+| POST | `/email/resend` | `/auth/email/verification-notification` | `verification` | email-verification |
+| POST | `/password/reset-request` | `/auth/password/reset-request` | pré-auth | password |
+| POST | `/password/reset` | `/auth/password/reset` | pré-auth | password |
+| POST | `/password/change` | `/auth/password/change` | `session` | password |
+| POST | `/logout` | `/auth/logout` | `session` \| `verification` | session-shell |
+| POST | `/logout-all` | `/auth/logout-all` | `session` | session-shell |
+| GET | `/me` | `/me` | `session` \| `verification` | session-shell |
+| PATCH | `/me` | `/me` | `session` | session-shell |
+
+Allowlist central: `modules/auth/bff/allowlist.ts` (11 entradas produto).
+
+### Páginas UI (`app/`)
+
+| Path | Componente | Fatia |
+| --- | --- | --- |
+| `/login` | `LoginForm` | login |
+| `/register` | `RegisterForm` | register |
+| `/verify-email` | `VerifyEmailForm` | email-verification |
+| `/forgot-password` | `ForgotPasswordForm` | password |
+| `/reset-password` | `ResetPasswordForm` | password |
+| `/settings` | `ProfileForm` + `LogoutAllForm` | session-shell |
+| `/settings/password` | `ChangePasswordForm` (shell de conta) | password + session-shell |
+| `/terms` | estático | register |
+
+### Núcleo BFF e sessão (`modules/auth/`)
+
+| Área | Arquivos principais | Fatia |
+| --- | --- | --- |
+| Sessão Redis/cookie | `lib/session/*`, `services/bff-session.ts` | session-core |
+| CSRF / Origin / proxy | `bff/csrf.ts`, `bff/origin.ts`, `bff/upstream.ts`, `bff/mutation-guard.ts` | csrf-proxy |
+| Guard sessão restrita | `lib/verification-guard.ts`, `lib/account-guard.ts` | email-verification + session-shell |
+| Shell autenticado | `components/authenticated-shell.tsx`, `logout-button.tsx` | session-shell |
+| Schemas Zod | `schemas/login-schema.ts`, `register-schema.ts`, `verify-email-schema.ts`, `forgot-password-schema.ts`, `reset-password-schema.ts`, `change-password-schema.ts`, `password-schema.ts`, `update-profile-schema.ts`, `logout-all-schema.ts` | várias |
+| Mensagens pt-BR | `lib/auth-messages.ts`, `lib/validation-errors.ts` | várias |
+
+### Ainda não implementado
+
+| Item | Fatia alvo | IDs |
+| --- | --- | --- |
+| Playwright E2E (Bearer ausente, CSRF, Redis flush) | e2e-security-gate | BFFUI-80…83 |
 
 ---
 
