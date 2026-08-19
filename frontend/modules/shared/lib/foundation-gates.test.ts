@@ -59,6 +59,7 @@ describe('foundation gates (FND-02, FND-07, FND-08)', () => {
     expect(relativePages.filter((page) => page.includes(`password${path.sep}`)).sort()).toEqual([
       `forgot-password${path.sep}page.tsx`,
       `reset-password${path.sep}page.tsx`,
+      `settings${path.sep}password${path.sep}page.tsx`,
     ]);
     expect(relativePages.filter((page) => page.includes('verify'))).toEqual([
       `verify-email${path.sep}page.tsx`,

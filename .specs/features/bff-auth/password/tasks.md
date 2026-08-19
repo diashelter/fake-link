@@ -554,10 +554,10 @@ T19
 
 **Done when**:
 
-- [ ] Sem sessão → `/login`
-- [ ] `verification` → `/verify-email`
-- [ ] `session` → render form
-- [ ] Gate: `make test-frontend` passa
+- [x] Sem sessão → `/login`
+- [x] `verification` → `/verify-email`
+- [x] `session` → render form
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit (RTL/node)  
 **Gate**: full  
