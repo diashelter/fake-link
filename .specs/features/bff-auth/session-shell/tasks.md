@@ -322,9 +322,9 @@ T21
 
 **Done when**:
 
-- [ ] POST chama `performBffLogout`; outros métodos 405 se o projeto já padroniza
-- [ ] Teste de integração fina com service mock/spy
-- [ ] Gate: `make test-frontend` passa
+- [x] POST chama `performBffLogout`; outros métodos 405 se o projeto já padroniza
+- [x] Teste de integração fina com service mock/spy
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
