@@ -29,9 +29,9 @@ describe('resolveAccountPageGuard (SH-18, SH-19, SH-20)', () => {
   });
 
   it('redirects a verification-kind visitor on /settings to /verify-email', () => {
-    expect(
-      resolveAccountPageGuard({ pathname: '/settings', sessionKind: 'verification' }),
-    ).toEqual({ action: 'redirect', to: '/verify-email' });
+    expect(resolveAccountPageGuard({ pathname: '/settings', sessionKind: 'verification' })).toEqual(
+      { action: 'redirect', to: '/verify-email' },
+    );
   });
 
   it('redirects a verification-kind visitor on /settings/password to /verify-email', () => {

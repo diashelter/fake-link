@@ -13,8 +13,7 @@ const UPSTREAM_TIMEOUT_MS = 10_000;
 const BAD_REQUEST_MESSAGE = 'Requisição inválida.';
 const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 const GATEWAY_ERROR_MESSAGE = 'Não foi possível conectar ao serviço. Tente novamente.';
-const LOGOUT_ALL_SUCCESS_MESSAGE =
-  'Todas as sessões foram encerradas. Faça login para continuar.';
+const LOGOUT_ALL_SUCCESS_MESSAGE = 'Todas as sessões foram encerradas. Faça login para continuar.';
 const LOGOUT_ALL_SUCCESS_REDIRECT = '/login' as const;
 
 export type BffLogoutAllSuccess = {

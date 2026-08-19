@@ -565,10 +565,10 @@ T21
 
 **Done when**:
 
-- [ ] Gates conhecem `/settings`, logout, me
-- [ ] `make lint-frontend` passa
-- [ ] `make test-frontend-coverage` ≥75% no escopo novo
-- [ ] Test count não cai por deleção silenciosa
+- [x] Gates conhecem `/settings`, logout, me
+- [x] `make lint-frontend` passa
+- [x] `make test-frontend-coverage` ≥75% no escopo novo
+- [x] Test count não cai por deleção silenciosa
 
 **Tests**: none (quality gate)  
 **Gate**: build  

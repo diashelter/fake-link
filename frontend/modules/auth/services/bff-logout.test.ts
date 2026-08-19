@@ -122,7 +122,9 @@ describe('performBffLogout (SH-01–05, SH-21)', () => {
     expect(clearSessionCookieSpy).toHaveBeenCalled();
     expect(sessionCookieHeader(result.response)).toMatch(/Max-Age=0/i);
     const cookies = setCookies(result.response);
-    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(/Max-Age=0/i);
+    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(
+      /Max-Age=0/i,
+    );
     expect(cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`))).toMatch(/Max-Age=0/i);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://nginx/api/v1/auth/logout',
@@ -133,8 +135,8 @@ describe('performBffLogout (SH-01–05, SH-21)', () => {
         }),
       }),
     );
-    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
-    expect(init.body).toBeUndefined();
+    const firstCall = fetchMock.mock.calls[0] as unknown as [unknown, RequestInit] | undefined;
+    expect(firstCall?.[1].body).toBeUndefined();
   });
 
   it('does not return 403 when session kind is verification (SH-05)', async () => {
@@ -226,7 +228,9 @@ describe('performBffLogout (SH-01–05, SH-21)', () => {
     expect(clearSessionCookieSpy).toHaveBeenCalled();
     expect(sessionCookieHeader(result.response)).toMatch(/Max-Age=0/i);
     const cookies = setCookies(result.response);
-    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(/Max-Age=0/i);
+    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(
+      /Max-Age=0/i,
+    );
     expect(cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`))).toMatch(/Max-Age=0/i);
   });
 

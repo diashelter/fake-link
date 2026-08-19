@@ -197,8 +197,8 @@ describe('performBffMeGet / performBffMePatch (SH-10–13, SH-21)', () => {
     expect(result.response.status).toBe(200);
     expect(await result.response.json()).toEqual(updated);
     expect(result.response.headers.get('Cache-Control')).toBe('private, no-store');
-    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
-    expect(JSON.parse(String(init.body))).toEqual({ name: 'Novo Nome' });
+    const firstCall = fetchMock.mock.calls[0] as unknown as [unknown, RequestInit] | undefined;
+    expect(JSON.parse(String(firstCall?.[1].body))).toEqual({ name: 'Novo Nome' });
     expect(fetchMock).toHaveBeenCalledWith(
       'http://nginx/api/v1/me',
       expect.objectContaining({

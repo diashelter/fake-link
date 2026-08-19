@@ -10,8 +10,7 @@ import { createSession } from '@/modules/auth/services/bff-session';
 
 const TEST_KEY = Buffer.alloc(32, 2).toString('base64');
 const CURRENT_PASSWORD_SENTINEL = 'old-secret-SENTINEL';
-const LOGOUT_ALL_SUCCESS_MESSAGE =
-  'Todas as sessões foram encerradas. Faça login para continuar.';
+const LOGOUT_ALL_SUCCESS_MESSAGE = 'Todas as sessões foram encerradas. Faça login para continuar.';
 const VALID_BODY = { current_password: CURRENT_PASSWORD_SENTINEL };
 
 const logoutAllHarness = vi.hoisted(() => {

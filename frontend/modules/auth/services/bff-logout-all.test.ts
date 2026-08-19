@@ -13,8 +13,7 @@ import { createSession } from './bff-session';
 
 const TEST_KEY = Buffer.alloc(32, 2).toString('base64');
 const CURRENT_PASSWORD_SENTINEL = 'old-secret-SENTINEL';
-const LOGOUT_ALL_SUCCESS_MESSAGE =
-  'Todas as sessões foram encerradas. Faça login para continuar.';
+const LOGOUT_ALL_SUCCESS_MESSAGE = 'Todas as sessões foram encerradas. Faça login para continuar.';
 const LOGOUT_ALL_SUCCESS_BODY = {
   data: { redirect_to: '/login', message: LOGOUT_ALL_SUCCESS_MESSAGE },
 };
@@ -130,7 +129,9 @@ describe('performBffLogoutAll (SH-06–09, SH-21)', () => {
     expect(clearSessionCookieSpy).toHaveBeenCalled();
     expect(sessionCookieHeader(result.response)).toMatch(/Max-Age=0/i);
     const cookies = setCookies(result.response);
-    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(/Max-Age=0/i);
+    expect(cookies.find((value) => value.startsWith(`${CSRF_TOKEN_COOKIE}=`))).toMatch(
+      /Max-Age=0/i,
+    );
     expect(cookies.find((value) => value.startsWith(`${CSRF_SID_COOKIE}=`))).toMatch(/Max-Age=0/i);
     expect(fetchMock).toHaveBeenCalledWith(
       'http://nginx/api/v1/auth/logout-all',

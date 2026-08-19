@@ -2,7 +2,11 @@ import 'server-only';
 
 import { NextResponse } from 'next/server';
 
-import { ME_GET_ALLOWLIST_ENTRY, ME_PATCH_ALLOWLIST_ENTRY, buildUpstreamUrl } from '../bff/allowlist';
+import {
+  ME_GET_ALLOWLIST_ENTRY,
+  ME_PATCH_ALLOWLIST_ENTRY,
+  buildUpstreamUrl,
+} from '../bff/allowlist';
 import { forbiddenResponse, jsonWithPrivateCache } from '../bff/private-response';
 import { updateProfileSchema } from '../schemas/update-profile-schema';
 import { getSession, type BffSessionDependencies } from './bff-session';
@@ -14,8 +18,7 @@ const GENERIC_ERROR_MESSAGE = 'Algo deu errado. Tente novamente.';
 const GATEWAY_ERROR_MESSAGE = 'Não foi possível conectar ao serviço. Tente novamente.';
 
 export type BffMeResult =
-  | { ok: true; response: NextResponse }
-  | { ok: false; response: NextResponse };
+  { ok: true; response: NextResponse } | { ok: false; response: NextResponse };
 
 export type BffMeDependencies = BffSessionDependencies & {
   fetchImpl?: typeof fetch;

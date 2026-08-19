@@ -161,9 +161,7 @@ describe('Settings layout and profile page (SH-14, SH-18, SH-20, BFFUI-73, BFFUI
     'destroys session, expires cookies, and redirects to /login on GET me 403 %s',
     async (code) => {
       getSessionFromRequestMock.mockResolvedValue(SESSION_USER);
-      performBffMeGetMock.mockResolvedValue(
-        jsonResponse(403, { message: 'Forbidden.', code }),
-      );
+      performBffMeGetMock.mockResolvedValue(jsonResponse(403, { message: 'Forbidden.', code }));
 
       await expect(SettingsPage()).rejects.toThrow('REDIRECT:/login');
 
@@ -171,7 +169,13 @@ describe('Settings layout and profile page (SH-14, SH-18, SH-20, BFFUI-73, BFFUI
       expect(cookiesSetMock).toHaveBeenCalledWith(
         '__Host-fl_session',
         '',
-        expect.objectContaining({ maxAge: 0, httpOnly: true, secure: true, sameSite: 'lax', path: '/' }),
+        expect.objectContaining({
+          maxAge: 0,
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+        }),
       );
       expect(cookiesSetMock).toHaveBeenCalledWith(
         '__Host-fl_csrf',
@@ -181,7 +185,13 @@ describe('Settings layout and profile page (SH-14, SH-18, SH-20, BFFUI-73, BFFUI
       expect(cookiesSetMock).toHaveBeenCalledWith(
         '__Host-fl_csrf_sid',
         '',
-        expect.objectContaining({ maxAge: 0, httpOnly: true, secure: true, sameSite: 'lax', path: '/' }),
+        expect.objectContaining({
+          maxAge: 0,
+          httpOnly: true,
+          secure: true,
+          sameSite: 'lax',
+          path: '/',
+        }),
       );
       expect(redirectMock).toHaveBeenCalledWith('/login');
     },

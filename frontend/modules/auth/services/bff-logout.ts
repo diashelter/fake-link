@@ -7,7 +7,12 @@ import { clearCsrfCookies, validateCsrfDoubleSubmit } from '../bff/csrf';
 import { validateMutationOrigin } from '../bff/origin';
 import { forbiddenResponse, jsonWithPrivateCache } from '../bff/private-response';
 import { incrementLogoutRedisFail, incrementLogoutUpstreamFail } from '../lib/session/metrics';
-import { clearSessionCookie, destroySession, getSession, type BffSessionDependencies } from './bff-session';
+import {
+  clearSessionCookie,
+  destroySession,
+  getSession,
+  type BffSessionDependencies,
+} from './bff-session';
 
 const UPSTREAM_TIMEOUT_MS = 10_000;
 const LOGOUT_SUCCESS_MESSAGE = 'Você saiu da conta.';
