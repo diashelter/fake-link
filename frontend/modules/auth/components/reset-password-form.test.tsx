@@ -29,10 +29,7 @@ afterEach(() => {
 });
 afterAll(() => server.close());
 
-async function fillValidForm(
-  user: ReturnType<typeof userEvent.setup>,
-  email = 'User@Example.COM',
-) {
+async function fillValidForm(user: ReturnType<typeof userEvent.setup>, email = 'User@Example.COM') {
   await user.type(screen.getByLabelText(/^E-mail$/i), email);
   await user.type(screen.getByLabelText(/^Código de recuperação$/i), 'opaque-token');
   await user.type(screen.getByLabelText(/^Senha$/i), VALID_PASSWORD);
@@ -196,7 +193,9 @@ describe('ResetPasswordForm (PW-09–11, PW-20, PW-22)', () => {
     await user.click(screen.getByRole('button', { name: 'Redefinir senha' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert').textContent).toBe('Esta conta está em processo de exclusão.');
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Esta conta está em processo de exclusão.',
+      );
     });
   });
 

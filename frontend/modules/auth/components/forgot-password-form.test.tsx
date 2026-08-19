@@ -110,7 +110,9 @@ describe('ForgotPasswordForm (PW-04, PW-05, PW-20)', () => {
     await user.click(screen.getByRole('button', { name: 'Enviar instruções' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert').textContent).toBe('Esta conta está em processo de exclusão.');
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Esta conta está em processo de exclusão.',
+      );
     });
   });
 

@@ -205,7 +205,9 @@ describe('ChangePasswordForm (PW-16, PW-17, PW-20, PW-22)', () => {
     await user.click(screen.getByRole('button', { name: 'Alterar senha' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert').textContent).toBe('Esta conta está em processo de exclusão.');
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Esta conta está em processo de exclusão.',
+      );
     });
     expect(pushMock).not.toHaveBeenCalled();
   });
