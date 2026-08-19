@@ -297,12 +297,12 @@ T21
 
 **Done when**:
 
-- [ ] GET session e verification 200 pass-through User; sem CSRF
-- [ ] GET miss → 403
-- [ ] PATCH name 200; extras/email → 400 zero fetch
-- [ ] PATCH verification → 403
-- [ ] Bearer ausente
-- [ ] Gate: `make test-frontend` passa
+- [x] GET session e verification 200 pass-through User; sem CSRF
+- [x] GET miss → 403
+- [x] PATCH name 200; extras/email → 400 zero fetch
+- [x] PATCH verification → 403
+- [x] Bearer ausente
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: quick  
