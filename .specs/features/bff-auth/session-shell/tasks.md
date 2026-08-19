@@ -408,10 +408,10 @@ T21
 
 **Done when**:
 
-- [ ] 200 → `/login`; 401 campo senha; permanece autenticado no MSW 401
-- [ ] 429 com Retry-After ≠ copy sem header
-- [ ] Headers L-046
-- [ ] Gate: `make test-frontend` passa
+- [x] 200 → `/login`; 401 campo senha; permanece autenticado no MSW 401
+- [x] 429 com Retry-After ≠ copy sem header
+- [x] Headers L-046
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
