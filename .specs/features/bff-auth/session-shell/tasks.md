@@ -543,9 +543,9 @@ T21
 
 **Done when**:
 
-- [ ] Página não duplica h1/nav do shell de forma quebrada; form change permanece
-- [ ] Testes: session vê nav Conta/Sair; guest/verification redirects (layout)
-- [ ] Gate: `make test-frontend` passa
+- [x] Página não duplica h1/nav do shell de forma quebrada; form change permanece
+- [x] Testes: session vê nav Conta/Sair; guest/verification redirects (layout)
+- [x] Gate: `make test-frontend` passa
 
 **Tests**: unit  
 **Gate**: full  
