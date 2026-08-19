@@ -136,6 +136,25 @@ describe('ForgotPasswordForm (PW-04, PW-05, PW-20)', () => {
     });
   });
 
+  it('shows generic rate limit message when Retry-After is absent (PW-20)', async () => {
+    server.use(
+      http.post('/api/bff/auth/password/reset-request', () =>
+        HttpResponse.json({ code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' }, { status: 429 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<ForgotPasswordForm />);
+    await user.type(screen.getByLabelText('E-mail'), 'user@example.com');
+    await user.click(screen.getByRole('button', { name: 'Enviar instruções' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Muitas tentativas. Aguarde antes de tentar novamente.',
+      );
+    });
+  });
+
   it('renders a link back to login (PW-04)', () => {
     render(<ForgotPasswordForm />);
 

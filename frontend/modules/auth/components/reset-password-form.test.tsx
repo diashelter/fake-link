@@ -222,6 +222,25 @@ describe('ResetPasswordForm (PW-09–11, PW-20, PW-22)', () => {
     });
   });
 
+  it('shows generic rate limit message when Retry-After is absent (PW-20)', async () => {
+    server.use(
+      http.post('/api/bff/auth/password/reset', () =>
+        HttpResponse.json({ code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' }, { status: 429 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<ResetPasswordForm />);
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: 'Redefinir senha' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Muitas tentativas. Aguarde antes de tentar novamente.',
+      );
+    });
+  });
+
   it('renders a link back to login (PW-09)', () => {
     render(<ResetPasswordForm />);
 

@@ -231,4 +231,23 @@ describe('ChangePasswordForm (PW-16, PW-17, PW-20, PW-22)', () => {
       );
     });
   });
+
+  it('shows generic rate limit message when Retry-After is absent (PW-20)', async () => {
+    server.use(
+      http.post('/api/bff/auth/password/change', () =>
+        HttpResponse.json({ code: 'RATE_LIMIT_EXCEEDED', message: 'Too many.' }, { status: 429 }),
+      ),
+    );
+
+    const user = setupUser();
+    render(<ChangePasswordForm />);
+    await fillValidForm(user);
+    await user.click(screen.getByRole('button', { name: 'Alterar senha' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Muitas tentativas. Aguarde antes de tentar novamente.',
+      );
+    });
+  });
 });
