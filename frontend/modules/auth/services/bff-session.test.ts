@@ -96,6 +96,22 @@ describe('createSession (SC-01, SC-02, SC-04)', () => {
     );
   });
 
+  it('uses config absoluteTtlSeconds for Redis TTL (not the hardcoded constant)', async () => {
+    const customConfig = testConfig({
+      absoluteTtlSeconds: { session: 999, verification: 86400 },
+    });
+    const customStore = new FakeSessionStore();
+
+    const result = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config: customConfig, store: customStore, now: () => fixedNow },
+    );
+
+    const idBytes = parseSessionId(result.sessionId)!;
+    const key = buildRedisSessionKey(idBytes, customConfig.hmacKey);
+    expect(customStore.getExSeconds(key)).toBe(999);
+  });
+
   it('rejects empty bearer before SET', async () => {
     const setSpy = vi.spyOn(store, 'set');
 
