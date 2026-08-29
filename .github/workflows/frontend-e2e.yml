@@ -1,0 +1,32 @@
+name: Frontend E2E
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  frontend-e2e:
+    name: Frontend E2E auth security gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment file
+        run: cp .env.example .env
+
+      - name: Trust local CA
+        run: make trust-ca
+
+      - name: Run E2E auth suite
+        run: make test-e2e-auth
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: frontend/e2e/.artifacts/

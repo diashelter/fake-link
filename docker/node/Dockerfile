@@ -30,6 +30,15 @@ FROM base AS deps
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
+FROM deps AS e2e
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+    NODE_ENV=development
+
+RUN pnpm exec playwright install --with-deps chromium
+
+CMD ["pnpm", "dev"]
+
 FROM deps AS build
 
 COPY frontend/ .

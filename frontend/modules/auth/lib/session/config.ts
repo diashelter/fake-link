@@ -1,3 +1,6 @@
+import { ABSOLUTE_TTL_SECONDS, IDLE_TTL_SECONDS } from './ttl';
+import type { SessionKind } from './types';
+
 export interface BffSessionConfig {
   aesKey: Buffer;
   hmacKey: Buffer;
@@ -5,6 +8,8 @@ export interface BffSessionConfig {
   cookieName: string;
   redisUrl: string;
   probeEnabled: boolean;
+  absoluteTtlSeconds: Record<SessionKind, number>;
+  idleTtlSeconds: Record<SessionKind, number>;
 }
 
 function requireEnv(name: string): string {
@@ -21,6 +26,20 @@ function decodeBase64Key(name: string, value: string): Buffer {
     throw new Error(`Malformed ${name}: decoded key is empty`);
   }
   return key;
+}
+
+function parseTtlEnv(name: string): number | undefined {
+  const raw = process.env[name];
+  if (raw === undefined || raw === '') {
+    return undefined;
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n <= 0) {
+    throw new Error(
+      `Invalid environment variable ${name}: expected a positive integer, got ${JSON.stringify(raw)}`,
+    );
+  }
+  return n;
 }
 
 /**
@@ -50,6 +69,18 @@ export function loadBffSessionConfig(): BffSessionConfig {
   const cookieName = process.env.BFF_SESSION_COOKIE_NAME || '__Host-fl_session';
   const probeEnabled = process.env.BFF_SESSION_PROBE_ENABLED === 'true';
 
+  const absoluteTtlSeconds: Record<SessionKind, number> = {
+    session: parseTtlEnv('BFF_SESSION_ABSOLUTE_TTL_SESSION') ?? ABSOLUTE_TTL_SECONDS.session,
+    verification:
+      parseTtlEnv('BFF_SESSION_ABSOLUTE_TTL_VERIFICATION') ?? ABSOLUTE_TTL_SECONDS.verification,
+  };
+
+  const idleTtlSeconds: Record<SessionKind, number> = {
+    session: parseTtlEnv('BFF_SESSION_IDLE_TTL_SESSION') ?? IDLE_TTL_SECONDS.session,
+    verification:
+      parseTtlEnv('BFF_SESSION_IDLE_TTL_VERIFICATION') ?? IDLE_TTL_SECONDS.verification,
+  };
+
   return {
     aesKey,
     hmacKey,
@@ -57,5 +88,7 @@ export function loadBffSessionConfig(): BffSessionConfig {
     cookieName,
     redisUrl: `redis://${redisHost}:${redisPort}`,
     probeEnabled,
+    absoluteTtlSeconds,
+    idleTtlSeconds,
   };
 }

@@ -19,6 +19,8 @@ function testConfig(): BffSessionConfig {
     cookieName: COOKIE_NAME,
     redisUrl: 'redis://redis-ephemeral:6379',
     probeEnabled: true,
+    absoluteTtlSeconds: { session: 604_800, verification: 86_400 },
+    idleTtlSeconds: { session: 86_400, verification: 3_600 },
   };
 }
 
