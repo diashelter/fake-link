@@ -12,6 +12,8 @@ export const IDLE_TTL_SECONDS: Record<SessionKind, number> = {
 
 export const TOUCH_THROTTLE_SECONDS = 900;
 
+type TtlTable = Record<SessionKind, number>;
+
 function createdAtMs(record: SessionRecord): number {
   return Date.parse(record.createdAt);
 }
@@ -20,18 +22,30 @@ function lastActivityAtMs(record: SessionRecord): number {
   return Date.parse(record.lastActivityAt);
 }
 
-export function isAbsoluteExpired(record: SessionRecord, now: Date): boolean {
-  const limitMs = ABSOLUTE_TTL_SECONDS[record.kind] * 1000;
+export function isAbsoluteExpired(
+  record: SessionRecord,
+  now: Date,
+  absolute: TtlTable = ABSOLUTE_TTL_SECONDS,
+): boolean {
+  const limitMs = absolute[record.kind] * 1000;
   return now.getTime() > createdAtMs(record) + limitMs;
 }
 
-export function isIdleExpired(record: SessionRecord, now: Date): boolean {
-  const limitMs = IDLE_TTL_SECONDS[record.kind] * 1000;
+export function isIdleExpired(
+  record: SessionRecord,
+  now: Date,
+  idle: TtlTable = IDLE_TTL_SECONDS,
+): boolean {
+  const limitMs = idle[record.kind] * 1000;
   return now.getTime() > lastActivityAtMs(record) + limitMs;
 }
 
-export function remainingAbsoluteSeconds(record: SessionRecord, now: Date): number {
-  const expiresAt = createdAtMs(record) + ABSOLUTE_TTL_SECONDS[record.kind] * 1000;
+export function remainingAbsoluteSeconds(
+  record: SessionRecord,
+  now: Date,
+  absolute: TtlTable = ABSOLUTE_TTL_SECONDS,
+): number {
+  const expiresAt = createdAtMs(record) + absolute[record.kind] * 1000;
   const remainingMs = expiresAt - now.getTime();
   if (remainingMs <= 0) {
     return 0;

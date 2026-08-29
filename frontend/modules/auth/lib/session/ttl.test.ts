@@ -87,4 +87,30 @@ describe('session TTL helpers (SC-04, SC-08, SC-09, SC-10)', () => {
     vi.setSystemTime(new Date(base.getTime() + 3_600 * 1000 + 1));
     expect(isIdleExpired(verification, new Date())).toBe(true);
   });
+
+  it('custom absolute table expires sooner than the default', () => {
+    const shortAbsolute = { session: 20, verification: 20 };
+    const r = record({ kind: 'session' });
+    const base = new Date('2026-08-11T12:00:00.000Z');
+
+    // Not yet expired with default
+    expect(isAbsoluteExpired(r, new Date(base.getTime() + 21 * 1000))).toBe(false);
+    // Already expired with short table
+    expect(isAbsoluteExpired(r, new Date(base.getTime() + 21 * 1000), shortAbsolute)).toBe(true);
+    // remainingAbsoluteSeconds reflects the custom table
+    expect(remainingAbsoluteSeconds(r, base, shortAbsolute)).toBe(20);
+    // Already 0 with short table after limit
+    expect(remainingAbsoluteSeconds(r, new Date(base.getTime() + 21 * 1000), shortAbsolute)).toBe(0);
+  });
+
+  it('custom idle table expires sooner than the default', () => {
+    const shortIdle = { session: 8, verification: 8 };
+    const r = record({ kind: 'session' });
+    const base = new Date('2026-08-11T12:00:00.000Z');
+
+    // Not yet expired with default
+    expect(isIdleExpired(r, new Date(base.getTime() + 9 * 1000))).toBe(false);
+    // Already expired with short table
+    expect(isIdleExpired(r, new Date(base.getTime() + 9 * 1000), shortIdle)).toBe(true);
+  });
 });
