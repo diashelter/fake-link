@@ -159,6 +159,16 @@ test('login form error is visible and associated to field at 360px', async ({ pa
   // Error must be visible
   expect(await errorLocator.isVisible()).toBe(true);
 
+  // Error must be programmatically associated to the field (AC E2E-16)
+  // Check via aria-describedby on the invalid input, or aria-errormessage
+  const associatedInput = page
+    .locator('input[aria-describedby], input[aria-errormessage], input[aria-invalid="true"]')
+    .first();
+  const describedBy =
+    (await associatedInput.getAttribute('aria-describedby')) ??
+    (await associatedInput.getAttribute('aria-errormessage'));
+  expect(describedBy, 'input must have aria-describedby or aria-errormessage referencing the error').toBeTruthy();
+
   // Restore viewport
   await page.setViewportSize({ width: 1280, height: 720 });
 });
