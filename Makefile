@@ -1,10 +1,11 @@
 COMPOSE := docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.dev.yml
 COMPOSE_TEST := COMPOSE_PROJECT_NAME=fake_link_test docker compose --env-file docker/versions.env -f docker-compose.yml --profile test
+COMPOSE_E2E := COMPOSE_PROJECT_NAME=fake_link_e2e docker compose --env-file docker/versions.env -f docker-compose.yml -f docker-compose.e2e.yml --profile e2e
 REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-openapi lint-backend lint-frontend analyse-backend md-backend format-backend
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-openapi lint-backend lint-frontend analyse-backend md-backend format-backend test-e2e-auth
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -110,6 +111,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/docs-profile.sh
 	bash tests/compose/benchmark-profile.sh
 	bash tests/compose/observability-profile.sh
+	bash tests/compose/e2e-profile.sh
 	bash tests/compose/prod-config.sh
 	bash tests/compose/backend-quality-gates.sh
 	@test -f .env || cp .env.example .env
@@ -123,6 +125,14 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	bash tests/compose/unhealthy-report.sh
 	$(MAKE) smoke
 	$(MAKE) smoke-docs
+
+test-e2e-auth: ## Run the Playwright Auth security gate (profile e2e)
+	$(COMPOSE_E2E) build frontend
+	$(COMPOSE_E2E) up -d --wait
+	$(COMPOSE_E2E) exec -T backend php artisan migrate:fresh --force --env=testing
+	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e ; status=$$? ; \
+	  $(COMPOSE_E2E) cp frontend:/app/e2e/.artifacts ./frontend/e2e/.artifacts 2>/dev/null || true ; \
+	  $(COMPOSE_E2E) down -v ; exit $$status
 
 lint-openapi: ## Lint docs/openapi.yaml with Spectral (Docker openapi-tooling)
 	bash scripts/lint-openapi.sh
