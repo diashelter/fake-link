@@ -6,15 +6,15 @@ Fake Link é um encurtador de URLs com criação e gestão de `Short Links`, red
 
 A **Fase 1 Auth Backend API** (`backend/modules/Auth/`) está entregue nas fatias 1–7 (register → verify → login → password → session/profile), com OpenAPI lint (Spectral), contract tests e fechamento documental em andamento na fatia 8 (`auth/module-closure`). Declaração oficial de módulo concluído depende do Verifier dessa fatia.
 
-No **frontend Auth + BFF** (`frontend/modules/auth/`), três fatias de infraestrutura estão implementadas e verificadas:
+No **frontend Auth + BFF** (`frontend/modules/auth/`), todas as 9 fatias estão em Execute ou verificadas:
 
 - **foundation** — módulos `auth`/`shared`, stack de forms (RHF+Zod), TanStack Query, primitivos UI, gates de qualidade.
 - **session-core** — sessão opaca (cookie `__Host-fl_session`), Bearer cifrado AES-256-GCM no Redis, TTL absoluto/idle, rotação e destroy.
 - **csrf-proxy** — validação de `Origin`, CSRF double-submit, allowlist/proxy upstream, `returnUrl` seguro.
+- **login**, **register**, **email-verification**, **password**, **session-shell** — Route Handlers BFF, UIs e guards verificados.
+- **e2e-security-gate** — suíte Playwright (`make test-e2e-auth`): Bearer ausente no browser, CSRF, Redis flush, TTL e axe WCAG 2.2 AA; Execute concluído, aguarda Verifier.
 
-**Login** e **cadastro** (`bff-auth/login`, `bff-auth/register`) entregues — Route Handlers BFF, UI `/login` e `/register`, Terms e sessão `verification` verificados.
-
-Próximo marco: **verificação de e-mail** (`bff-auth/email-verification`). Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
+Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
 
 Em caso de divergência, [decisions.md](docs/decisions.md) e `.specs/STATE.md` (Decisions AD-NNN) registram a política confirmada; [product.md](docs/product.md) define o comportamento esperado.
 
@@ -107,6 +107,8 @@ O script gera os certificados em `docker/nginx/certs/` e imprime o comando de im
 
 CI backend: workflow [`.github/workflows/backend-quality.yml`](.github/workflows/backend-quality.yml) (PR e push em `main`) executa os mesmos targets via Docker Compose — sem PHP/Composer no host do runner.
 
+CI frontend E2E: workflow [`.github/workflows/frontend-e2e.yml`](.github/workflows/frontend-e2e.yml) (PR e push em `main`) executa `make test-e2e-auth` e publica artefatos Playwright em falha.
+
 ### Git hooks (host)
 
 Para ativar Husky + lint-staged (pre-commit só em arquivos staged sob `frontend/`):
@@ -118,11 +120,12 @@ CI=true pnpm --dir frontend install
 
 Rode o primeiro comando na **raiz do monorepo**. O segundo instala as ferramentas de lint/format usadas pelo hook no host. Os gates Docker (`make lint`, `make lint-frontend`, `make test-frontend`, `make test-frontend-coverage`) continuam obrigatórios independentemente dos hooks.
 
-Checklist BFF Auth (estado da infraestrutura — fatias foundation, session-core, csrf-proxy):
+Checklist BFF Auth (estado atual — fatias 1–9 em Execute ou verificadas):
 
-- Sem Route Handlers Auth de **produto** (`/api/bff/auth/login`, register, etc.) — apenas probes em dev/test
+- Todos os Route Handlers Auth de produto implementados (`/api/bff/auth/login`, register, email/verify, email/resend, password/*, logout, logout-all, me)
 - Sem Radix UI (adiado além da fundação)
-- Bearer token nunca exposto ao browser (facade server-only + testes Vitest)
+- Bearer token nunca exposto ao browser (facade server-only + testes Vitest + suíte Playwright `make test-e2e-auth`)
+- Gate E2E Playwright entregue: Bearer ausente, CSRF, Redis flush, TTL, axe WCAG 2.2 AA (fatia `e2e-security-gate`)
 
 Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
 

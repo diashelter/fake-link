@@ -56,6 +56,7 @@ Os testes de arquitetura devem falhar quando:
 ### 3.3 E2E, compatibilidade e visual
 
 - Playwright cobre login, recuperação, criação e gestão de links, redirect, conflito de edição e dashboard de analytics.
+- **`make test-e2e-auth`** é o gate de saída da Fase 1 (Auth + BFF): executa a suíte Playwright do perfil `e2e` (`docker-compose.e2e.yml`) cobrindo Bearer ausente no browser/HTML/storage, CSRF, Origin, cookie, returnUrl, flush Redis, TTL absoluto/idle, guards de sessão e axe WCAG 2.2 AA nos fluxos críticos. O workflow `.github/workflows/frontend-e2e.yml` executa esse target em cada PR e push em `main`.
 - Snapshots visuais Playwright são restritos a estados críticos e estáveis, em viewport de 360 px e em desktop. Dados, relógio, fontes, animações e rede devem estar estabilizados.
 - Antes de release, BrowserStack executa as versões atual e anterior de Chrome, Edge, Firefox e Safari em desktop e iOS nas combinações aplicáveis.
 - Estados dinâmicos, animações e dashboards com dados não determinísticos não entram em snapshots visuais.

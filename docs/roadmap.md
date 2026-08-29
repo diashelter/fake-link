@@ -41,7 +41,7 @@
 
 ## Fase 1: Auth + BFF
 
-**Progresso (2026-08-11):** API Laravel Auth entregue (fatias 1–7). No frontend, a infraestrutura BFF (fundação, session-core, csrf-proxy) e as fatias **login** e **cadastro** estão implementadas e verificadas. Faltam fatias 6–9 (email-verification → e2e-security-gate) e gate E2E Playwright. Índice: `.specs/features/bff-auth/README.md`.
+**Progresso (2026-08-29):** API Laravel Auth entregue (fatias 1–7). No frontend, todas as 9 fatias BFF Auth estão em Execute ou verificadas (foundation → e2e-security-gate). Gate E2E Playwright (`make test-e2e-auth`) entregue na fatia 9; aguarda Verifier. Índice: `.specs/features/bff-auth/README.md`.
 
 ### Entregáveis
 

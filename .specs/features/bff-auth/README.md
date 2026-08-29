@@ -6,9 +6,9 @@
 
 **Fase alvo:** Fase 1 (Auth + BFF) — complemento da API Auth.
 
-**Progresso (2026-08-19):** 8 de 9 fatias verificadas (foundation → session-shell). Pendente: seed `e2e-security-gate`.
+**Progresso (2026-08-29):** 9 de 9 fatias com Execute em andamento ou concluído (foundation → e2e-security-gate). Fatia 9 aguarda Verifier.
 
-**Maturidade:** fatias 1–8 concluíram Specify → Design → Tasks → Execute → Validate. Fatia 9 permanece **SPEC-semente**.
+**Maturidade:** fatias 1–8 concluíram Specify → Design → Tasks → Execute → Validate. Fatia 9 concluiu Specify → Design → Tasks → Execute; aguarda Validate.
 
 ---
 
@@ -35,7 +35,7 @@
 | 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | register | BFF verify/resend + UI |
 | 7 | Senha | [password](./password/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Forgot / reset / change |
 | 8 | Sessão e shell | [session-shell](./session-shell/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Logout, me, perfil, guards |
-| 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Seed | 4–8 | Playwright + ausência de Bearer |
+| 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ⏳ | 4–8 | Playwright + ausência de Bearer |
 
 ```mermaid
 flowchart LR
@@ -151,7 +151,7 @@ Allowlist central: `modules/auth/bff/allowlist.ts` (11 entradas produto).
 
 | Item | Fatia alvo | IDs |
 | --- | --- | --- |
-| Playwright E2E (Bearer ausente, CSRF, Redis flush) | e2e-security-gate | BFFUI-80…83 |
+| Validate Playwright E2E (Verifier pendente) | e2e-security-gate | BFFUI-80…83 |
 
 ---
 
