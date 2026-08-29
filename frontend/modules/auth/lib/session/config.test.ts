@@ -10,6 +10,10 @@ const ENV_KEYS = [
   'BFF_SESSION_PROBE_ENABLED',
   'REDIS_HOST',
   'REDIS_PORT',
+  'BFF_SESSION_ABSOLUTE_TTL_SESSION',
+  'BFF_SESSION_IDLE_TTL_SESSION',
+  'BFF_SESSION_ABSOLUTE_TTL_VERIFICATION',
+  'BFF_SESSION_IDLE_TTL_VERIFICATION',
 ] as const;
 
 const VALID_AES_KEY = Buffer.alloc(32, 7).toString('base64');
@@ -116,5 +120,77 @@ describe('loadBffSessionConfig (SC-14)', () => {
     setValidEnv({ BFF_SESSION_AES_KEY: 'not-valid-base64!!!' });
 
     expect(() => loadBffSessionConfig()).toThrow(/BFF_SESSION_AES_KEY/);
+  });
+
+  // TTL env-configurable tests
+  it('returns default TTLs when no TTL env vars are set', () => {
+    setValidEnv();
+
+    const config = loadBffSessionConfig();
+
+    expect(config.absoluteTtlSeconds.session).toBe(604_800);
+    expect(config.absoluteTtlSeconds.verification).toBe(86_400);
+    expect(config.idleTtlSeconds.session).toBe(86_400);
+    expect(config.idleTtlSeconds.verification).toBe(3_600);
+  });
+
+  it('overrides absoluteTtlSeconds.session from BFF_SESSION_ABSOLUTE_TTL_SESSION', () => {
+    setValidEnv({ BFF_SESSION_ABSOLUTE_TTL_SESSION: '20' });
+
+    const config = loadBffSessionConfig();
+
+    expect(config.absoluteTtlSeconds.session).toBe(20);
+    expect(config.absoluteTtlSeconds.verification).toBe(86_400); // unchanged
+  });
+
+  it('overrides idleTtlSeconds.session from BFF_SESSION_IDLE_TTL_SESSION', () => {
+    setValidEnv({ BFF_SESSION_IDLE_TTL_SESSION: '8' });
+
+    const config = loadBffSessionConfig();
+
+    expect(config.idleTtlSeconds.session).toBe(8);
+    expect(config.idleTtlSeconds.verification).toBe(3_600); // unchanged
+  });
+
+  it('overrides absoluteTtlSeconds.verification from BFF_SESSION_ABSOLUTE_TTL_VERIFICATION', () => {
+    setValidEnv({ BFF_SESSION_ABSOLUTE_TTL_VERIFICATION: '20' });
+
+    const config = loadBffSessionConfig();
+
+    expect(config.absoluteTtlSeconds.verification).toBe(20);
+    expect(config.absoluteTtlSeconds.session).toBe(604_800); // unchanged
+  });
+
+  it('overrides idleTtlSeconds.verification from BFF_SESSION_IDLE_TTL_VERIFICATION', () => {
+    setValidEnv({ BFF_SESSION_IDLE_TTL_VERIFICATION: '8' });
+
+    const config = loadBffSessionConfig();
+
+    expect(config.idleTtlSeconds.verification).toBe(8);
+    expect(config.idleTtlSeconds.session).toBe(86_400); // unchanged
+  });
+
+  it('throws when BFF_SESSION_ABSOLUTE_TTL_SESSION is non-numeric', () => {
+    setValidEnv({ BFF_SESSION_ABSOLUTE_TTL_SESSION: 'abc' });
+
+    expect(() => loadBffSessionConfig()).toThrow(/BFF_SESSION_ABSOLUTE_TTL_SESSION/);
+  });
+
+  it('throws when BFF_SESSION_IDLE_TTL_SESSION is zero', () => {
+    setValidEnv({ BFF_SESSION_IDLE_TTL_SESSION: '0' });
+
+    expect(() => loadBffSessionConfig()).toThrow(/BFF_SESSION_IDLE_TTL_SESSION/);
+  });
+
+  it('throws when BFF_SESSION_ABSOLUTE_TTL_VERIFICATION is negative', () => {
+    setValidEnv({ BFF_SESSION_ABSOLUTE_TTL_VERIFICATION: '-1' });
+
+    expect(() => loadBffSessionConfig()).toThrow(/BFF_SESSION_ABSOLUTE_TTL_VERIFICATION/);
+  });
+
+  it('throws when BFF_SESSION_IDLE_TTL_VERIFICATION is non-integer', () => {
+    setValidEnv({ BFF_SESSION_IDLE_TTL_VERIFICATION: '3.5' });
+
+    expect(() => loadBffSessionConfig()).toThrow(/BFF_SESSION_IDLE_TTL_VERIFICATION/);
   });
 });
