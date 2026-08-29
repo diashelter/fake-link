@@ -21,15 +21,16 @@
 | AD-015 | 2026-07-30 | Estilo frontend greenfield: **Tailwind CSS v4** (CSS-first, `@tailwindcss/postcss`); tema claro único; Radix adiado além da fundação BFF Auth |
 | AD-016 | 2026-08-11 | OpenAPI: lint via **Spectral** (`@stoplight/spectral-cli`) no monorepo (`make lint-openapi`); contract tests Pest em `modules/{Module}/Tests/Contract/`; containers backend montam `./docs:/var/www/docs:ro` (`OPENAPI_SPEC_PATH`) |
 | AD-017 | 2026-08-11 | Route Handlers BFF Auth usam prefixo **`/api/bff/...`** no App Router Next.js; Laravel permanece em `/api/v1/...` via nginx |
+| AD-018 | 2026-08-29 | Profile `e2e` + `docker-compose.e2e.yml` + `make test-e2e-auth` + `frontend-e2e.yml`; Playwright roda no container `frontend` (stage `e2e`); Mailpit para captura de e-mail; TTLs de sessão BFF configuráveis por env com defaults inalterados |
 
 ## Handoff
 
-- **Feature**: `bff-auth/session-shell` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verified PASS
-- **Phase / Task**: T1–T21 complete; Verifier PASS (57/57 ACs, 613 tests, 6/6 mutants killed)
-- **Completed**: Batch 1 T1–T6; Batch 2 T7–T12; Batch 3 T13–T16; Batch 4 T17–T21; fix `3edf532`; validation `15d4cfd`
+- **Feature**: `bff-auth/e2e-security-gate` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verified pendente
+- **Phase / Task**: T1–T24 complete (Phase 5: T22–T24); aguarda Verifier para fatia 9
+- **Completed**: Phase 1 T1–T6; Phase 2 T7–T12; Phase 3 T13–T16; Phase 4 T17–T21; Phase 5 T22–T24
 - **In-progress**: none
-- **Next step**: PR da branch `feature/bff-auth-session-shell` (não fazer push para `main`)
-- **Blockers**: none
-- **Branch**: `feature/bff-auth-session-shell`
-- **Prior feature**: `bff-auth/password` — Verified PASS
-- **Artifacts**: `.specs/features/bff-auth/session-shell/{spec,context,design,tasks,validation}.md`
+- **Next step**: Verifier da fatia `bff-auth/e2e-security-gate`; após PASS, PR da branch `feature/bff-auth-e2e-security-gate`
+- **Blockers**: SPEC_DEVIATION em T21 — `guards.spec.ts`: probe `GET /api/bff/auth/me` retorna 401 em vez de 200 para a sessão de verificação; comportamento correto do guard mas diverge do AC original. Tarefa de fix necessária antes do Verifier.
+- **Branch**: `feature/bff-auth-e2e-security-gate`
+- **Prior feature**: `bff-auth/session-shell` — Verified PASS
+- **Artifacts**: `.specs/features/bff-auth/e2e-security-gate/{spec,context,design,tasks}.md`
