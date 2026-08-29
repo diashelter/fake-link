@@ -32,6 +32,8 @@ function testConfig(overrides: Partial<BffSessionConfig> = {}): BffSessionConfig
     cookieName: '__Host-fl_session',
     redisUrl: 'redis://redis-ephemeral:6379',
     probeEnabled: false,
+    absoluteTtlSeconds: { session: ABSOLUTE_TTL_SECONDS.session, verification: ABSOLUTE_TTL_SECONDS.verification },
+    idleTtlSeconds: { session: IDLE_TTL_SECONDS.session, verification: IDLE_TTL_SECONDS.verification },
     ...overrides,
   };
 }
@@ -511,5 +513,49 @@ describe('getSessionFromRequest (LOG-11)', () => {
 
     expect(summary).toBeNull();
     vi.useRealTimers();
+  });
+});
+
+describe('getSession respects config TTL tables (SC-08, SC-09)', () => {
+  const base = new Date('2026-08-11T12:00:00.000Z');
+
+  it('treats a backdated record as idle-expired when config.idleTtlSeconds is short', async () => {
+    const shortConfig = testConfig({ idleTtlSeconds: { session: 8, verification: 8 } });
+    const store = new FakeSessionStore();
+
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config: shortConfig, store, now: () => base },
+    );
+
+    // Advance 9s — past the short idle TTL (8s) but well within the default (86400s)
+    const nowPlus9s = new Date(base.getTime() + 9_000);
+    const result = await getSession(`${shortConfig.cookieName}=${created.sessionId}`, {
+      config: shortConfig,
+      store,
+      now: () => nowPlus9s,
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
+  });
+
+  it('treats a backdated record as absolute-expired when config.absoluteTtlSeconds is short', async () => {
+    const shortConfig = testConfig({ absoluteTtlSeconds: { session: 20, verification: 20 } });
+    const store = new FakeSessionStore();
+
+    const created = await createSession(
+      { bearer: TEST_BEARER, kind: 'session', userId: TEST_USER_ID },
+      { config: shortConfig, store, now: () => base },
+    );
+
+    // Advance 21s — past the short absolute TTL (20s) but well within default (604800s)
+    const nowPlus21s = new Date(base.getTime() + 21_000);
+    const result = await getSession(`${shortConfig.cookieName}=${created.sessionId}`, {
+      config: shortConfig,
+      store,
+      now: () => nowPlus21s,
+    });
+
+    expect(result).toEqual({ context: null, clearCookie: true });
   });
 });

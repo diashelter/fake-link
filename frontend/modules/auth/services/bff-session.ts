@@ -18,7 +18,6 @@ import type {
   SessionRecord,
 } from '../lib/session/types';
 import {
-  ABSOLUTE_TTL_SECONDS,
   isAbsoluteExpired,
   isIdleExpired,
   remainingAbsoluteSeconds,
@@ -84,12 +83,12 @@ export async function createSession(
   };
 
   const redisKey = buildRedisSessionKey(sessionIdBytes, config.hmacKey);
-  const exSeconds = remainingAbsoluteSeconds(record, createdAt);
+  const exSeconds = remainingAbsoluteSeconds(record, createdAt, config.absoluteTtlSeconds);
   await store.set(redisKey, record, exSeconds);
 
   return {
     sessionId,
-    expiresAt: new Date(createdAt.getTime() + ABSOLUTE_TTL_SECONDS[input.kind] * 1000),
+    expiresAt: new Date(createdAt.getTime() + config.absoluteTtlSeconds[input.kind] * 1000),
   };
 }
 
@@ -101,7 +100,7 @@ export function applySessionCookie(
 ): NextResponse {
   const { config } = resolveDeps(deps);
   return setSessionCookie(response, config.cookieName, sessionId, {
-    maxAge: maxAge ?? ABSOLUTE_TTL_SECONDS.session,
+    maxAge: maxAge ?? config.absoluteTtlSeconds.session,
   });
 }
 
@@ -174,7 +173,10 @@ export async function getSession(
   }
 
   const current = now();
-  if (isAbsoluteExpired(record, current) || isIdleExpired(record, current)) {
+  if (
+    isAbsoluteExpired(record, current, config.absoluteTtlSeconds) ||
+    isIdleExpired(record, current, config.idleTtlSeconds)
+  ) {
     await deleteSessionRecord(cookieValue, config, store);
     return { context: null, clearCookie: true };
   }
@@ -223,7 +225,10 @@ export async function touchSession(
   }
 
   const current = now();
-  if (isAbsoluteExpired(record, current) || isIdleExpired(record, current)) {
+  if (
+    isAbsoluteExpired(record, current, config.absoluteTtlSeconds) ||
+    isIdleExpired(record, current, config.idleTtlSeconds)
+  ) {
     await store.del(redisKey);
     return;
   }
@@ -236,7 +241,7 @@ export async function touchSession(
     ...record,
     lastActivityAt: current.toISOString(),
   };
-  const exSeconds = remainingAbsoluteSeconds(updated, current);
+  const exSeconds = remainingAbsoluteSeconds(updated, current, config.absoluteTtlSeconds);
   if (exSeconds <= 0) {
     await store.del(redisKey);
     return;
