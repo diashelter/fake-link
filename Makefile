@@ -131,8 +131,35 @@ test-e2e-auth: ## Run the Playwright Auth security gate (profile e2e)
 	$(COMPOSE_E2E) up -d --wait --scale openapi-tooling=0
 	$(COMPOSE_E2E) exec -T backend php artisan migrate:fresh --force --env=testing
 	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e ; status=$$? ; \
+	  mkdir -p ./frontend/e2e/.artifacts ; \
 	  $(COMPOSE_E2E) cp frontend:/app/e2e/.artifacts ./frontend/e2e/.artifacts 2>/dev/null || true ; \
-	  $(COMPOSE_E2E) down -v ; exit $$status
+	  $(COMPOSE_E2E) logs frontend > ./frontend/e2e/.artifacts/frontend.log 2>&1 || true ; \
+	  $(COMPOSE_E2E) down -v ; \
+	  if [ -f ./frontend/e2e/.artifacts/sentinel.txt ] && [ -s ./frontend/e2e/.artifacts/sentinel.txt ]; then \
+	    SENTINEL=$$(cat ./frontend/e2e/.artifacts/sentinel.txt) ; \
+	    SCAN_FAIL=0 ; \
+	    if grep -rl "$$SENTINEL" ./frontend/e2e/.artifacts/ \
+	        --exclude="sentinel.txt" --exclude="session-cookie.txt" \
+	        2>/dev/null | grep -q .; then \
+	      echo "ERROR: Bearer sentinel found in E2E artefacts — see grep output:" >&2 ; \
+	      grep -rl "$$SENTINEL" ./frontend/e2e/.artifacts/ \
+	          --exclude="sentinel.txt" --exclude="session-cookie.txt" 2>/dev/null >&2 ; \
+	      SCAN_FAIL=1 ; \
+	    fi ; \
+	    if [ -f ./frontend/e2e/.artifacts/session-cookie.txt ] && [ -s ./frontend/e2e/.artifacts/session-cookie.txt ]; then \
+	      COOKIE=$$(cat ./frontend/e2e/.artifacts/session-cookie.txt) ; \
+	      if grep -rl "$$COOKIE" ./frontend/e2e/.artifacts/ \
+	          --exclude="sentinel.txt" --exclude="session-cookie.txt" \
+	          2>/dev/null | grep -q .; then \
+	        echo "ERROR: Session cookie value found in E2E artefacts — see grep output:" >&2 ; \
+	        grep -rl "$$COOKIE" ./frontend/e2e/.artifacts/ \
+	            --exclude="sentinel.txt" --exclude="session-cookie.txt" 2>/dev/null >&2 ; \
+	        SCAN_FAIL=1 ; \
+	      fi ; \
+	    fi ; \
+	    if [ "$$SCAN_FAIL" -eq 1 ]; then echo "FAIL: secret leak detected in artefacts" >&2 ; exit 1 ; fi ; \
+	  fi ; \
+	  exit $$status
 
 lint-openapi: ## Lint docs/openapi.yaml with Spectral (Docker openapi-tooling)
 	bash scripts/lint-openapi.sh

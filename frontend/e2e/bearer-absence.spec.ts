@@ -11,11 +11,22 @@
  *
  * ACs: E2E-05..08, BFFUI-80
  */
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { test, expect } from '@playwright/test';
 
 import { loginViaUi } from './helpers/account';
 import { captureBearerSentinel, assertAbsent } from './helpers/sentinel';
 import { collectClientState } from './helpers/leak-scan';
+
+// Directory where ephemeral scan artefacts are written (same as playwright outputDir parent)
+const ARTIFACTS_DIR = join(__dirname, '.artifacts');
+
+async function writeArtefact(filename: string, content: string): Promise<void> {
+  await mkdir(ARTIFACTS_DIR, { recursive: true });
+  await writeFile(join(ARTIFACTS_DIR, filename), content, 'utf-8');
+}
 
 const TEST_EMAIL = 'e2e-auth@fake-link.test';
 const TEST_PASSWORD = 'E2E-P4ssw0rd!';
@@ -32,6 +43,9 @@ test('sentinel absent from page HTML, RSC payloads, and JS bundles', async ({ pa
     password: TEST_PASSWORD,
   });
   expect(sentinel.length).toBeGreaterThan(10);
+
+  // Write sentinel to .artifacts/ so the Makefile scan step can read it
+  await writeArtefact('sentinel.txt', sentinel);
 
   // Collect JS bundle URL samples for later scanning
   const jsBundleTexts: string[] = [];
@@ -82,6 +96,15 @@ test('cookie surface contains only session cookie with valid format, no sentinel
 
   await loginViaUi(page, { email: TEST_EMAIL, password: TEST_PASSWORD });
   await page.waitForURL('/', { timeout: 10_000 });
+
+  // Write the current session cookie value to .artifacts/ for the scan step
+  const initialCookies = await page.context().cookies();
+  const initialSession = initialCookies.find(
+    (c) => c.domain === 'app.localhost' && c.name === SESSION_COOKIE,
+  );
+  if (initialSession) {
+    await writeArtefact('session-cookie.txt', initialSession.value);
+  }
 
   const checkCookies = async (atPath: string) => {
     await page.goto(atPath);
