@@ -6,7 +6,7 @@ export interface ClientState {
   cookies: string[];
   localStorage: string[];
   sessionStorage: string[];
-  indexedDbNames: string[];
+  indexedDbEntries: string[];
   html: string;
   rscPayload: string;
 }
@@ -16,28 +16,70 @@ export async function collectClientState(page: Page): Promise<ClientState> {
   const cookies = await page.context().cookies();
   const cookieStrings = cookies.map((c) => `${c.name}=${c.value}`);
 
-  const { localStorageItems, sessionStorageItems, indexedDbNames } = await page.evaluate(() => {
-    const ls: string[] = [];
-    for (let i = 0; i < window.localStorage.length; i++) {
-      const key = window.localStorage.key(i);
-      if (key !== null) {
-        ls.push(`${key}=${window.localStorage.getItem(key) ?? ''}`);
+  const { localStorageItems, sessionStorageItems, indexedDbEntries } = await page.evaluate(
+    async () => {
+      const ls: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key !== null) {
+          ls.push(`${key}=${window.localStorage.getItem(key) ?? ''}`);
+        }
       }
-    }
 
-    const ss: string[] = [];
-    for (let i = 0; i < window.sessionStorage.length; i++) {
-      const key = window.sessionStorage.key(i);
-      if (key !== null) {
-        ss.push(`${key}=${window.sessionStorage.getItem(key) ?? ''}`);
+      const ss: string[] = [];
+      for (let i = 0; i < window.sessionStorage.length; i++) {
+        const key = window.sessionStorage.key(i);
+        if (key !== null) {
+          ss.push(`${key}=${window.sessionStorage.getItem(key) ?? ''}`);
+        }
       }
-    }
 
-    // IndexedDB database names (async, best-effort)
-    const idbNames: string[] = [];
+      // IndexedDB — enumerate all databases and read all record values
+      const idbEntries: string[] = [];
+      if ('databases' in indexedDB) {
+        const dbs = await indexedDB.databases();
+        for (const dbInfo of dbs) {
+          if (!dbInfo.name) continue;
+          await new Promise<void>((resolve) => {
+            const req = indexedDB.open(dbInfo.name!);
+            req.onsuccess = () => {
+              const db = req.result;
+              const storeNames = Array.from(db.objectStoreNames);
+              if (storeNames.length === 0) {
+                db.close();
+                resolve();
+                return;
+              }
+              const tx = db.transaction(storeNames, 'readonly');
+              let pending = storeNames.length;
+              for (const storeName of storeNames) {
+                const store = tx.objectStore(storeName);
+                const all = store.getAll();
+                all.onsuccess = () => {
+                  idbEntries.push(
+                    ...all.result.map((v: unknown) => JSON.stringify(v)),
+                  );
+                  if (--pending === 0) {
+                    db.close();
+                    resolve();
+                  }
+                };
+                all.onerror = () => {
+                  if (--pending === 0) {
+                    db.close();
+                    resolve();
+                  }
+                };
+              }
+            };
+            req.onerror = () => resolve();
+          });
+        }
+      }
 
-    return { localStorageItems: ls, sessionStorageItems: ss, indexedDbNames: idbNames };
-  });
+      return { localStorageItems: ls, sessionStorageItems: ss, indexedDbEntries: idbEntries };
+    },
+  );
 
   const html = await page.content();
 
@@ -59,7 +101,7 @@ export async function collectClientState(page: Page): Promise<ClientState> {
     cookies: cookieStrings,
     localStorage: localStorageItems,
     sessionStorage: sessionStorageItems,
-    indexedDbNames,
+    indexedDbEntries,
     html,
     rscPayload,
   };

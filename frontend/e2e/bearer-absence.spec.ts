@@ -78,11 +78,13 @@ test('sentinel absent from page HTML, RSC payloads, and JS bundles', async ({ pa
   assertAbsent(sentinel, [stateHome.html, stateHome.rscPayload]);
   assertAbsent(sentinel, [stateSettings.html, stateSettings.rscPayload]);
 
-  // Assert sentinel absent from localStorage and sessionStorage at both pages
+  // Assert sentinel absent from localStorage, sessionStorage, and IndexedDB at both pages
   assertAbsent(sentinel, stateHome.localStorage);
   assertAbsent(sentinel, stateHome.sessionStorage);
+  assertAbsent(sentinel, stateHome.indexedDbEntries);
   assertAbsent(sentinel, stateSettings.localStorage);
   assertAbsent(sentinel, stateSettings.sessionStorage);
+  assertAbsent(sentinel, stateSettings.indexedDbEntries);
 
   // Assert sentinel absent from collected JS bundles
   assertAbsent(sentinel, jsBundleTexts);
