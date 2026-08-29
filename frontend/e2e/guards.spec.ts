@@ -24,7 +24,7 @@
  */
 import { test, expect, type BrowserContext } from '@playwright/test';
 
-import { loginViaUi, probeCreateSession } from './helpers/account';
+import { loginViaUi, probeCreateSession, registerViaUi } from './helpers/account';
 
 const TEST_EMAIL = 'e2e-auth@fake-link.test';
 const TEST_PASSWORD = 'E2E-P4ssw0rd!';
@@ -72,25 +72,22 @@ test('verification session accessing /settings redirects to /verify-email', asyn
 });
 
 // ---------------------------------------------------------------------------
-// T21-2: verification session → GET /api/bff/auth/me — BFF does not block it
+// T21-2: verification session → GET /api/bff/auth/me — returns 200 (AC E2E-21)
 // ---------------------------------------------------------------------------
-test('verification session GET /api/bff/auth/me is not blocked by BFF guard', async ({
+test('verification session GET /api/bff/auth/me returns 200', async ({
   page,
-  request,
 }) => {
-  const cookieValue = await probeCreateSession(request, {
-    kind: 'verification',
-    email: TEST_EMAIL,
-  });
-
-  await injectProbeSession(page.context(), cookieValue);
+  // Register a fresh account — this creates a verification session (kind='verification')
+  // backed by a real backend bearer, so the BFF can proxy /api/v1/me and get 200.
+  const uniqueEmail = `e2e-verif-me-${Date.now()}@fake-link.test`;
+  await registerViaUi(page, { email: uniqueEmail, password: TEST_PASSWORD });
+  await page.waitForLoadState('networkidle');
 
   // Use page.request (shares page context cookies) to hit the me endpoint
   const resp = await page.request.get('/api/bff/auth/me');
 
-  // The BFF found the session and proxied the request (not a BFF-level 403).
-  // The backend may return a non-200 status for the synthetic bearer (see SPEC_DEVIATION).
-  expect(resp.status()).not.toBe(403);
+  // AC E2E-21: WHEN verification session accesses GET /api/bff/auth/me THEN SHALL get 200
+  expect(resp.status()).toBe(200);
 });
 
 // ---------------------------------------------------------------------------
