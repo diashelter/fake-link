@@ -128,7 +128,7 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 
 test-e2e-auth: ## Run the Playwright Auth security gate (profile e2e)
 	$(COMPOSE_E2E) build frontend
-	$(COMPOSE_E2E) up -d --wait
+	$(COMPOSE_E2E) up -d --wait --scale openapi-tooling=0
 	$(COMPOSE_E2E) exec -T backend php artisan migrate:fresh --force --env=testing
 	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e ; status=$$? ; \
 	  $(COMPOSE_E2E) cp frontend:/app/e2e/.artifacts ./frontend/e2e/.artifacts 2>/dev/null || true ; \
