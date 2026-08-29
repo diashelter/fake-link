@@ -1,0 +1,38 @@
+# E2E override — wires mailpit, short TTLs, and Playwright stage (AD-008).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.e2e.yml --profile e2e …
+services:
+  backend:
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: no-reply@fake-link.test
+      QUEUE_CONNECTION: sync
+      AUTH_INVITE_ALLOWLIST_PATH: /var/www/config/invite-allowlist.e2e.json
+    depends_on:
+      mailpit:
+        condition: service_healthy
+
+  frontend:
+    build:
+      target: e2e
+    environment:
+      BFF_SESSION_PROBE_ENABLED: "true"
+      BFF_SESSION_ABSOLUTE_TTL_SESSION: "20"
+      BFF_SESSION_IDLE_TTL_SESSION: "8"
+      BFF_SESSION_ABSOLUTE_TTL_VERIFICATION: "20"
+      BFF_SESSION_IDLE_TTL_VERIFICATION: "8"
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      E2E_APP_ORIGIN: https://app.localhost
+      E2E_MAILPIT_URL: http://mailpit:8025
+      E2E_REDIS_URL: redis://redis-ephemeral:6379
+    depends_on:
+      mailpit:
+        condition: service_healthy
+
+  nginx:
+    networks:
+      default:
+        aliases:
+          - app.localhost
+          - go.localhost
