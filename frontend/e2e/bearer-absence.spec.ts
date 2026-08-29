@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
 
 import { loginViaUi } from './helpers/account';
 import { captureBearerSentinel, assertAbsent } from './helpers/sentinel';
-import { collectClientState } from './helpers/leak-scan';
+import { collectClientState, scanArtifacts } from './helpers/leak-scan';
 
 // Directory where ephemeral scan artefacts are written (same as playwright outputDir parent)
 const ARTIFACTS_DIR = join(__dirname, '.artifacts');
@@ -245,4 +245,29 @@ test('URL bar never contains sentinel or token/bearer query params', async ({ pa
       // Non-parseable URL — skip
     }
   }
+});
+
+// ---------------------------------------------------------------------------
+// T16-5: Artifact scan — sentinel absent from all files in .artifacts/
+// ---------------------------------------------------------------------------
+test('sentinel absent from all files written to .artifacts/', async ({ request }) => {
+  const sentinel = await captureBearerSentinel(request, {
+    email: TEST_EMAIL,
+    password: TEST_PASSWORD,
+  });
+
+  // Write sentinel.txt so the external Makefile scan step can locate it
+  await mkdir(ARTIFACTS_DIR, { recursive: true });
+  await writeFile(join(ARTIFACTS_DIR, 'sentinel.txt'), sentinel, 'utf-8');
+
+  // Scan all files in .artifacts/ — sentinel.txt itself is intentionally excluded
+  // by filtering: the sentinel file is the needle source, not a leak surface.
+  // We scan every other file for the sentinel value.
+  const allHits = await scanArtifacts(ARTIFACTS_DIR, [sentinel]);
+  const leakHits = allHits.filter((h) => !h.file.endsWith('sentinel.txt'));
+
+  expect(
+    leakHits,
+    `sentinel found in artifact files: ${leakHits.map((h) => `${h.file}:${h.line}`).join(', ')}`,
+  ).toHaveLength(0);
 });
