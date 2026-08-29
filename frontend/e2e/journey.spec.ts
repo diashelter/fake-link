@@ -216,7 +216,25 @@ test('password reset invalidates previous session and authenticates with new pas
   expect(newCookie).toBeDefined();
   expect(newCookie!.value).toMatch(COOKIE_PATTERN);
 
-  // Reset the password back to the original so subsequent suites work
-  // (Forgot-password for original password or just note the deviation)
-  // We leave NEW_PASSWORD in effect — journey spec is last to exercise password reset.
+  // ---- Step 7: reset password back to TEST_PASSWORD so subsequent specs work ----
+  await clearMailbox();
+  await page.goto('/forgot-password');
+  await page.locator('input[name="email"]').fill(TEST_EMAIL);
+  await page.locator('button[type="submit"]:has-text("Enviar instruções")').click();
+  await page.locator('[role="status"]').waitFor({ timeout: 10_000 });
+
+  const resetMsg2 = await waitForMessage(TEST_EMAIL, { timeoutMs: 10_000 });
+  const resetToken2 = extractLinkToken(resetMsg2);
+
+  await page.goto(`/reset-password?token=${encodeURIComponent(resetToken2)}`);
+  await page.locator('input[name="email"]').fill(TEST_EMAIL);
+  await page.locator('input[name="token"]').fill(resetToken2);
+  await page.locator('input[name="password"]').fill(TEST_PASSWORD);
+  await page.locator('input[name="password_confirmation"]').fill(TEST_PASSWORD);
+  await page.locator('button[type="submit"]:has-text("Redefinir senha")').click();
+  await page.waitForURL(/\/login/, { timeout: 10_000 });
+
+  // Confirm TEST_PASSWORD is back in effect
+  await loginViaUi(page, { email: TEST_EMAIL, password: TEST_PASSWORD });
+  await page.waitForURL('/', { timeout: 10_000 });
 });
