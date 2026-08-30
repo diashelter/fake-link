@@ -72,6 +72,8 @@
 
 ## Fase 2: Links + Redirect
 
+**Progresso (2026-08-29):** estrutura de specs da API backend criada — 13 fatias seed cobrindo os módulos Laravel `Links` e `Redirects`, ainda sem implementação. O pacote frontend (dashboard de links) será aberto depois. Índice: `.specs/features/links/README.md`.
+
 ### Entregáveis
 
 - Domínio de Links com ownership, listagem, detalhe, pesquisa, título, status e expiração em UTC.

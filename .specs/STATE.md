@@ -22,15 +22,28 @@
 | AD-016 | 2026-08-11 | OpenAPI: lint via **Spectral** (`@stoplight/spectral-cli`) no monorepo (`make lint-openapi`); contract tests Pest em `modules/{Module}/Tests/Contract/`; containers backend montam `./docs:/var/www/docs:ro` (`OPENAPI_SPEC_PATH`) |
 | AD-017 | 2026-08-11 | Route Handlers BFF Auth usam prefixo **`/api/bff/...`** no App Router Next.js; Laravel permanece em `/api/v1/...` via nginx |
 | AD-018 | 2026-08-29 | Profile `e2e` + `docker-compose.e2e.yml` + `make test-e2e-auth` + `frontend-e2e.yml`; Playwright roda no container `frontend` (stage `e2e`); Mailpit para captura de e-mail; TTLs de sessão BFF configuráveis por env com defaults inalterados |
+| AD-019 | 2026-08-30 | Parsing de URL não confiável usa **`league/uri`** (promovido a dependência direta em `backend/composer.json`, `^7.8`); `parse_url()` e regex sobre a autoridade são proibidos para entrada de usuário — vale para `Links`, `Redirects` e qualquer fatia futura que leia URL. Checagens que o parser reescreveria em silêncio (bytes não-ASCII, caracteres de controle, percent-encoding malformado) rodam **antes** dele |
 
 ## Handoff
 
-- **Feature**: `bff-auth/e2e-security-gate` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Verified pendente
-- **Phase / Task**: T1–T24 complete (Phase 5: T22–T24); aguarda Verifier para fatia 9
-- **Completed**: Phase 1 T1–T6; Phase 2 T7–T12; Phase 3 T13–T16; Phase 4 T17–T21; Phase 5 T22–T24
+- **Feature**: `links/foundation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ **PASS**
+- **Completed**: T1–T15 commitados em `main` (commits `f82f57c`…`922bbbb`); 554 testes, 0 falhas; cobertura Links 91.51%/91.38%, Redirects 90.91%/100%; 3/3 mutantes mortos
 - **In-progress**: none
-- **Next step**: Verifier da fatia `bff-auth/e2e-security-gate`; após PASS, PR da branch `feature/bff-auth-e2e-security-gate`
-- **Blockers**: SPEC_DEVIATION em T21 — `guards.spec.ts`: probe `GET /api/bff/auth/me` retorna 401 em vez de 200 para a sessão de verificação; comportamento correto do guard mas diverge do AC original. Tarefa de fix necessária antes do Verifier.
-- **Branch**: `feature/bff-auth-e2e-security-gate`
-- **Prior feature**: `bff-auth/session-shell` — Verified PASS
-- **Artifacts**: `.specs/features/bff-auth/e2e-security-gate/{spec,context,design,tasks}.md`
+- **Next step**: iniciar fatia 2 (`slug-policy`) — spec e context já fechados (SLG-01…18); ou fatia 3 (`destination-policy`) — spec/design/tasks fechados (LDST-01…24, T1–T12). Fatia 3 altera `DestinationUrl` e `LinksDomainException` criados pela fundação — executar depois de confirmar branch strategy
+- **Blockers**: none
+- **Branch**: `main`
+- **Prior feature**: `links/foundation` — Verified PASS 2026-08-30 (15 tasks, 3 workers + Verifier)
+- **Gap de baixo risco**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude, risco baixo
+
+### Fase 1: Auth + BFF — CONCLUÍDA ✅
+
+Todas as 9 fatias do pacote BFF Auth entregues e verificadas. Critérios de saída da Fase 1 atendidos:
+
+- Usuário convidado cadastra, verifica e-mail, autentica e encerra sessão(ões) pelo BFF ✅
+- Nenhum teste de browser, HTML, storage, log ou trace encontrou token Bearer ✅
+- CSRF, cookie, Origin, HMAC, returnUrl, flush Redis e expirações passam nas suítes ✅
+- Gate E2E Playwright (`make test-e2e-auth`) entregue e passando em CI ✅
+
+### Fase 2: Links + Redirect — INICIADA
+
+Estrutura de specs da API backend criada em `.specs/features/links/` (índice + 13 fatias seed, catálogo `LNK-01`…`LNK-124`). Fatia 1 (`foundation`) fechada em Specify/Design/Tasks (25 requisitos, 15 tasks); fatia 2 (`slug-policy`) fechada em Specify/Discuss (SLG-01…18); fatia 3 (`destination-policy`) fechada em Specify/Discuss/Design/Tasks (LDST-01…24, 12 tasks). Fatias 4–13 seguem em status **Seed**. Nenhuma linha de código dos módulos existe ainda. O pacote frontend correspondente (`bff-links/`) será aberto depois.
