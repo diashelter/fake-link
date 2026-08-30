@@ -39,4 +39,11 @@ describe('RedirectsServiceProvider', function () {
 
         expect($response->status())->toBe(404);
     });
+
+    it('placeholder GET /{slug} responds to HEAD with no body', function () {
+        $response = $this->call('HEAD', '/some-slug');
+
+        expect($response->status())->toBe(404)
+            ->and($response->getContent())->toBe('');
+    });
 });

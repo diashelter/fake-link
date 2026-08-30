@@ -77,7 +77,17 @@ Não existe baseline tolerado ou cobertura herdada abaixo das metas. Os gates va
 | Auth, Analytics e BFF | 80% | 80% |
 | Domínios frontend | 75% | 75% |
 
-PCOV mede cobertura de **linhas** e **métodos** no relatório HTML (`storage/coverage/modules/{Module}/index.html`). Não há métrica nativa de branches no PHP com PCOV; para módulos backend, **cobertura de métodos** substitui o gate de branches. O script `backend/scripts/check-auth-coverage-gate.php` (executado após `make test-backend-coverage`) falha se linhas ou métodos do módulo Auth ficarem abaixo de 80%.
+PCOV mede cobertura de **linhas** e **métodos** no relatório HTML (`storage/coverage/modules/{Module}/index.html`). Não há métrica nativa de branches no PHP com PCOV; para módulos backend, **cobertura de métodos** substitui o gate de branches.
+
+O script `backend/scripts/check-module-coverage-gate.php` (executado após `make test-backend-coverage` via `composer test:coverage`) valida cada módulo contra seu limiar próprio:
+
+| Módulo | Linhas mínimas | Métodos mínimos |
+| --- | ---: | ---: |
+| Auth | 80% | 80% |
+| Links | 90% | 85% |
+| Redirects | 90% | 85% |
+
+O script lê o relatório HTML PCOV de cada módulo em `storage/coverage/modules/{Module}/index.html`, extrai os percentuais da linha Total via `aria-valuenow` e falha com mensagem por módulo se qualquer limiar for violado. Relatório ausente para um módulo esperado é falha explícita — nunca passa silenciosamente. Para executar localmente: `composer test:coverage` (dentro do container via `make test-backend-coverage`).
 
 Cobertura numérica não substitui casos relevantes. Exclusões exigem justificativa técnica explícita e não podem remover regras de domínio, segurança ou tratamento de falhas do cálculo.
 

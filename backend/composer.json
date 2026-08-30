@@ -70,7 +70,7 @@
         ],
         "test:coverage": [
             "@php vendor/bin/pest --coverage",
-            "@php scripts/check-auth-coverage-gate.php"
+            "@php scripts/check-module-coverage-gate.php"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
