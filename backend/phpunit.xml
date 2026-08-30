@@ -8,6 +8,7 @@
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
             <directory>modules/Auth/Tests/Unit</directory>
+            <directory>modules/Links/Tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
@@ -25,6 +26,7 @@
         <include>
             <directory>app</directory>
             <directory>modules/Auth</directory>
+            <directory>modules/Links</directory>
         </include>
     </source>
     <coverage>
@@ -56,5 +58,7 @@
         <env name="AUTH_INVITE_ALLOWLIST_PATH" value="/var/www/html/config/invite-allowlist.testing.json"/>
         <env name="AUTH_RATE_LIMIT_HMAC_KEY" value="testing-auth-rate-limit-hmac-key"/>
         <env name="OPENAPI_SPEC_PATH" value="/var/www/docs/openapi.yaml"/>
+        <env name="LINKS_DESTINATION_KEYRING" value="{&quot;testing-key-1&quot;:&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=&quot;}"/>
+        <env name="LINKS_DESTINATION_ACTIVE_KEY_ID" value="testing-key-1"/>
     </php>
 </phpunit>
