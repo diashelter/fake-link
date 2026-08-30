@@ -18,6 +18,12 @@ declare(strict_types=1);
 | adds `use App\Models\User;` (or Model) inside App\Http\Controllers\*
 | is killed by that expectation.
 |
+| Discrimination (seam): a class inside Modules\Redirects that adds
+| `use Modules\Links\Domain\...` or `use Modules\Links\Infrastructure\...`
+| must fail the "Redirects does not reach into Links internals" rule.
+| A mutant that couples Redirects to Links domain or infrastructure is
+| killed by that expectation.
+|
 */
 
 $domainModules = [
@@ -50,6 +56,13 @@ foreach ($domainModules as $module) {
         ->expect("{$moduleRoot}\\Infrastructure\\Persistence\\Eloquent\\Models")
         ->toOnlyBeUsedIn($moduleRoot);
 }
+
+arch('Redirects does not reach into Links internals')
+    ->expect('Modules\Redirects')
+    ->not->toUse([
+        'Modules\Links\Infrastructure',
+        'Modules\Links\Domain',
+    ]);
 
 arch('shared does not depend on domain modules')
     ->expect('Modules\Shared')
