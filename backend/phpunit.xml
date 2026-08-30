@@ -14,6 +14,7 @@
             <directory>tests/Feature</directory>
             <directory>modules/Auth/Tests/Feature</directory>
             <directory>modules/Auth/Tests/Contract</directory>
+            <directory>modules/Links/Tests/Feature</directory>
         </testsuite>
         <testsuite name="Integration">
             <directory>modules/Auth/Tests/Integration</directory>
