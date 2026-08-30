@@ -19,6 +19,9 @@ uses(TestCase::class);
 $keyA = base64_encode(str_repeat("\x00", 32));
 $keyB = base64_encode(str_repeat("\x01", 32));
 
+/**
+ * @param  array<string, string>  $keys
+ */
 function makeCipher(array $keys, string $activeKeyId): Aes256GcmDestinationCipher
 {
     $keyring = DestinationKeyring::fromConfig([
@@ -182,7 +185,9 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
         $encrypted = $cipher->encrypt($url);
 
         expect($encrypted->envelope())->not->toContain($plaintext);
-        expect(base64_decode($encrypted->envelope()))->not->toContain($plaintext);
+        $decodedEnvelope = base64_decode($encrypted->envelope(), strict: true);
+        expect($decodedEnvelope)->not->toBeFalse();
+        expect($decodedEnvelope)->not->toContain($plaintext);
     });
 
     it('failed decryption does not log the url or envelope', function () use ($keyA) {

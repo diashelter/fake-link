@@ -8,7 +8,7 @@ final readonly class EncryptedDestination
 {
     /**
      * @param  string  $envelope  Base64-encoded ciphertext envelope.
-     * @param  string  $keyId     The key_id used to encrypt (stored separately from the envelope).
+     * @param  string  $keyId  The key_id used to encrypt (stored separately from the envelope).
      */
     private function __construct(
         private string $envelope,

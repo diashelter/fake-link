@@ -25,8 +25,8 @@ final class DestinationKeyring
      */
     public static function fromConfig(array $config): self
     {
-        $activeKeyId = $config['active_key_id'] ?? '';
-        $keyringJson = $config['keyring'] ?? '{}';
+        $activeKeyId = $config['active_key_id'];
+        $keyringJson = $config['keyring'];
 
         $decoded = json_decode($keyringJson, true);
 

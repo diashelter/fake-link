@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -37,7 +38,7 @@ return new class extends Migration
             $table->index('user_id', 'short_links_user_id_index');
         });
 
-        \Illuminate\Support\Facades\DB::statement(
+        DB::statement(
             "ALTER TABLE short_links ADD CONSTRAINT short_links_slug_source_check CHECK (slug_source IN ('automatic','custom'))"
         );
     }

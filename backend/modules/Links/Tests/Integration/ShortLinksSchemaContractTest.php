@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
-use Modules\Links\Infrastructure\Persistence\Eloquent\Factories\ShortLinkModelFactory;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\ShortLinkModel;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\SlugReservationModel;
 use Tests\TestCase;

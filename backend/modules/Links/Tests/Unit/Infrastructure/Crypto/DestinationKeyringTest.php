@@ -16,7 +16,7 @@ describe('DestinationKeyring', function () {
         'active_key_id' => 'key-1',
     ];
 
-    it('builds keyring from valid config read from the application config', function () use ($validConfig) {
+    it('builds keyring from valid config read from the application config', function () {
         $keyring = DestinationKeyring::fromConfig(
             config('links.destination'),
         );

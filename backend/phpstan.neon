@@ -8,6 +8,8 @@ parameters:
     paths:
         - app
         - modules/Auth
+        - modules/Links
+        - modules/Redirects
         - tests
     excludePaths:
         - bootstrap/cache/*
@@ -25,3 +27,9 @@ parameters:
         -
             message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
             path: modules/Auth/Tests/*
+        -
+            message: '#Access to an undefined property Pest\\PendingCalls\\TestCall::#'
+            path: modules/Links/Tests/*
+        -
+            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+            path: modules/Redirects/Tests/*
