@@ -17,6 +17,7 @@
         </testsuite>
         <testsuite name="Integration">
             <directory>modules/Auth/Tests/Integration</directory>
+            <directory>modules/Links/Tests/Integration</directory>
         </testsuite>
         <testsuite name="Architecture">
             <directory>tests/Architecture</directory>
