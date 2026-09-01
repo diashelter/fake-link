@@ -10,9 +10,66 @@ Implemente estas tasks com a skill `tlc-spec-driven`: **ative-a pelo nome e siga
 
 **Spec**: `.specs/features/links/slug-policy/spec.md`  
 **Design**: `.specs/features/links/slug-policy/design.md`  
-**Status**: Draft — aguardando aprovação
+**Status**: ✅ Concluído e verificado 2026-09-01 — Execute (T1–T13) + Verifier **PASS** (`validation.md`)
 
-> ⛔ **Bloqueio de pré-requisito**: nenhuma task abaixo pode começar antes de a fatia [foundation](../foundation/spec.md) estar implementada e verificada. Hoje `backend/modules/` contém apenas `Auth/`. A T1 começa conferindo esse pré-requisito.
+> ✅ **Pré-requisito atendido**: a fatia [foundation](../foundation/spec.md) está implementada e verificada (STATE handoff — `f82f57c`…`922bbbb`). Já existem em `main`: módulos `backend/modules/{Links,Redirects}`, migrations `slug_reservations` / `short_links` / `link_destination_versions`, suítes de `Links` em `backend/phpunit.xml` (Unit/Feature/Integration) e no bloco `<source>`, e o gate por módulo `backend/scripts/check-module-coverage-gate.php` já com `Links => [lines 90, methods 85]`. A T1 confirma esse estado antes de escrever código.
+
+### Reconciliação 2026-09-01 (o que mudou vs. o Draft original)
+
+O Draft foi escrito assumindo `backend/modules/` só com `Auth/`. O estado real de `main` divergiu:
+
+| Task original | Situação encontrada | Ajuste |
+| --- | --- | --- |
+| T1 — criar `config/links.php` | Arquivo **já existe** com a chave `destination` (fatia foundation) | T1 **acrescenta** a sub-árvore `slug`, não cria o arquivo |
+| T4 — criar VO `Slug` | Skeleton **já shipado** (`fromString` + regex `[a-z0-9-]{1,48}`, sem normalização); **sem call site de produção** (só o próprio teste) | T4 **reescreve** o skeleton: troca `fromString` por `fromCustomAlias`/`fromGenerated`, substitui `SlugTest.php`, e remove `LinksDomainException::invalidSlug()` + `INVALID_SLUG` (órfãos após a troca) |
+| T9 — criar `SlugReservationModel` + factory + `Pest.php` | Model, factory e testes de integração (`SlugReservationsSchemaContractTest`) **já existem e passam**; a foundation registra `RefreshDatabase` **por arquivo** (`uses(TestCase::class, RefreshDatabase::class)`), **não** em `Pest.php` | T9 **removida**. Sua verificação vira o primeiro bullet da nova T9 (repositório). Tasks renumeradas 14 → 13 |
+| T14 — gravar `AD-019` | `AD-019` **já usado** (league/uri, 2026-08-30) | Agora **T13**, grava **`AD-020`** |
+
+Numeração nova: **T1…T13**. Batches: A = T1–T8, B = T9–T13.
+
+---
+
+## Execution Log
+
+### Batch A (Phase 1 + Phase 2, T1–T8) — ✅ COMPLETE 2026-09-01
+
+| Task | Commit | Notes |
+| --- | --- | --- |
+| T1 | `f016f51` | `slug` subtree added to `config/links.php`; `destination` intact |
+| T2 | `6fca361` | `SlugSource` / `SlugRejectionReason` enums |
+| T3 | `242a71b` | `SlugPolicyException`, `SlugUnavailable` (`errorCode ALIAS_UNAVAILABLE`), `SlugGenerationExhausted` (`errorCode SLUG_GENERATION_FAILED`) |
+| T4 | `f5887c9` | `Slug` skeleton replaced (`fromCustomAlias`/`fromGenerated`, no `fromString`); `LinksDomainException::invalidSlug` + `INVALID_SLUG` removed; 29 tests (all spec edge cases kept) |
+| T5 | `2dd547b` | `ReservedSlugs` port + `Infrastructure/Slug/ConfigReservedSlugs` |
+| T6 | `06e6300` | `SlugPolicy` (`final readonly`, ctor `(ReservedSlugs)`, `fromCustomAlias`/`fromGenerated`/`isReserved`) |
+| T7 | `76c1071` | `RandomSlugSource` port + `Infrastructure/Slug/CsprngSlugSource` (`random_int` per position) |
+| T8 | `c57a849` | `SlugGenerator` ctor `(RandomSlugSource, SlugPolicy, int length=8, int maxDenylistDiscards=5)`, `generate(): Slug` |
+
+- **Tests**: 620 passed, 0 failed (full suite). Batch delta +66.
+- **Quality**: Pint / PHPStan L6 + strict-rules / PHPMD all clean.
+- **Env issue (not code)**: `make test-backend` blocked here by a host **port 6380** clash (Redis) with an unrelated running project. Worker ran the same suite via `docker compose -f docker-compose.yml run --rm … backend php artisan test` against `fake_link_testing`. **Batch B will hit the same clash** and must use the same workaround (or the other project's Redis is stopped). The **Verifier still needs `make test-backend-coverage`** to produce the coverage report — port 6380 must be free by then, or run the coverage command with the base-compose-only workaround.
+- **SPEC_DEVIATION (SlugGenerator)**: `int $length = 8` kept in ctor but effectively pinned — `Slug::fromGenerated` enforces exactly 8 per spec. Alphabet is a private Base36 const in the generator (design ctor omits an alphabet param); `config('links.slug.alphabet')` exists but is **not read by code**. Rationale: the `Slug` VO is the single source of the 8-char rule.
+- **T10 wiring reminder**: provider bindings should pass `max_collision_attempts`, `max_denylist_discards`, `length` from `config('links.slug.*')` (not hardcoded).
+- **Global Pest helpers already defined** (avoid clashes in Batch B): `assertSlugRejected`, `policyWith`, `assertPolicyRejected`, `base36Alphabet`, `generatorWith`, `class ScriptedSlugSource`.
+
+### Batch B (Phase 3 + Phase 4, T9–T13) — ✅ COMPLETE 2026-09-01
+
+| Task | Commit | Notes |
+| --- | --- | --- |
+| T9 | `93d1139` | `SlugReservationRepository` port + `EloquentSlugReservationRepository` (`reserve` / `existsWithoutLink`, no removal path); 10 integration tests. Gate: full suite 630/630. |
+| T10 | `22b9820` | `ReserveSlug` UseCase (`forAlias` single-shot; `automatic` bounded retry via per-attempt `DB::transaction` SAVEPOINT); provider binds the 3 ports + wires `SlugGenerator`/`ReserveSlug` from `config('links.slug.*')`. 11 + 3 tests. Gate: full suite 644/644. |
+| T11 | `ed8dcf0` | `tests/Architecture/SlugPolicyBoundariesTest.php` — 4 rules (Domain framework-free, Domain⊄Infrastructure, no reservation removal/mutation path, `Slug` readonly/no-mutator) with a discrimination-sensor header. Gate: `make lint-backend` + `make test-architecture` 17/17 + coverage 648/648, **Links 92.30% lines / 91.00% methods**. |
+| T12 | `68ac6eb` | `SlugReservationConcurrencyTest.php` — 2 real PG connections, overlapping transactions, one winner; loser gets `SlugUnavailable`; one row; failure carries no occupant data (orphan vs linked identical). Runs outside transactional `RefreshDatabase` with explicit cleanup + in-file note. 4 tests. |
+| T13 | `47ece77` | `docs/api.md` §7 registers `SLUG_GENERATION_FAILED` (`503`, `Retry-After`); `AD-020` in `.specs/STATE.md`; STATE Handoff + `links/README.md` updated; OpenAPI change explicitly deferred to `link-creation`. |
+
+- **Environment caveat**: Batch B ran while the host was heavily loaded by an unrelated process (load avg up to ~41; it also holds ports 6380/5432, so `make test-backend`/`make test-backend-coverage` couldn't bind and were replaced by base-compose-only `docker compose -f docker-compose.yml run …`). Consequences:
+  - T9/T10/T11 gates completed green as noted above (T11's coverage run: 648/648, **Links 92.30% lines / 91.00% methods**).
+  - **Orchestrator follow-up (post-Batch B)**: re-ran the full suite directly (`vendor/bin/pest --coverage`, `COMPOSER_PROCESS_TIMEOUT=0` to avoid composer's own 300s cap) → **652 total, 651 passed, 1 failed**. The 1 failure is `Tests\Feature\QualityToolingTest` (`QTOOL-26`, pre-existing, unrelated to this slice) hitting its own hardcoded `->timeout(180)` on a `phpstan analyse` subprocess under host load (confirmed: isolated `phpstan analyse modules/Links` and `make lint-backend`'s `composer run quality` both passed clean on this same host earlier). Count reconciles exactly: 648 (T11) + 4 (T12) = 652 total, all Links/Redirects/Auth tests green.
+  - `make lint` also surfaced a **pre-existing, out-of-slice** failure: `frontend/e2e/{guards,journey}.spec.ts` fail `tsc --noEmit` (`TS2353: 'launchOptions' does not exist in type 'BrowserContextOptions'`) — reproduced identically on a clean `main` checkout, so it predates this branch and is a Playwright-types drift unrelated to backend/Links work. `make lint-backend` (Pint + PHPStan L6 + strict-rules + PHPMD) and OpenAPI Spectral lint both pass with 0 errors.
+  - **Verdict**: T12/T13 close on the evidence above; no code defect found. The frontend `tsc` breakage is flagged to the user as a separate, pre-existing backlog item.
+
+### Verifier — ✅ PASS 2026-09-01
+
+Independent sub-agent, author ≠ verifier. 25/25 requirement IDs traced to `file:line` with spec-matching assertions (3 marked scope-deferred to `link-creation`, by design). Discrimination sensor: 5 targeted mutations (normalization order, denylist-after-structural order, generator's two independent budgets, `ReserveSlug` retry bound, no-removal architecture rule) — **5/5 killed, 0 survived**. Own clean full-suite run: 652 passed, 0 failed (no `QualityToolingTest` flake this time — corroborates it as a host-load artifact, not a code defect). Full report: `.specs/features/links/slug-policy/validation.md`. Both spec deviations (SlugGenerator config/alphabet, ReserveSlug per-attempt SAVEPOINT) scrutinized and judged non-blocking; one low-severity spec-precision gap noted (orphan-reservation-then-denylisted-later has no dedicated scenario test, though structurally guaranteed); 4 lessons distilled as candidates (`L-068`…`L-071`).
 
 ---
 
@@ -22,15 +79,15 @@ Implemente estas tasks com a skill `tlc-spec-driven`: **ative-a pelo nome e siga
 
 | Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
 | --- | --- | --- | --- | --- |
-| Domain — VO, enums, exceções, services (`Slug`, `SlugPolicy`, `SlugGenerator`) | unit | Todas as branches; 1:1 com os ACs da spec; **todo** edge case listado tem teste | `backend/modules/Links/Tests/Unit/*Test.php` | `make test-backend` |
-| Contracts + adapters de serviço (`ConfigReservedSlugs`, `CsprngSlugSource`) | unit | Todas as branches + caminhos de erro; denylist e aleatoriedade injetadas, nunca globais | `backend/modules/Links/Tests/Unit/*Test.php` | `make test-backend` |
-| Persistência — Model, Repository (`slug_reservations`) | integration | Caminhos de query principais + violação de constraint real em PostgreSQL + rollback | `backend/modules/Links/Tests/Integration/*Test.php` | `make test-backend` |
+| Domain — VO, enums, exceções, services (`Slug`, `SlugPolicy`, `SlugGenerator`) | unit | Todas as branches; 1:1 com os ACs da spec; **todo** edge case listado tem teste | `backend/modules/Links/Tests/Unit/**/*Test.php` | `make test-backend` |
+| Contracts + adapters de serviço (`ConfigReservedSlugs`, `CsprngSlugSource`) | unit | Todas as branches + caminhos de erro; denylist e aleatoriedade injetadas, nunca globais | `backend/modules/Links/Tests/Unit/**/*Test.php` | `make test-backend` |
+| Persistência — Repository (`slug_reservations`) | integration | Caminhos de query principais + violação de constraint real em PostgreSQL + rollback | `backend/modules/Links/Tests/Integration/*Test.php` | `make test-backend` |
 | UseCase com I/O (`ReserveSlug`) | integration | Happy path + colisão + exaustão + alias indisponível + concorrência | `backend/modules/Links/Tests/Integration/*Test.php` | `make test-backend` |
-| Config PHP (`config/links.php`) | unit | Chaves, tipos e valores default asseridos (precedente `HashingConfigTest`) | `backend/modules/Links/Tests/Unit/*Test.php` | `make test-backend` |
+| Config PHP (`config/links.php`) | unit | Chaves, tipos e valores default asseridos (precedente `HashingConfigTest`) | `backend/modules/Links/Tests/Unit/**/*Test.php` | `make test-backend` |
 | Regras arquiteturais | architecture | Ausência de caminho de remoção de reserva; `Domain` sem `config()`/Eloquent | `backend/tests/Architecture/*Test.php` | `make test-architecture` |
 | Docs / STATE / índice | none | — (build gate) | — | `make lint` |
 
-**Cobertura numérica da fatia**: 90% linhas / 85% branches — em PCOV, **métodos** substituem branches (`docs/testing.md` §4).
+**Cobertura numérica da fatia**: 90% linhas / 85% branches — em PCOV, **métodos** substituem branches (`docs/testing.md` §4); já aplicado por `scripts/check-module-coverage-gate.php` (`Links => 90/85`).
 
 ## Gate Check Commands
 
@@ -63,36 +120,37 @@ T6 → T7 → T8
 ### Phase 3: Persistência e reserva
 
 ```
-T9 → T10 → T11
+T9 → T10
 ```
 
 ### Phase 4: Garantias transversais e fechamento
 
 ```
-T12 → T13 → T14
+T11 → T12 → T13
 ```
 
-**Packing previsto no Execute**: 14 tasks → 2 batches (Batch A = Phase 1 + Phase 2, 8 tasks; Batch B = Phase 3 + Phase 4, 6 tasks). Como isso passa de um batch, o Execute **deve oferecer** sub-agents antes de dispatch.
+**Packing previsto no Execute**: 13 tasks → 2 batches (Batch A = Phase 1 + Phase 2, 8 tasks; Batch B = Phase 3 + Phase 4, 5 tasks). Como isso passa de um batch, o Execute **deve oferecer** sub-agents antes de dispatch.
 
 ---
 
 ## Task Breakdown
 
-### T1: Criar `config/links.php` com os parâmetros de slug
+### T1: Acrescentar a sub-árvore `slug` a `config/links.php`
 
-**What**: arquivo de configuração versionado com alfabeto, comprimentos, tetos de tentativa e denylist.  
-**Where**: `backend/config/links.php` (novo), `backend/modules/Links/Tests/Unit/LinksSlugConfigTest.php`  
-**Depends on**: None (após a foundation)  
+**What**: adicionar ao arquivo de config já existente o alfabeto, comprimentos, tetos de tentativa e denylist do slug.  
+**Where**: `backend/config/links.php` (modificar — hoje só tem a chave `destination`), `backend/modules/Links/Tests/Unit/Config/LinksSlugConfigTest.php`  
+**Depends on**: None  
 **Reuses**: `backend/config/auth.php` (forma), `modules/Auth/Tests/Unit/HashingConfigTest.php` (padrão de teste de config)  
 **Requirement**: SLG-12, LNK-14
 
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Pré-requisito conferido: `backend/modules/Links/` existe, `slug_reservations` migra e `phpunit.xml` inclui as suítes de Links — se faltar, PARAR e escalar
-- [ ] `config/links.php` define `slug.length=8`, `slug.alphabet` Base36 minúsculo, `slug.min_alias_length=3`, `slug.max_alias_length=48`, `slug.max_collision_attempts=5`, `slug.max_denylist_discards=5`
-- [ ] `slug.reserved_words` contém exatamente as 10 palavras da spec, todas minúsculas
-- [ ] Teste assere cada chave, tipo e valor default
+- [ ] Pré-requisito conferido: `backend/modules/Links/` existe; migrations `slug_reservations` / `short_links` presentes; `phpunit.xml` inclui as suítes de Links (Unit/Feature/Integration) e o `<source>`; `scripts/check-module-coverage-gate.php` tem `Links => 90/85` — se algo faltar, PARAR e escalar
+- [ ] `config/links.php` ganha a chave `slug` com `length=8`, `alphabet` Base36 minúsculo (`abcdefghijklmnopqrstuvwxyz0123456789`), `min_alias_length=3`, `max_alias_length=48`, `max_collision_attempts=5`, `max_denylist_discards=5`
+- [ ] `slug.reserved_words` contém exatamente as 10 palavras da spec (`admin`, `api`, `login`, `register`, `docs`, `health`, `status`, `support`, `terms`, `privacy`), todas minúsculas
+- [ ] A chave `destination` pré-existente permanece intacta
+- [ ] Teste assere cada chave nova, tipo e valor default
 - [ ] Gate passa: `make test-backend`
 - [ ] Test count: 6 testes passam (sem deleções silenciosas)
 
@@ -104,7 +162,7 @@ T12 → T13 → T14
 ### T2: Criar enums `SlugSource` e `SlugRejectionReason`
 
 **What**: enums de domínio para origem do slug e códigos estáveis de rejeição.  
-**Where**: `backend/modules/Links/Domain/Enums/{SlugSource,SlugRejectionReason}.php`, `modules/Links/Tests/Unit/SlugEnumsTest.php`  
+**Where**: `backend/modules/Links/Domain/Enums/{SlugSource,SlugRejectionReason}.php`, `modules/Links/Tests/Unit/Domain/Enums/SlugEnumsTest.php`  
 **Depends on**: None  
 **Reuses**: `modules/Auth/Domain/Enums/UserStatus.php`, `PasswordPolicyRule`  
 **Requirement**: SLG-07, SLG-08, SLG-11
@@ -126,9 +184,9 @@ T12 → T13 → T14
 ### T3: Criar exceções tipadas da política de slug
 
 **What**: `SlugPolicyException` (com `SlugRejectionReason`), `SlugUnavailable` e `SlugGenerationExhausted`.  
-**Where**: `backend/modules/Links/Exceptions/*.php`, `modules/Links/Tests/Unit/SlugExceptionsTest.php`  
+**Where**: `backend/modules/Links/Exceptions/{SlugPolicyException,SlugUnavailable,SlugGenerationExhausted}.php`, `modules/Links/Tests/Unit/Exceptions/SlugExceptionsTest.php`  
 **Depends on**: T2  
-**Reuses**: `modules/Auth/Exceptions/AuthDomainException.php` (named constructors)  
+**Reuses**: `modules/Links/Exceptions/LinksDomainException.php` (named constructors, `errorCode()`), `modules/Auth/Exceptions/AuthDomainException.php`  
 **Requirement**: SLG-05, SLG-18
 
 **Tools**: MCP: NONE · Skill: NONE
@@ -146,10 +204,10 @@ T12 → T13 → T14
 
 ---
 
-### T4: Implementar o Value Object `Slug`
+### T4: Reescrever o Value Object `Slug` (skeleton da foundation)
 
-**What**: VO imutável com normalização ASCII e validação estrutural completa do alias, mais o factory do slug gerado.  
-**Where**: `backend/modules/Links/Domain/ValueObjects/Slug.php`, `modules/Links/Tests/Unit/SlugTest.php`  
+**What**: substituir o skeleton `fromString` por um VO imutável com normalização ASCII e validação estrutural completa do alias, mais o factory do slug gerado.  
+**Where**: `backend/modules/Links/Domain/ValueObjects/Slug.php` (reescrever), `modules/Links/Tests/Unit/Domain/ValueObjects/SlugTest.php` (substituir os 13 testes de `fromString`), `modules/Links/Exceptions/LinksDomainException.php` + `modules/Links/Tests/Unit/Exceptions/LinksDomainExceptionTest.php` (remover `invalidSlug()` / `INVALID_SLUG` órfãos)  
 **Depends on**: T2, T3  
 **Reuses**: `modules/Auth/Domain/ValueObjects/EmailAddress.php` (forma `final readonly`, construtor privado, `value()`, `equals()`)  
 **Requirement**: LNK-12, LNK-13, SLG-07, SLG-08, SLG-09, SLG-10, SLG-16
@@ -157,24 +215,26 @@ T12 → T13 → T14
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
+- [ ] Confirmado que `Slug` não tem call site de produção antes de reescrever (grep: só o próprio arquivo e `SlugTest.php`)
 - [ ] `fromCustomAlias()` aplica trim ASCII e lowercase por `strtr` com mapa explícito `A-Z`→`a-z` (**não** `strtolower`/`mb_strtolower`)
 - [ ] Normalização ocorre antes de qualquer validação
-- [ ] Valida comprimento 3–48, allowlist `[a-z0-9-]`, fronteiras alfanuméricas e ausência de hífens consecutivos, cada falha com seu `SlugRejectionReason`
-- [ ] `fromGenerated()` aceita somente 8 caracteres `[a-z0-9]` e marca origem `automatic`
-- [ ] VO é `final readonly`, sem `config()`, sem framework, sem `intl`; não existe setter nem `withSlug()`
+- [ ] Valida comprimento 3–48, allowlist `[a-z0-9-]`, fronteiras alfanuméricas e ausência de hífens consecutivos, cada falha lançando `SlugPolicyException` com seu `SlugRejectionReason`
+- [ ] `fromGenerated()` aceita somente 8 caracteres `[a-z0-9]` e marca origem `automatic`; `source()` expõe `SlugSource`
+- [ ] VO é `final readonly`, sem `config()`, sem framework, sem `intl`; não existe setter nem `withSlug()`; `fromString` deixa de existir
+- [ ] `LinksDomainException::invalidSlug()` e a constante `INVALID_SLUG` são removidas, junto dos casos correspondentes em `LinksDomainExceptionTest.php`; `make lint` continua verde (sem referência órfã)
 - [ ] Testes 1:1 com os ACs de LNK-12/LNK-13 e **todos** os edge cases da spec: `"  Architecture  "`, 2/3/48/49 caracteres, `---`, `a-b`, `a--b`, `аdmin` (cirílico U+0430), `ADMÍN`, `İstanbul` (U+0130), `%61dmin`, `"my link"`, string vazia, caractere de controle
 - [ ] Gate passa: `make test-backend`
 - [ ] Test count: 28 testes passam
 
 **Tests**: unit · **Gate**: quick  
-**Commit**: `feat(links): add Slug value object with ASCII normalization`
+**Commit**: `feat(links): replace Slug skeleton with normalized value object`
 
 ---
 
 ### T5: Criar port `ReservedSlugs` e adapter `ConfigReservedSlugs`
 
 **What**: contrato que expõe a denylist ao domínio, com adaptador lendo `config('links.slug.reserved_words')`.  
-**Where**: `backend/modules/Links/Contracts/Services/ReservedSlugs.php`, `modules/Links/Infrastructure/Slug/ConfigReservedSlugs.php`, `modules/Links/Tests/Unit/ConfigReservedSlugsTest.php`  
+**Where**: `backend/modules/Links/Contracts/Services/ReservedSlugs.php`, `modules/Links/Infrastructure/Slug/ConfigReservedSlugs.php`, `modules/Links/Tests/Unit/Infrastructure/Slug/ConfigReservedSlugsTest.php`  
 **Depends on**: T1  
 **Reuses**: `modules/Auth/Contracts/Services/InviteAllowlist.php` + `Infrastructure/Allowlist/JsonFileInviteAllowlist.php`  
 **Requirement**: LNK-14, SLG-12
@@ -198,7 +258,7 @@ T12 → T13 → T14
 ### T6: Implementar `SlugPolicy` como fábrica única de `Slug`
 
 **What**: serviço de domínio que combina validação estrutural do VO com a denylist, nos dois fluxos.  
-**Where**: `backend/modules/Links/Domain/Services/SlugPolicy.php`, `modules/Links/Tests/Unit/SlugPolicyTest.php`  
+**Where**: `backend/modules/Links/Domain/Services/SlugPolicy.php`, `modules/Links/Tests/Unit/Domain/Services/SlugPolicyTest.php`  
 **Depends on**: T4, T5  
 **Reuses**: `modules/Auth/Domain/Services/PasswordPolicy.php` (política de domínio com códigos estáveis)  
 **Requirement**: LNK-14, SLG-11, SLG-13
@@ -207,7 +267,7 @@ T12 → T13 → T14
 
 **Done when**:
 - [ ] `fromCustomAlias()` e `fromGenerated()` são o único caminho de construção usado por gerador e UseCase
-- [ ] Denylist é verificada **depois** da validação estrutural e **sobre** o valor normalizado
+- [ ] Denylist é verificada **depois** da validação estrutural do VO e **sobre** o valor normalizado
 - [ ] `ADMIN` e `Admin` falham com `reserved_word`; `ADMÍN` falha com `invalid_characters` (a ordem importa e está testada)
 - [ ] A mesma denylist se aplica a alias e a candidato gerado (SLG-13), com uma única implementação
 - [ ] Nenhuma chamada a `config()` dentro de `Domain`
@@ -222,7 +282,7 @@ T12 → T13 → T14
 ### T7: Criar port `RandomSlugSource` e adapter `CsprngSlugSource`
 
 **What**: fonte de aleatoriedade criptográfica isolável, sem viés de módulo.  
-**Where**: `backend/modules/Links/Contracts/Services/RandomSlugSource.php`, `modules/Links/Infrastructure/Slug/CsprngSlugSource.php`, `modules/Links/Tests/Unit/CsprngSlugSourceTest.php`  
+**Where**: `backend/modules/Links/Contracts/Services/RandomSlugSource.php`, `modules/Links/Infrastructure/Slug/CsprngSlugSource.php`, `modules/Links/Tests/Unit/Infrastructure/Slug/CsprngSlugSourceTest.php`  
 **Depends on**: T1  
 **Reuses**: `modules/Auth/Domain/Services/BearerTokenGenerator.php` (padrão de geração segura)  
 **Requirement**: LNK-10, SLG-02
@@ -245,7 +305,7 @@ T12 → T13 → T14
 ### T8: Implementar `SlugGenerator` com descarte por denylist
 
 **What**: gerador Base36 de 8 caracteres que descarta candidatos reservados sob teto próprio.  
-**Where**: `backend/modules/Links/Domain/Services/SlugGenerator.php`, `modules/Links/Tests/Unit/SlugGeneratorTest.php`  
+**Where**: `backend/modules/Links/Domain/Services/SlugGenerator.php`, `modules/Links/Tests/Unit/Domain/Services/SlugGeneratorTest.php`  
 **Depends on**: T6, T7  
 **Reuses**: `SlugPolicy` (T6), `RandomSlugSource` (T7)  
 **Requirement**: LNK-10, SLG-01, SLG-03
@@ -266,46 +326,24 @@ T12 → T13 → T14
 
 ---
 
-### T9: Criar `SlugReservationModel`, factory e registro de `RefreshDatabase`
-
-**What**: Eloquent Model da tabela `slug_reservations` (schema da foundation), factory de teste e registro do trait para a suíte de Integration de Links.  
-**Where**: `backend/modules/Links/Infrastructure/Persistence/Eloquent/Models/SlugReservationModel.php`, `.../Factories/SlugReservationModelFactory.php`, `backend/tests/Pest.php` (modificar), `modules/Links/Tests/Integration/SlugReservationModelTest.php`  
-**Depends on**: T4  
-**Reuses**: `modules/Auth/.../Models/UserModel.php`, `UserModelFactory`, `backend/tests/Pest.php:19-27`  
-**Requirement**: LNK-15, SLG-14
-
-**Tools**: MCP: NONE · Skill: NONE
-
-**Done when**:
-- [ ] Model aponta para `slug_reservations`, PK `slug` (string, não incrementing), sem `updated_at`
-- [ ] `backend/tests/Pest.php` registra `RefreshDatabase` para `modules/Links/Tests/Integration` (se a foundation ainda não o fez)
-- [ ] Teste de integração cria e lê uma reserva em `fake_link_testing` (AD-011)
-- [ ] Model não expõe `delete()` habilitado por soft delete nem `SoftDeletes`
-- [ ] Gate passa: `make test-backend`
-- [ ] Test count: 4 testes passam
-
-**Tests**: integration · **Gate**: full  
-**Commit**: `feat(links): add slug reservation eloquent model`
-
----
-
-### T10: Implementar port e repositório de reserva
+### T9: Implementar port e repositório de reserva
 
 **What**: `SlugReservationRepository` (sem método de remoção) e o adaptador Eloquent que traduz violação de unicidade em `SlugUnavailable`.  
-**Where**: `backend/modules/Links/Contracts/Repositories/SlugReservationRepository.php`, `.../Eloquent/Repositories/EloquentSlugReservationRepository.php`, `modules/Links/Tests/Integration/SlugReservationRepositoryTest.php`  
-**Depends on**: T3, T9  
-**Reuses**: `EloquentUserRepository.php:85` (captura de `UniqueConstraintViolationException`)  
+**Where**: `backend/modules/Links/Contracts/Repositories/SlugReservationRepository.php`, `modules/Links/Infrastructure/Persistence/Eloquent/Repositories/EloquentSlugReservationRepository.php`, `modules/Links/Tests/Integration/SlugReservationRepositoryTest.php`  
+**Depends on**: T3, T4  
+**Reuses**: `EloquentUserRepository.php:85` (captura de `UniqueConstraintViolationException`); `SlugReservationModel` + `SlugReservationModelFactory` (já entregues pela foundation); `SlugReservationsSchemaContractTest` (padrão de teste de integração com `uses(TestCase::class, RefreshDatabase::class)` por arquivo)  
 **Requirement**: LNK-15, LNK-16, SLG-06, SLG-14, SLG-15
 
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
+- [ ] Pré-check: `SlugReservationModel` (tabela `slug_reservations`, PK `slug` string não-incrementing, sem `timestamps`, sem `SoftDeletes`) e sua factory existem e passam nos testes atuais — se divergir, PARAR e escalar; nenhuma migration nova nesta fatia
 - [ ] Port expõe somente `reserve(Slug): void` e `existsWithoutLink(Slug): bool` — **nenhum** método de remoção ou update
 - [ ] `reserve()` faz `INSERT` sem `SELECT` prévio de disponibilidade (SLG-06)
 - [ ] Violação de PK vira `SlugUnavailable`; a reserva existente permanece com o mesmo `reserved_at`
 - [ ] `reserve()` participa da transação do chamador: teste com `DB::transaction` + rollback prova que a linha não persiste (SLG-14)
-- [ ] `existsWithoutLink()` retorna `true` para reserva sem `short_link` e `false` quando há link
-- [ ] PostgreSQL indisponível/erro genérico propaga sem virar `SlugUnavailable`
+- [ ] `existsWithoutLink()` retorna `true` para reserva sem `short_links` correspondente (`LEFT JOIN`) e `false` quando há link
+- [ ] PostgreSQL indisponível/erro genérico (`QueryException` não-unicidade) propaga sem virar `SlugUnavailable`
 - [ ] Gate passa: `make test-backend`
 - [ ] Test count: 10 testes passam
 
@@ -314,11 +352,11 @@ T12 → T13 → T14
 
 ---
 
-### T11: Implementar `ReserveSlug` e registrar bindings
+### T10: Implementar `ReserveSlug` e registrar bindings
 
 **What**: UseCase que orquestra alias vs. automático com o teto de 5 colisões, e os bindings dos três ports no provider do módulo.  
-**Where**: `backend/modules/Links/UseCases/ReserveSlug.php`, `modules/Links/ServiceProviders/LinksServiceProvider.php` (modificar), `modules/Links/Tests/Integration/ReserveSlugTest.php`  
-**Depends on**: T8, T10  
+**Where**: `backend/modules/Links/UseCases/ReserveSlug.php`, `modules/Links/ServiceProviders/LinksServiceProvider.php` (modificar), `modules/Links/Tests/Integration/ReserveSlugTest.php`, `modules/Links/Tests/Feature/LinksServiceProviderTest.php` (estender com as 3 resoluções)  
+**Depends on**: T8, T9  
 **Reuses**: `modules/Auth/ServiceProviders/AuthServiceProvider.php` (padrão de bindings)  
 **Requirement**: LNK-11, SLG-04, SLG-05
 
@@ -339,11 +377,11 @@ T12 → T13 → T14
 
 ---
 
-### T12: Adicionar gates arquiteturais da política de slug
+### T11: Adicionar gates arquiteturais da política de slug
 
 **What**: regras Pest Arch que provam ausência de caminho de remoção de reserva e pureza do `Domain`.  
 **Where**: `backend/tests/Architecture/SlugPolicyBoundariesTest.php` (novo)  
-**Depends on**: T11  
+**Depends on**: T10  
 **Reuses**: `backend/tests/Architecture/ModularMonolithTest.php` (que já itera `Links` em `$domainModules`)  
 **Requirement**: SLG-15, SLG-16
 
@@ -362,12 +400,12 @@ T12 → T13 → T14
 
 ---
 
-### T13: Teste de concorrência entre aliases equivalentes
+### T12: Teste de concorrência entre aliases equivalentes
 
 **What**: prova com duas conexões PostgreSQL de que aliases equivalentes por caixa têm um único vencedor.  
 **Where**: `backend/modules/Links/Tests/Integration/SlugReservationConcurrencyTest.php`  
-**Depends on**: T11  
-**Reuses**: `modules/Auth/Tests/Integration/UsersPersistenceConstraintsTest.php` (padrão de constraint real)  
+**Depends on**: T10  
+**Reuses**: `modules/Auth/Tests/Integration/UsersPersistenceConstraintsTest.php` (padrão de constraint real), `Modules\Auth\Tests\Support\DatabaseSafetyGuard`  
 **Requirement**: LNK-12, LNK-15, SLG-17, SLG-18
 
 **Tools**: MCP: NONE · Skill: NONE
@@ -386,22 +424,22 @@ T12 → T13 → T14
 
 ---
 
-### T14: Registrar o código de erro e fechar a fatia
+### T13: Registrar o código de erro e fechar a fatia
 
-**What**: documentar `SLUG_GENERATION_FAILED`, gravar AD-019 e atualizar índice e handoff.  
+**What**: documentar `SLUG_GENERATION_FAILED`, gravar AD-020 e atualizar índice e handoff.  
 **Where**: `docs/api.md` §7 (modificar), `.specs/STATE.md` (Decisions + Handoff), `.specs/features/links/README.md`, `docs/roadmap.md` se aplicável  
-**Depends on**: T12, T13  
+**Depends on**: T11, T12  
 **Reuses**: formato das entradas `AD-NNN` existentes  
 **Requirement**: SLG-05
 
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `docs/api.md` §7 lista `SLUG_GENERATION_FAILED` entre os códigos estáveis, associado a `503`
-- [ ] `.specs/STATE.md` recebe `AD-019` com a decisão do código de erro; nenhuma decisão anterior é marcada superseded
+- [ ] `docs/api.md` §7 registra `SLUG_GENERATION_FAILED` como código estável específico associado a `503` (na estrutura real da seção — tabela de status + nota de códigos; não confundir com a linha de "códigos gerais")
+- [ ] `.specs/STATE.md` recebe `AD-020` com a decisão do código de erro; nenhuma decisão anterior é marcada superseded (`AD-019` = league/uri, já existente)
 - [ ] Handoff do `STATE.md` e o índice `links/README.md` refletem a fatia entregue
 - [ ] A OpenAPI **não** é alterada aqui (o endpoint que produz o erro é da fatia link-creation) — registrado explicitamente como escopo diferido
-- [ ] Cobertura da fatia confere 90% linhas / 85% (métodos) em `modules/Links`
+- [ ] Cobertura da fatia confere 90% linhas / 85% (métodos) em `modules/Links` via `make test-backend-coverage`
 - [ ] Gate passa: `make lint && make test-backend-coverage`
 
 **Tests**: none (build gate — camada docs/STATE na matriz) · **Gate**: build  
@@ -416,8 +454,8 @@ Phase 1 → Phase 2 → Phase 3 → Phase 4
 
 Phase 1:  T1 ──→ T2 ──→ T3 ──→ T4 ──→ T5
 Phase 2:  T6 ──→ T7 ──→ T8
-Phase 3:  T9 ──→ T10 ──→ T11
-Phase 4:  T12 ──→ T13 ──→ T14
+Phase 3:  T9 ──→ T10
+Phase 4:  T11 ──→ T12 ──→ T13
 ```
 
 Execução é estritamente sequencial — não há paralelismo intra-fase.
@@ -428,20 +466,19 @@ Execução é estritamente sequencial — não há paralelismo intra-fase.
 
 | Task | Scope | Status |
 | --- | --- | --- |
-| T1: config de slug | 1 arquivo de config + teste | ✅ Granular |
+| T1: sub-árvore `slug` na config | 1 arquivo de config (modif.) + teste | ✅ Granular |
 | T2: dois enums | 2 arquivos coesos, mesmo conceito | ⚠️ OK (coeso) |
 | T3: três exceções | 3 arquivos coesos, mesma hierarquia | ⚠️ OK (coeso) |
-| T4: VO `Slug` | 1 classe | ✅ Granular |
+| T4: reescrever VO `Slug` | 1 classe (reescrita) + limpeza de exceção órfã | ⚠️ OK (a limpeza é consequência direta da troca) |
 | T5: port + adapter da denylist | 1 contrato + 1 implementação | ⚠️ OK (par port/adapter) |
 | T6: `SlugPolicy` | 1 classe | ✅ Granular |
 | T7: port + adapter CSPRNG | 1 contrato + 1 implementação | ⚠️ OK (par port/adapter) |
 | T8: `SlugGenerator` | 1 classe | ✅ Granular |
-| T9: Model + factory + `Pest.php` | 1 model + suporte de teste | ⚠️ OK (coeso) |
-| T10: port + repositório | 1 contrato + 1 implementação | ⚠️ OK (par port/adapter) |
-| T11: UseCase + bindings | 1 classe + registro no provider | ⚠️ OK (o UseCase não é resolvível sem os bindings) |
-| T12: gates arquiteturais | 1 arquivo de teste | ✅ Granular |
-| T13: teste de concorrência | 1 arquivo de teste | ✅ Granular |
-| T14: docs + STATE | somente documentação | ✅ Granular |
+| T9: port + repositório | 1 contrato + 1 implementação | ⚠️ OK (par port/adapter) |
+| T10: UseCase + bindings | 1 classe + registro no provider | ⚠️ OK (o UseCase não é resolvível sem os bindings) |
+| T11: gates arquiteturais | 1 arquivo de teste | ✅ Granular |
+| T12: teste de concorrência | 1 arquivo de teste | ✅ Granular |
+| T13: docs + STATE | somente documentação | ✅ Granular |
 
 Nenhum ❌ — nenhuma task cria múltiplos componentes não coesos.
 
@@ -459,14 +496,13 @@ Nenhum ❌ — nenhuma task cria múltiplos componentes não coesos.
 | T6 | T4, T5 | T5 → T6 | ✅ Match |
 | T7 | T1 | T6 → T7 (T1 alcançado transitivamente) | ✅ Match |
 | T8 | T6, T7 | T7 → T8 | ✅ Match |
-| T9 | T4 | T8 → T9 (T4 alcançado transitivamente) | ✅ Match |
-| T10 | T3, T9 | T9 → T10 | ✅ Match |
-| T11 | T8, T10 | T10 → T11 | ✅ Match |
-| T12 | T11 | T11 → T12 | ✅ Match |
-| T13 | T11 | T12 → T13 (T11 alcançado transitivamente) | ✅ Match |
-| T14 | T12, T13 | T13 → T14 | ✅ Match |
+| T9 | T3, T4 | T8 → T9 (T3/T4 alcançados transitivamente) | ✅ Match |
+| T10 | T8, T9 | T9 → T10 | ✅ Match |
+| T11 | T10 | T10 → T11 | ✅ Match |
+| T12 | T10 | T11 → T12 (T10 alcançado transitivamente) | ✅ Match |
+| T13 | T11, T12 | T12 → T13 | ✅ Match |
 
-Nenhuma task depende de fase posterior. As setas do mapa são a ordem de execução; as dependências de dados são um subconjunto delas — nenhuma dependência do corpo fica sem caminho no diagrama.
+Nenhuma task depende de fase posterior. As setas do mapa são a ordem de execução; as dependências de dados são um subconjunto delas.
 
 ---
 
@@ -482,14 +518,13 @@ Nenhuma task depende de fase posterior. As setas do mapa são a ordem de execuç
 | T6 | Domain (service) | unit | unit | ✅ OK |
 | T7 | Contract + adapter de serviço | unit | unit | ✅ OK |
 | T8 | Domain (service) | unit | unit | ✅ OK |
-| T9 | Persistência (Model) | integration | integration | ✅ OK |
-| T10 | Persistência (Repository) | integration | integration | ✅ OK |
-| T11 | UseCase com I/O + provider | integration | integration | ✅ OK |
-| T12 | Regras arquiteturais | architecture | architecture | ✅ OK |
-| T13 | UseCase com I/O (concorrência) | integration | integration | ✅ OK |
-| T14 | Docs / STATE | none | none | ✅ OK |
+| T9 | Persistência (Repository) | integration | integration | ✅ OK |
+| T10 | UseCase com I/O + provider | integration | integration | ✅ OK |
+| T11 | Regras arquiteturais | architecture | architecture | ✅ OK |
+| T12 | UseCase com I/O (concorrência) | integration | integration | ✅ OK |
+| T13 | Docs / STATE | none | none | ✅ OK |
 
-Nenhuma ❌. Nenhuma task produz código não verificado, e nenhum teste foi adiado para task posterior — T13 é cobertura **adicional** de concorrência, não o teste faltante de T11.
+Nenhuma ❌. T12 é cobertura **adicional** de concorrência, não o teste faltante de T10.
 
 ---
 
@@ -498,13 +533,13 @@ Nenhuma ❌. Nenhuma task produz código não verificado, e nenhum teste foi adi
 | Requirement | Tasks |
 | --- | --- |
 | LNK-10, SLG-01, SLG-02, SLG-03 | T7, T8 |
-| LNK-11, SLG-04, SLG-05, SLG-06 | T10, T11, T14 |
-| LNK-12, SLG-09, SLG-10 | T4, T13 |
+| LNK-11, SLG-04, SLG-05, SLG-06 | T9, T10, T13 |
+| LNK-12, SLG-09, SLG-10 | T4, T12 |
 | LNK-13, SLG-07, SLG-08 | T2, T4 |
 | LNK-14, SLG-11, SLG-12, SLG-13 | T1, T5, T6 |
-| LNK-15, SLG-14, SLG-15, SLG-17 | T9, T10, T12, T13 |
-| LNK-16 | T10 |
-| SLG-16 | T4, T12 |
-| SLG-18 | T3, T13 |
+| LNK-15, SLG-14, SLG-15, SLG-17 | T9, T11, T12 |
+| LNK-16 | T9 |
+| SLG-16 | T4, T11 |
+| SLG-18 | T3, T12 |
 
 **Coverage**: 25 requisitos, 25 mapeados para tasks, 0 sem mapeamento.

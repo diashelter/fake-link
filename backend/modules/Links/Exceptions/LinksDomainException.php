@@ -8,8 +8,6 @@ use DomainException;
 
 final class LinksDomainException extends DomainException
 {
-    public const INVALID_SLUG = 'INVALID_SLUG';
-
     public const INVALID_DESTINATION_URL = 'INVALID_DESTINATION_URL';
 
     public const INVALID_SHORT_LINK_ID = 'INVALID_SHORT_LINK_ID';
@@ -21,14 +19,6 @@ final class LinksDomainException extends DomainException
         string $message,
     ) {
         parent::__construct($message);
-    }
-
-    public static function invalidSlug(): self
-    {
-        return new self(
-            errorCode: self::INVALID_SLUG,
-            message: 'The provided slug is invalid.',
-        );
     }
 
     public static function invalidDestinationUrl(): self

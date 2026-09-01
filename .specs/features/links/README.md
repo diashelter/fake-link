@@ -1,6 +1,6 @@
 # Links + Redirect Backend API — Índice de specs
 
-**Status do módulo:** Em progresso — 2026-08-30 (13 fatias criadas; specs de `foundation` e `destination-policy` fechadas)
+**Status do módulo:** Em progresso — 2026-09-01 (13 fatias criadas; `foundation` implementada e verificada; `slug-policy` implementada — T1–T13 em `feat/links-slug-policy`, Verifier pendente; specs de `destination-policy` fechadas)
 
 **Escopo do módulo:** backend Laravel em `backend/modules/Links/` e `backend/modules/Redirects/` — endpoints `/api/v1/links*` do host da aplicação e a superfície pública do host curto.
 
@@ -26,7 +26,7 @@
 | Ordem | Fatia | Pasta | Status | Depende de | Endpoints / entrega |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Fundação dos módulos | [foundation](./foundation/spec.md) | Spec fechada | Fase 0 + Auth | Scaffold `Links`/`Redirects`, migrations base, keyring de destinos |
-| 2 | Política de slug | [slug-policy](./slug-policy/spec.md) | Spec fechada | foundation | Base36 automático, alias personalizado, reserva permanente |
+| 2 | Política de slug | [slug-policy](./slug-policy/spec.md) | Implementada (Execute ✅, Verifier pendente) | foundation | Base36 automático, alias personalizado, reserva permanente |
 | 3 | Política de destino | [destination-policy](./destination-policy/spec.md) | Spec fechada | foundation | Validação, normalização e cifra AES-256-GCM da URL |
 | 4 | Criação de link | [link-creation](./link-creation/spec.md) | Spec fechada | slug-policy, destination-policy | `POST /api/v1/links` |
 | 5 | Idempotência | [idempotency](./idempotency/spec.md) | Seed | link-creation | `Idempotency-Key`, replay cifrado, `409` |

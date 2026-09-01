@@ -2,84 +2,159 @@
 
 declare(strict_types=1);
 
+use Modules\Links\Domain\Enums\SlugRejectionReason;
+use Modules\Links\Domain\Enums\SlugSource;
 use Modules\Links\Domain\ValueObjects\Slug;
-use Modules\Links\Exceptions\LinksDomainException;
+use Modules\Links\Exceptions\SlugPolicyException;
 
-describe('Slug', function () {
-    it('accepts a simple lowercase slug', function () {
-        $slug = Slug::fromString('abc-123');
+/**
+ * Assert that $fn throws SlugPolicyException carrying exactly $expected.
+ */
+function assertSlugRejected(Closure $fn, SlugRejectionReason $expected): void
+{
+    try {
+        $fn();
+    } catch (SlugPolicyException $exception) {
+        expect($exception->rejectionReason())->toBe($expected);
 
-        expect($slug->value())->toBe('abc-123');
+        return;
+    }
+
+    throw new RuntimeException('Expected SlugPolicyException carrying '.$expected->value.', none thrown.');
+}
+
+describe('Slug::fromCustomAlias — normalization', function () {
+    it('trims outer ASCII whitespace and lowercases before anything else', function () {
+        $slug = Slug::fromCustomAlias('  Architecture  ');
+
+        expect($slug->value())->toBe('architecture')
+            ->and($slug->source())->toBe(SlugSource::Custom);
     });
 
-    it('accepts exactly 1 character', function () {
-        $slug = Slug::fromString('a');
+    it('applies normalization before validation so a trimmable, mixed-case input is still valid', function () {
+        expect(Slug::fromCustomAlias('  My-Alias  ')->value())->toBe('my-alias');
+    });
+});
 
-        expect($slug->value())->toBe('a');
+describe('Slug::fromCustomAlias — length bounds', function () {
+    it('rejects 2 characters as too_short', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('ab'), SlugRejectionReason::TooShort);
+    });
+
+    it('accepts exactly 3 characters', function () {
+        expect(Slug::fromCustomAlias('abc')->value())->toBe('abc');
     });
 
     it('accepts exactly 48 characters', function () {
         $value = str_repeat('a', 48);
-        $slug = Slug::fromString($value);
 
-        expect($slug->value())->toBe($value);
+        expect(Slug::fromCustomAlias($value)->value())->toBe($value);
     });
 
-    it('rejects 49 characters', function () {
-        Slug::fromString(str_repeat('a', 49));
-    })->throws(LinksDomainException::class);
-
-    it('rejects empty string', function () {
-        Slug::fromString('');
-    })->throws(LinksDomainException::class);
-
-    it('rejects uppercase letters', function () {
-        Slug::fromString('ABC');
-    })->throws(LinksDomainException::class, 'The provided slug is invalid.');
-
-    it('rejects characters outside [a-z0-9-]', function () {
-        Slug::fromString('hello_world');
-    })->throws(LinksDomainException::class);
-
-    it('accepts hyphen at start (alias rules are slice 2)', function () {
-        // Leading/trailing hyphens and consecutive hyphens are allowed structurally in this slice.
-        // Alias uniqueness and formatting constraints are enforced in slice 2.
-        $slug = Slug::fromString('-abc');
-
-        expect($slug->value())->toBe('-abc');
+    it('rejects 49 characters as too_long', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias(str_repeat('a', 49)), SlugRejectionReason::TooLong);
     });
 
-    it('accepts hyphen at end', function () {
-        $slug = Slug::fromString('abc-');
-
-        expect($slug->value())->toBe('abc-');
+    it('rejects the empty string as too_short after normalization', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias(''), SlugRejectionReason::TooShort);
     });
 
-    it('accepts consecutive hyphens', function () {
-        // Consecutive hyphens are structurally allowed; slice 2 enforces alias format.
-        $slug = Slug::fromString('a--b');
+    it('rejects a whitespace-only alias as too_short after normalization', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('   '), SlugRejectionReason::TooShort);
+    });
+});
 
-        expect($slug->value())->toBe('a--b');
+describe('Slug::fromCustomAlias — character allowlist', function () {
+    it('rejects an internal space as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('my link'), SlugRejectionReason::InvalidCharacters);
     });
 
-    it('equals returns true for same value', function () {
-        $a = Slug::fromString('my-slug');
-        $b = Slug::fromString('my-slug');
-
-        expect($a->equals($b))->toBeTrue();
+    it('rejects an underscore as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('my_link'), SlugRejectionReason::InvalidCharacters);
     });
 
-    it('equals returns false for different values', function () {
-        $a = Slug::fromString('slug-a');
-        $b = Slug::fromString('slug-b');
-
-        expect($a->equals($b))->toBeFalse();
+    it('rejects a Cyrillic homoglyph as invalid_characters and never transliterates it', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('аdmin'), SlugRejectionReason::InvalidCharacters);
     });
 
-    it('preserves value byte-for-byte without normalization', function () {
-        $raw = 'abc-123';
-        $slug = Slug::fromString($raw);
+    it('rejects ADMÍN as invalid_characters (not reserved_word) after ASCII lowercasing', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('ADMÍN'), SlugRejectionReason::InvalidCharacters);
+    });
 
-        expect($slug->value())->toBe($raw);
+    it('rejects İstanbul (U+0130) as invalid_characters — no locale-dependent case collapse', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('İstanbul'), SlugRejectionReason::InvalidCharacters);
+    });
+
+    it('rejects percent-encoding as invalid_characters and never decodes it', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('%61dmin'), SlugRejectionReason::InvalidCharacters);
+    });
+
+    it('rejects a control character as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias("a\x01b"), SlugRejectionReason::InvalidCharacters);
+    });
+
+    it('rejects an emoji as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('a😀b'), SlugRejectionReason::InvalidCharacters);
+    });
+});
+
+describe('Slug::fromCustomAlias — hyphen rules', function () {
+    it('rejects a leading hyphen as invalid_boundary', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('-abc'), SlugRejectionReason::InvalidBoundary);
+    });
+
+    it('rejects a trailing hyphen as invalid_boundary', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('abc-'), SlugRejectionReason::InvalidBoundary);
+    });
+
+    it('rejects "---" as invalid_boundary — the boundary rule fires before consecutive-hyphens', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('---'), SlugRejectionReason::InvalidBoundary);
+    });
+
+    it('rejects two consecutive internal hyphens as consecutive_hyphens', function () {
+        assertSlugRejected(fn () => Slug::fromCustomAlias('a--b'), SlugRejectionReason::ConsecutiveHyphens);
+    });
+
+    it('accepts a single internal hyphen', function () {
+        expect(Slug::fromCustomAlias('a-b')->value())->toBe('a-b');
+    });
+});
+
+describe('Slug::fromCustomAlias — result shape', function () {
+    it('marks an accepted alias with source custom', function () {
+        expect(Slug::fromCustomAlias('valid-alias')->source())->toBe(SlugSource::Custom);
+    });
+
+    it('treats case-equivalent aliases as equal by normalized value', function () {
+        expect(Slug::fromCustomAlias('Foo')->equals(Slug::fromCustomAlias('foo')))->toBeTrue();
+    });
+
+    it('treats different normalized values as not equal', function () {
+        expect(Slug::fromCustomAlias('foo')->equals(Slug::fromCustomAlias('bar')))->toBeFalse();
+    });
+});
+
+describe('Slug::fromGenerated', function () {
+    it('accepts exactly 8 lowercase alphanumerics and marks source automatic', function () {
+        $slug = Slug::fromGenerated('a1b2c3d4');
+
+        expect($slug->value())->toBe('a1b2c3d4')
+            ->and($slug->source())->toBe(SlugSource::Automatic);
+    });
+
+    it('rejects fewer than 8 characters as too_short', function () {
+        assertSlugRejected(fn () => Slug::fromGenerated('a1b2c3'), SlugRejectionReason::TooShort);
+    });
+
+    it('rejects more than 8 characters as too_long', function () {
+        assertSlugRejected(fn () => Slug::fromGenerated('a1b2c3d4e5'), SlugRejectionReason::TooLong);
+    });
+
+    it('rejects uppercase in a generated candidate as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromGenerated('ABCDEFGH'), SlugRejectionReason::InvalidCharacters);
+    });
+
+    it('rejects a hyphen in a generated candidate as invalid_characters', function () {
+        assertSlugRejected(fn () => Slug::fromGenerated('abcdef-h'), SlugRejectionReason::InvalidCharacters);
     });
 });
