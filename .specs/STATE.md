@@ -26,14 +26,15 @@
 
 ## Handoff
 
-- **Feature**: `links/foundation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ **PASS**
-- **Completed**: T1–T15 commitados em `main` (commits `f82f57c`…`922bbbb`); 554 testes, 0 falhas; cobertura Links 91.51%/91.38%, Redirects 90.91%/100%; 3/3 mutantes mortos
-- **In-progress**: none
-- **Next step**: iniciar fatia 2 (`slug-policy`) — spec e context já fechados (SLG-01…18); ou fatia 3 (`destination-policy`) — spec/design/tasks fechados (LDST-01…24, T1–T12). Fatia 3 altera `DestinationUrl` e `LinksDomainException` criados pela fundação — executar depois de confirmar branch strategy
+- **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute 🔄 · Validate ⏳
+- **Completed**: `links/foundation` T1–T15 em `main` (`f82f57c`…`922bbbb`); 554 testes, 0 falhas; cobertura Links 91.51%/91.38%, Redirects 90.91%/100%
+- **In-progress**: `links/slug-policy` Execute — `tasks.md` reconciliado com `main` (14→13 tasks: T1 modifica `config/links.php` existente; T4 reescreve o skeleton `Slug`; ex-T9 removida, model+factory já vêm da foundation; ex-T14→T13 grava `AD-020`). 2 batches: A=T1–T8, B=T9–T13. Batch A despachado a worker.
+- **Next step**: receber summary do Batch A → atualizar `tasks.md` → despachar Batch B → Verifier
 - **Blockers**: none
-- **Branch**: `main`
+- **Branch**: `feat/links-slug-policy` (criada de `main`)
 - **Prior feature**: `links/foundation` — Verified PASS 2026-08-30 (15 tasks, 3 workers + Verifier)
-- **Gap de baixo risco**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude, risco baixo
+- **AD pendente**: `AD-020` (código estável `SLUG_GENERATION_FAILED` / `503`) — gravado na T13 ao aprovar/fechar a fatia
+- **Gap de baixo risco herdado**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude
 
 ### Fase 1: Auth + BFF — CONCLUÍDA ✅
 
