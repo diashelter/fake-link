@@ -3,12 +3,18 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Modules\Links\Contracts\Repositories\SlugReservationRepository;
 use Modules\Links\Contracts\Services\DestinationCipher;
 use Modules\Links\Contracts\Services\LinkDestinationVersionIdGenerator;
+use Modules\Links\Contracts\Services\RandomSlugSource;
+use Modules\Links\Contracts\Services\ReservedSlugs;
 use Modules\Links\Contracts\Services\ShortLinkIdGenerator;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
+use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
+use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -30,6 +36,18 @@ describe('LinksServiceProvider', function () {
         $resolved = app(LinkDestinationVersionIdGenerator::class);
 
         expect($resolved)->toBeInstanceOf(Uuid7LinkDestinationVersionIdGenerator::class);
+    });
+
+    it('resolves ReservedSlugs to ConfigReservedSlugs', function () {
+        expect(app(ReservedSlugs::class))->toBeInstanceOf(ConfigReservedSlugs::class);
+    });
+
+    it('resolves RandomSlugSource to CsprngSlugSource', function () {
+        expect(app(RandomSlugSource::class))->toBeInstanceOf(CsprngSlugSource::class);
+    });
+
+    it('resolves SlugReservationRepository to EloquentSlugReservationRepository', function () {
+        expect(app(SlugReservationRepository::class))->toBeInstanceOf(EloquentSlugReservationRepository::class);
     });
 
     it('registers no routes under api/v1/links', function () {
