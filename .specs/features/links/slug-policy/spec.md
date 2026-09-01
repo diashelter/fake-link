@@ -272,33 +272,33 @@ Toda ambiguidade está resolvida ou registrada aqui — nada fica silenciosament
 
 | Requirement ID | Story | Descrição | Phase | Status |
 | --- | --- | --- | --- | --- |
-| LNK-10 | P1: Slug automático | Base36 8 caracteres por CSPRNG | Design | Pending |
-| SLG-01 | P1: Slug automático | Formato e comprimento exatos | Design | Pending |
-| SLG-02 | P1: Slug automático | Fonte CSPRNG injetável sem viés de módulo | Design | Pending |
-| SLG-03 | P1: Slug automático | Candidato em denylist é descartado e regerado | Design | Pending |
-| LNK-11 | P1: Retentativa | Máximo de 5 tentativas de colisão | Design | Pending |
-| SLG-04 | P1: Retentativa | Parada imediata no primeiro sucesso | Design | Pending |
-| SLG-05 | P1: Retentativa | `SlugGenerationExhausted` → `503 SLUG_GENERATION_FAILED` | Design | Pending |
-| SLG-06 | P1: Retentativa | Sem check-then-insert; `INSERT` é a autoridade | Design | Pending |
-| LNK-12 | P1: Alias / P1: Concorrência | Normalização para ASCII minúsculo antes de tudo | Design | Pending |
-| LNK-13 | P1: Alias | Allowlist de caracteres e comprimento 3–48 | Design | Pending |
-| SLG-07 | P1: Alias | Limites 3/48 inclusivos com códigos estáveis | Design | Pending |
-| SLG-08 | P1: Alias | Fronteiras alfanuméricas e hífens não consecutivos | Design | Pending |
-| SLG-09 | P1: Alias | Unicode/homoglifo rejeitado, nunca normalizado | Design | Pending |
-| SLG-10 | P1: Alias | Lowercase ASCII independente de locale | Design | Pending |
-| LNK-14 | P1: Denylist | Denylist de palavras reservadas | Design | Pending |
-| SLG-11 | P1: Denylist | Comparação exata pós-normalização | Design | Pending |
-| SLG-12 | P1: Denylist | Fonte única em `config/links.php` via contrato | Design | Pending |
-| SLG-13 | P1: Denylist | Mesma lista aplicada a alias e slug automático | Design | Pending |
-| LNK-15 | P1: Reserva / P1: Concorrência | Reserva global e permanente | Design | Pending |
-| LNK-16 | P1: Reserva | Reserva órfã sem proprietário nem destino | Design | Pending |
-| SLG-14 | P1: Reserva | Reserva na transação do chamador; rollback desfaz | Design | Pending |
-| SLG-15 | P1: Reserva | Ausência de qualquer caminho de remoção | Design | Pending |
-| SLG-16 | P1: Reserva | `short_links.slug` imutável | Design | Pending |
-| SLG-17 | P1: Concorrência | Único vencedor entre aliases equivalentes por caixa | Design | Pending |
-| SLG-18 | P1: Concorrência | Falha uniforme que não revela o proprietário | Design | Pending |
+| LNK-10 | P1: Slug automático | Base36 8 caracteres por CSPRNG | Execute | Done |
+| SLG-01 | P1: Slug automático | Formato e comprimento exatos | Execute | Done |
+| SLG-02 | P1: Slug automático | Fonte CSPRNG injetável sem viés de módulo | Execute | Done |
+| SLG-03 | P1: Slug automático | Candidato em denylist é descartado e regerado | Execute | Done |
+| LNK-11 | P1: Retentativa | Máximo de 5 tentativas de colisão | Execute | Done |
+| SLG-04 | P1: Retentativa | Parada imediata no primeiro sucesso | Execute | Done |
+| SLG-05 | P1: Retentativa | `SlugGenerationExhausted` → `503 SLUG_GENERATION_FAILED` | Execute | Done |
+| SLG-06 | P1: Retentativa | Sem check-then-insert; `INSERT` é a autoridade | Execute | Done |
+| LNK-12 | P1: Alias / P1: Concorrência | Normalização para ASCII minúsculo antes de tudo | Execute | Done |
+| LNK-13 | P1: Alias | Allowlist de caracteres e comprimento 3–48 | Execute | Done |
+| SLG-07 | P1: Alias | Limites 3/48 inclusivos com códigos estáveis | Execute | Done |
+| SLG-08 | P1: Alias | Fronteiras alfanuméricas e hífens não consecutivos | Execute | Done |
+| SLG-09 | P1: Alias | Unicode/homoglifo rejeitado, nunca normalizado | Execute | Done |
+| SLG-10 | P1: Alias | Lowercase ASCII independente de locale | Execute | Done |
+| LNK-14 | P1: Denylist | Denylist de palavras reservadas | Execute | Done |
+| SLG-11 | P1: Denylist | Comparação exata pós-normalização | Execute | Done |
+| SLG-12 | P1: Denylist | Fonte única em `config/links.php` via contrato | Execute | Done |
+| SLG-13 | P1: Denylist | Mesma lista aplicada a alias e slug automático | Execute | Done |
+| LNK-15 | P1: Reserva / P1: Concorrência | Reserva global e permanente | Execute | Done |
+| LNK-16 | P1: Reserva | Reserva órfã sem proprietário nem destino | Execute | Done |
+| SLG-14 | P1: Reserva | Reserva na transação do chamador; rollback desfaz | Execute | Done |
+| SLG-15 | P1: Reserva | Ausência de qualquer caminho de remoção | Execute | Done |
+| SLG-16 | P1: Reserva | `short_links.slug` imutável | Execute | Done |
+| SLG-17 | P1: Concorrência | Único vencedor entre aliases equivalentes por caixa | Execute | Done |
+| SLG-18 | P1: Concorrência | Falha uniforme que não revela o proprietário | Execute | Done |
 
-**Coverage:** 25 total, 0 mapped to tasks ⚠️ (Design pendente)
+**Coverage:** 25 total, 25 mapped to tasks (T1–T13, `feat/links-slug-policy`); Execute ✅ 2026-09-01, Verifier pendente
 
 ---
 

@@ -23,17 +23,17 @@
 | AD-017 | 2026-08-11 | Route Handlers BFF Auth usam prefixo **`/api/bff/...`** no App Router Next.js; Laravel permanece em `/api/v1/...` via nginx |
 | AD-018 | 2026-08-29 | Profile `e2e` + `docker-compose.e2e.yml` + `make test-e2e-auth` + `frontend-e2e.yml`; Playwright roda no container `frontend` (stage `e2e`); Mailpit para captura de e-mail; TTLs de sessão BFF configuráveis por env com defaults inalterados |
 | AD-019 | 2026-08-30 | Parsing de URL não confiável usa **`league/uri`** (promovido a dependência direta em `backend/composer.json`, `^7.8`); `parse_url()` e regex sobre a autoridade são proibidos para entrada de usuário — vale para `Links`, `Redirects` e qualquer fatia futura que leia URL. Checagens que o parser reescreveria em silêncio (bytes não-ASCII, caracteres de controle, percent-encoding malformado) rodam **antes** dele |
+| AD-020 | 2026-09-01 | Código de erro estável **`SLUG_GENERATION_FAILED`** (`503`, com `Retry-After`) para exaustão das tentativas de gerar um slug automático livre (esgotou o teto de 5 colisões ou o teto de 5 descartes por denylist). Registrado em `docs/api.md` §7. O domínio (`Modules\Links`) expõe a falha tipada `SlugGenerationExhausted`; o mapeamento HTTP e a entrada na OpenAPI pertencem à fatia `link-creation` que expõe o endpoint (escopo diferido). Nenhuma decisão anterior é superseded |
 
 ## Handoff
 
-- **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute 🔄 · Validate ⏳
-- **Completed**: `links/foundation` T1–T15 em `main` (`f82f57c`…`922bbbb`); 554 testes, 0 falhas; cobertura Links 91.51%/91.38%, Redirects 90.91%/100%
-- **In-progress**: `links/slug-policy` Execute — **Batch A (T1–T8) ✅ complete** (`f016f51`…`c57a849`, 620 testes 0 falhas, Pint/PHPStan/PHPMD clean). **Batch B (T9–T13) despachado**. Env: `make test-backend` bloqueado localmente por clash de porta 6380 (Redis de projeto alheio) — worker usou `docker compose -f docker-compose.yml run --rm … backend php artisan test`; Verifier precisa da porta 6380 livre para `make test-backend-coverage`.
-- **Next step**: receber summary do Batch B → atualizar `tasks.md` → despachar Verifier (spec-anchored check + sensor de discriminação → `validation.md`)
-- **Blockers**: none
-- **Branch**: `feat/links-slug-policy` (criada de `main`)
-- **Prior feature**: `links/foundation` — Verified PASS 2026-08-30 (15 tasks, 3 workers + Verifier)
-- **AD pendente**: `AD-020` (código estável `SLUG_GENERATION_FAILED` / `503`) — gravado na T13 ao aprovar/fechar a fatia
+- **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute ✅ (T1–T13 commitados) · Validate ⏳ (Verifier pendente)
+- **Completed**: `links/foundation` em `main` (`f82f57c`…`922bbbb`). `links/slug-policy` Batch A (T1–T8, `f016f51`…`c57a849`) + Batch B (T9 `93d1139`, T10 `22b9820`, T11 `ed8dcf0`, T12 `68ac6eb`, T13 pendente commit) em `feat/links-slug-policy`.
+- **Gates executados**: T9 full-suite 630/630 ✅ · T10 full-suite 644/644 ✅ · T11 `make lint-backend` + `make test-architecture` 17/17 + coverage 648/648 (Links **92.30% linhas / 91.00% métodos**) ✅ · T12: 4/4 testes próprios ✅, `pint` ✅, `phpstan modules/Links` ✅ — **full-suite gate não fechou**: única falha recorrente é `QualityToolingTest` (phpstan como subprocesso, timeout de 180s) sob carga da máquina (load avg chegou a 41 por processo alheio), não é defeito de código.
+- **Next step**: (1) commitar T13 (docs); (2) re-rodar `make lint && make test-backend-coverage` numa janela sem carga para fechar o gate de T12/T13; (3) despachar Verifier (spec-anchored check + sensor de discriminação → `validation.md`).
+- **Blockers**: máquina sobrecarregada por projeto alheio (também segura a porta 6380 do Redis, forçando o workaround `docker compose -f docker-compose.yml run … php artisan test` no lugar de `make test-backend`).
+- **Branch**: `feat/links-slug-policy` (de `main`)
+- **Prior feature**: `links/foundation` — Verified PASS 2026-08-30
 - **Gap de baixo risco herdado**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude
 
 ### Fase 1: Auth + BFF — CONCLUÍDA ✅

@@ -51,7 +51,21 @@ Numeração nova: **T1…T13**. Batches: A = T1–T8, B = T9–T13.
 - **T10 wiring reminder**: provider bindings should pass `max_collision_attempts`, `max_denylist_discards`, `length` from `config('links.slug.*')` (not hardcoded).
 - **Global Pest helpers already defined** (avoid clashes in Batch B): `assertSlugRejected`, `policyWith`, `assertPolicyRejected`, `base36Alphabet`, `generatorWith`, `class ScriptedSlugSource`.
 
-### Batch B (Phase 3 + Phase 4, T9–T13) — 🔄 dispatched
+### Batch B (Phase 3 + Phase 4, T9–T13) — ✅ COMPLETE 2026-09-01
+
+| Task | Commit | Notes |
+| --- | --- | --- |
+| T9 | `93d1139` | `SlugReservationRepository` port + `EloquentSlugReservationRepository` (`reserve` / `existsWithoutLink`, no removal path); 10 integration tests. Gate: full suite 630/630. |
+| T10 | `22b9820` | `ReserveSlug` UseCase (`forAlias` single-shot; `automatic` bounded retry via per-attempt `DB::transaction` SAVEPOINT); provider binds the 3 ports + wires `SlugGenerator`/`ReserveSlug` from `config('links.slug.*')`. 11 + 3 tests. Gate: full suite 644/644. |
+| T11 | `ed8dcf0` | `tests/Architecture/SlugPolicyBoundariesTest.php` — 4 rules (Domain framework-free, Domain⊄Infrastructure, no reservation removal/mutation path, `Slug` readonly/no-mutator) with a discrimination-sensor header. Gate: `make lint-backend` + `make test-architecture` 17/17 + coverage 648/648, **Links 92.30% lines / 91.00% methods**. |
+| T12 | `68ac6eb` | `SlugReservationConcurrencyTest.php` — 2 real PG connections, overlapping transactions, one winner; loser gets `SlugUnavailable`; one row; failure carries no occupant data (orphan vs linked identical). Runs outside transactional `RefreshDatabase` with explicit cleanup + in-file note. 4 tests. |
+| T13 | *(this commit)* | `docs/api.md` §7 registers `SLUG_GENERATION_FAILED` (`503`, `Retry-After`); `AD-020` in `.specs/STATE.md`; STATE Handoff + `links/README.md` updated; OpenAPI change explicitly deferred to `link-creation`. |
+
+- **Environment caveat**: Batch B ran while the host was heavily loaded by an unrelated process (load avg up to ~41; it also holds Redis port 6380, so `make test-backend` was replaced by `docker compose -f docker-compose.yml run … backend php artisan test`). Consequences:
+  - T9/T10/T11 gates completed green as noted above.
+  - **T12 full-suite gate did not close**: its own 4 tests pass, `pint` passes, `phpstan analyse modules/Links` is clean, but the in-suite `QualityToolingTest` (which shells out to `phpstan` with a 180s self-timeout) timed out under load on every attempt — an environmental flake, not a code defect.
+  - **T13 build gate (`make lint && make test-backend-coverage`) still needs one clean run** on an unloaded machine. T13 changes are docs/STATE only and cannot affect tests.
+- **Follow-up for the orchestrator/Verifier**: re-run `make lint && make test-backend-coverage` once the host is quiet to close T12/T13; the Verifier's independent pass covers the same ground.
 
 ---
 

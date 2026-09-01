@@ -254,6 +254,14 @@ Dispositivos retornam somente `total_clicks`, sem `limit`, e incluem sempre as c
 
 A OpenAPI mantém os códigos específicos por resposta. Códigos gerais incluem `MALFORMED_REQUEST`, `UNAUTHENTICATED`, `TOKEN_RESTRICTED`, `RESOURCE_NOT_FOUND`, `METHOD_NOT_ALLOWED`, `PAYLOAD_TOO_LARGE`, `VALIDATION_FAILED`, `RATE_LIMIT_EXCEEDED`, `INTERNAL_ERROR`, `SERVICE_UNAVAILABLE` e `GATEWAY_TIMEOUT`.
 
+Códigos estáveis específicos por fatia (fora da lista geral acima):
+
+| Código | Status | Significado |
+| --- | --- | --- |
+| `SLUG_GENERATION_FAILED` | `503` | A criação de link esgotou as tentativas de gerar um slug automático livre; falha transitória e reprocessável, a resposta inclui `Retry-After`. |
+
+O domínio (`Modules\Links`) lança a falha tipada `SlugGenerationExhausted`; o mapeamento HTTP e a entrada correspondente na OpenAPI pertencem à fatia `link-creation` que expõe o endpoint e **não** são alterados aqui.
+
 ## 8. Rate limiting inicial
 
 | Grupo | Limite |
