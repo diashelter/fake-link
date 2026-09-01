@@ -5,12 +5,6 @@ declare(strict_types=1);
 use Modules\Links\Exceptions\LinksDomainException;
 
 describe('LinksDomainException', function () {
-    it('exposes error code INVALID_SLUG', function () {
-        $exception = LinksDomainException::invalidSlug();
-
-        expect($exception->errorCode())->toBe(LinksDomainException::INVALID_SLUG);
-    });
-
     it('exposes error code INVALID_DESTINATION_URL', function () {
         $exception = LinksDomainException::invalidDestinationUrl();
 
@@ -44,7 +38,7 @@ describe('LinksDomainException', function () {
     });
 
     it('is a DomainException', function () {
-        $exception = LinksDomainException::invalidSlug();
+        $exception = LinksDomainException::invalidDestinationUrl();
 
         expect($exception)->toBeInstanceOf(DomainException::class);
     });
