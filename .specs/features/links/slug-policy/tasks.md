@@ -29,6 +29,32 @@ Numeração nova: **T1…T13**. Batches: A = T1–T8, B = T9–T13.
 
 ---
 
+## Execution Log
+
+### Batch A (Phase 1 + Phase 2, T1–T8) — ✅ COMPLETE 2026-09-01
+
+| Task | Commit | Notes |
+| --- | --- | --- |
+| T1 | `f016f51` | `slug` subtree added to `config/links.php`; `destination` intact |
+| T2 | `6fca361` | `SlugSource` / `SlugRejectionReason` enums |
+| T3 | `242a71b` | `SlugPolicyException`, `SlugUnavailable` (`errorCode ALIAS_UNAVAILABLE`), `SlugGenerationExhausted` (`errorCode SLUG_GENERATION_FAILED`) |
+| T4 | `f5887c9` | `Slug` skeleton replaced (`fromCustomAlias`/`fromGenerated`, no `fromString`); `LinksDomainException::invalidSlug` + `INVALID_SLUG` removed; 29 tests (all spec edge cases kept) |
+| T5 | `2dd547b` | `ReservedSlugs` port + `Infrastructure/Slug/ConfigReservedSlugs` |
+| T6 | `06e6300` | `SlugPolicy` (`final readonly`, ctor `(ReservedSlugs)`, `fromCustomAlias`/`fromGenerated`/`isReserved`) |
+| T7 | `76c1071` | `RandomSlugSource` port + `Infrastructure/Slug/CsprngSlugSource` (`random_int` per position) |
+| T8 | `c57a849` | `SlugGenerator` ctor `(RandomSlugSource, SlugPolicy, int length=8, int maxDenylistDiscards=5)`, `generate(): Slug` |
+
+- **Tests**: 620 passed, 0 failed (full suite). Batch delta +66.
+- **Quality**: Pint / PHPStan L6 + strict-rules / PHPMD all clean.
+- **Env issue (not code)**: `make test-backend` blocked here by a host **port 6380** clash (Redis) with an unrelated running project. Worker ran the same suite via `docker compose -f docker-compose.yml run --rm … backend php artisan test` against `fake_link_testing`. **Batch B will hit the same clash** and must use the same workaround (or the other project's Redis is stopped). The **Verifier still needs `make test-backend-coverage`** to produce the coverage report — port 6380 must be free by then, or run the coverage command with the base-compose-only workaround.
+- **SPEC_DEVIATION (SlugGenerator)**: `int $length = 8` kept in ctor but effectively pinned — `Slug::fromGenerated` enforces exactly 8 per spec. Alphabet is a private Base36 const in the generator (design ctor omits an alphabet param); `config('links.slug.alphabet')` exists but is **not read by code**. Rationale: the `Slug` VO is the single source of the 8-char rule.
+- **T10 wiring reminder**: provider bindings should pass `max_collision_attempts`, `max_denylist_discards`, `length` from `config('links.slug.*')` (not hardcoded).
+- **Global Pest helpers already defined** (avoid clashes in Batch B): `assertSlugRejected`, `policyWith`, `assertPolicyRejected`, `base36Alphabet`, `generatorWith`, `class ScriptedSlugSource`.
+
+### Batch B (Phase 3 + Phase 4, T9–T13) — 🔄 dispatched
+
+---
+
 ## Test Coverage Matrix
 
 > Gerada a partir do codebase, das diretrizes do projeto e da spec — confirmar antes do Execute. Diretrizes encontradas: `AGENTS.md` (linhas 38, 42–44), `docs/testing.md` §3.1 e §4, `.specs/STATE.md` (AD-009, AD-011), `backend/phpunit.xml`, `backend/composer.json` (`quality`, `test:coverage`), `Makefile`, `LARAVEL_CODE_DESIGN.md`.

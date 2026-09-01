@@ -28,8 +28,8 @@
 
 - **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute 🔄 · Validate ⏳
 - **Completed**: `links/foundation` T1–T15 em `main` (`f82f57c`…`922bbbb`); 554 testes, 0 falhas; cobertura Links 91.51%/91.38%, Redirects 90.91%/100%
-- **In-progress**: `links/slug-policy` Execute — `tasks.md` reconciliado com `main` (14→13 tasks: T1 modifica `config/links.php` existente; T4 reescreve o skeleton `Slug`; ex-T9 removida, model+factory já vêm da foundation; ex-T14→T13 grava `AD-020`). 2 batches: A=T1–T8, B=T9–T13. Batch A despachado a worker.
-- **Next step**: receber summary do Batch A → atualizar `tasks.md` → despachar Batch B → Verifier
+- **In-progress**: `links/slug-policy` Execute — **Batch A (T1–T8) ✅ complete** (`f016f51`…`c57a849`, 620 testes 0 falhas, Pint/PHPStan/PHPMD clean). **Batch B (T9–T13) despachado**. Env: `make test-backend` bloqueado localmente por clash de porta 6380 (Redis de projeto alheio) — worker usou `docker compose -f docker-compose.yml run --rm … backend php artisan test`; Verifier precisa da porta 6380 livre para `make test-backend-coverage`.
+- **Next step**: receber summary do Batch B → atualizar `tasks.md` → despachar Verifier (spec-anchored check + sensor de discriminação → `validation.md`)
 - **Blockers**: none
 - **Branch**: `feat/links-slug-policy` (criada de `main`)
 - **Prior feature**: `links/foundation` — Verified PASS 2026-08-30 (15 tasks, 3 workers + Verifier)
