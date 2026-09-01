@@ -10,7 +10,7 @@ Implemente estas tasks com a skill `tlc-spec-driven`: **ative-a pelo nome e siga
 
 **Spec**: `.specs/features/links/slug-policy/spec.md`  
 **Design**: `.specs/features/links/slug-policy/design.md`  
-**Status**: Aprovado 2026-09-01 — Execute em andamento (sub-agents por batch)
+**Status**: ✅ Concluído e verificado 2026-09-01 — Execute (T1–T13) + Verifier **PASS** (`validation.md`)
 
 > ✅ **Pré-requisito atendido**: a fatia [foundation](../foundation/spec.md) está implementada e verificada (STATE handoff — `f82f57c`…`922bbbb`). Já existem em `main`: módulos `backend/modules/{Links,Redirects}`, migrations `slug_reservations` / `short_links` / `link_destination_versions`, suítes de `Links` em `backend/phpunit.xml` (Unit/Feature/Integration) e no bloco `<source>`, e o gate por módulo `backend/scripts/check-module-coverage-gate.php` já com `Links => [lines 90, methods 85]`. A T1 confirma esse estado antes de escrever código.
 
@@ -66,6 +66,10 @@ Numeração nova: **T1…T13**. Batches: A = T1–T8, B = T9–T13.
   - **Orchestrator follow-up (post-Batch B)**: re-ran the full suite directly (`vendor/bin/pest --coverage`, `COMPOSER_PROCESS_TIMEOUT=0` to avoid composer's own 300s cap) → **652 total, 651 passed, 1 failed**. The 1 failure is `Tests\Feature\QualityToolingTest` (`QTOOL-26`, pre-existing, unrelated to this slice) hitting its own hardcoded `->timeout(180)` on a `phpstan analyse` subprocess under host load (confirmed: isolated `phpstan analyse modules/Links` and `make lint-backend`'s `composer run quality` both passed clean on this same host earlier). Count reconciles exactly: 648 (T11) + 4 (T12) = 652 total, all Links/Redirects/Auth tests green.
   - `make lint` also surfaced a **pre-existing, out-of-slice** failure: `frontend/e2e/{guards,journey}.spec.ts` fail `tsc --noEmit` (`TS2353: 'launchOptions' does not exist in type 'BrowserContextOptions'`) — reproduced identically on a clean `main` checkout, so it predates this branch and is a Playwright-types drift unrelated to backend/Links work. `make lint-backend` (Pint + PHPStan L6 + strict-rules + PHPMD) and OpenAPI Spectral lint both pass with 0 errors.
   - **Verdict**: T12/T13 close on the evidence above; no code defect found. The frontend `tsc` breakage is flagged to the user as a separate, pre-existing backlog item.
+
+### Verifier — ✅ PASS 2026-09-01
+
+Independent sub-agent, author ≠ verifier. 25/25 requirement IDs traced to `file:line` with spec-matching assertions (3 marked scope-deferred to `link-creation`, by design). Discrimination sensor: 5 targeted mutations (normalization order, denylist-after-structural order, generator's two independent budgets, `ReserveSlug` retry bound, no-removal architecture rule) — **5/5 killed, 0 survived**. Own clean full-suite run: 652 passed, 0 failed (no `QualityToolingTest` flake this time — corroborates it as a host-load artifact, not a code defect). Full report: `.specs/features/links/slug-policy/validation.md`. Both spec deviations (SlugGenerator config/alphabet, ReserveSlug per-attempt SAVEPOINT) scrutinized and judged non-blocking; one low-severity spec-precision gap noted (orphan-reservation-then-denylisted-later has no dedicated scenario test, though structurally guaranteed); 4 lessons distilled as candidates (`L-068`…`L-071`).
 
 ---
 

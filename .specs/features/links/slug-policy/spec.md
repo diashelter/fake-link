@@ -298,7 +298,7 @@ Toda ambiguidade está resolvida ou registrada aqui — nada fica silenciosament
 | SLG-17 | P1: Concorrência | Único vencedor entre aliases equivalentes por caixa | Execute | Done |
 | SLG-18 | P1: Concorrência | Falha uniforme que não revela o proprietário | Execute | Done |
 
-**Coverage:** 25 total, 25 mapped to tasks (T1–T13, `feat/links-slug-policy`); Execute ✅ 2026-09-01, Verifier pendente
+**Coverage:** 25 total, 25 mapped to tasks (T1–T13, `feat/links-slug-policy`); Execute ✅ · Verifier ✅ **PASS** 2026-09-01 (`.specs/features/links/slug-policy/validation.md`) — 5/5 discrimination mutants killed, 0 surviving; 2 spec deviations scrutinized (both non-blocking, see report)
 
 ---
 

@@ -27,13 +27,14 @@
 
 ## Handoff
 
-- **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute ✅ (T1–T13 commitados) · Validate ⏳ (Verifier pendente)
-- **Completed**: `links/foundation` em `main` (`f82f57c`…`922bbbb`). `links/slug-policy` Batch A (T1–T8, `f016f51`…`c57a849`) + Batch B (T9 `93d1139`, T10 `22b9820`, T11 `ed8dcf0`, T12 `68ac6eb`, T13 `47ece77`) em `feat/links-slug-policy`. Todos os 13 tasks commitados; árvore limpa.
-- **Gates executados**: T9 full-suite 630/630 ✅ · T10 full-suite 644/644 ✅ · T11 `make lint-backend` + `make test-architecture` 17/17 + coverage 648/648 (Links **92.30% linhas / 91.00% métodos** — passa 90/85) ✅ · T12+T13 fechados pelo orquestrador via rerun direto (`pest --coverage`, `COMPOSER_PROCESS_TIMEOUT=0`): **652 total, 651 passed, 1 failed** — a única falha é `QualityToolingTest` (`QTOOL-26`, pré-existente, alheia à fatia) por timeout de 180s hardcoded no subprocesso `phpstan` sob carga do host; `phpstan analyse modules/Links` isolado e `make lint-backend` (`composer run quality`) passaram limpos no mesmo host. Contagem confere: 648 (T11) + 4 (T12) = 652.
-- **Achado à parte (fora do escopo desta fatia)**: `make lint` falha em `lint-frontend` — `frontend/e2e/{guards,journey}.spec.ts` não compilam (`tsc` `TS2353: 'launchOptions'` não existe em `BrowserContextOptions`). Reproduzido também em `main` limpo — é breakage pré-existente (drift de tipos do Playwright), não introduzido por `slug-policy`. Fica registrado para o backlog; não bloqueia esta fatia (backend-only).
-- **Next step**: despachar Verifier (spec-anchored check + sensor de discriminação → `validation.md`).
+- **Feature**: `links/slug-policy` — Specify ✅ · Discuss ✅ · Design ✅ (Draft) · Tasks ✅ (reconciliado + aprovado 2026-09-01) · Execute ✅ (T1–T13 commitados) · Validate ✅ **PASS** 2026-09-01
+- **Completed**: `links/foundation` em `main` (`f82f57c`…`922bbbb`). `links/slug-policy` T1–T13 em `feat/links-slug-policy` (`f016f51`…`47ece77`) — Verified PASS pelo Verifier independente (`.specs/features/links/slug-policy/validation.md`): 25/25 requisitos rastreados, sensor de discriminação 5/5 mutantes mortos, run próprio limpo 652/652. Branch **não mesclada** em `main` — aguardando decisão do usuário sobre merge/PR.
+- **Gates**: full-suite 652/652 (0 falhas, corrida limpa do Verifier); Links **92.30% linhas / 91.00% métodos** (passa 90/85); `make lint-backend` + `make test-architecture` (17/17) limpos.
+- **Achado à parte (fora do escopo desta fatia, backlog)**: `make lint` falha em `lint-frontend` — `frontend/e2e/{guards,journey}.spec.ts` não compilam (`tsc` `TS2353: 'launchOptions'` não existe em `BrowserContextOptions`). Reproduzido em `main` limpo — pré-existente, não introduzido por `slug-policy`.
+- **Lições candidatas registradas**: `L-068`…`L-071` (config órfã, savepoint aninhado sob transação de chamador, erro de domínio deferido para fatia HTTP, cenário temporal de denylist tardia) — ver `.specs/lessons.json`.
+- **Next step**: decidir merge/PR de `feat/links-slug-policy` → `main`; depois iniciar fatia 3 (`destination-policy`, spec/design/tasks já fechados, LDST-01…24) ou a próxima da fila.
 - **Blockers**: none.
-- **Branch**: `feat/links-slug-policy` (de `main`)
+- **Branch**: `feat/links-slug-policy` (de `main`, não mesclada)
 - **Prior feature**: `links/foundation` — Verified PASS 2026-08-30
 - **Gap de baixo risco herdado**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude
 

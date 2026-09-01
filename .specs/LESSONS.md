@@ -414,6 +414,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: SH-22 AC5 ProfileForm LogoutAllForm 403 (frontend/modules/auth)
 - last seen: 2026-08-19T16:18:58Z
 
+### L-068 — When a config key exists for a value that a value object independently hardcodes, either wire the config through or remove the unused config key — never leave both, since one silently becomes dead configuration.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `config` · harmful: 0
+- features: links/slug-policy
+- evidence: SPEC_DEVIATION: SlugGenerator alphabet/length (tasks.md Batch A log) (config)
+- last seen: 2026-09-01T16:03:24Z
+
+### L-069 — When a spec says a service must not open or commit its own transaction, add a test that exercises the service standalone (no pre-existing caller transaction), not only nested inside one, to catch the case where nesting silently degrades the guarantee.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `transactions` · harmful: 0
+- features: links/slug-policy
+- evidence: SPEC_DEVIATION: ReserveSlug::automatic() per-attempt DB::transaction() SAVEPOINT (UseCases/ReserveSlug.php:50) (transactions)
+- last seen: 2026-09-01T16:03:24Z
+
+### L-070 — When an HTTP-mapping AC is explicitly deferred to a downstream slice, still add a test for the domain-side half (stable error code, no leaked detail) so the AC is not left with zero direct evidence in the slice that owns the domain exception.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `error-handling` · harmful: 0
+- features: links/slug-policy
+- evidence: AC LNK-11.5 (SlugGenerationExhausted -> 503 SLUG_GENERATION_FAILED with Retry-After) (error-handling)
+- last seen: 2026-09-01T16:03:31Z
+
+### L-071 — When a spec edge case describes a temporal sequence (state created before a rule existed, rule added later), write a scenario test for that exact sequence rather than relying on the invariant being structurally implied by the absence of a re-validation path.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `testing` · harmful: 0
+- features: links/slug-policy
+- evidence: Edge case: orphan reservation of a word later added to the denylist (spec.md Edge Cases) (testing)
+- last seen: 2026-09-01T16:03:32Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
