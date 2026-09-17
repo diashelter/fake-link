@@ -133,6 +133,31 @@ describe('PublicHostClassifier::reject — accepted public hosts', function () {
     ]);
 });
 
+describe('PublicHostClassifier::reject — self host takes precedence over special-use suffix', function () {
+    // Regression for LDST-13 / spec.md AC7: a real self_host such as go.localhost
+    // itself ends in the special-use suffix ".localhost". reject() must classify
+    // it as SelfHost, not SpecialUseHost — checking self-host before special-use.
+    it('classifies an exact self host ending in a special-use suffix as SelfHost', function () {
+        expect(classifierWith(['go.localhost'])->reject('go.localhost'))
+            ->toBe(DestinationRejectionReason::SelfHost);
+    });
+
+    it('classifies a case-mixed self host as SelfHost (trailing-dot trimming is the caller\'s job — DestinationUrlPolicy, tested there)', function () {
+        expect(classifierWith(['go.localhost'])->reject('GO.Localhost'))
+            ->toBe(DestinationRejectionReason::SelfHost);
+    });
+
+    it('classifies a subdomain of a self host ending in a special-use suffix as SelfHost', function () {
+        expect(classifierWith(['go.localhost'])->reject('abc.go.localhost'))
+            ->toBe(DestinationRejectionReason::SelfHost);
+    });
+
+    it('still classifies a special-use suffix host that is not a configured self host as SpecialUseHost', function () {
+        expect(classifierWith(['go.localhost'])->reject('other.localhost'))
+            ->toBe(DestinationRejectionReason::SpecialUseHost);
+    });
+});
+
 describe('PublicHostClassifier — no I/O', function () {
     it('classifies a syntactically valid, unresolvable host without any DNS lookup or network I/O', function () {
         // RFC 2606 reserves ".invalid" as guaranteed never to resolve. If the classifier performed

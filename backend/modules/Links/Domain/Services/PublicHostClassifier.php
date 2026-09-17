@@ -62,17 +62,17 @@ final class PublicHostClassifier
             return DestinationRejectionReason::InvalidHostname;
         }
 
-        foreach (self::SPECIAL_USE_SUFFIXES as $suffix) {
-            if ($normalized === $suffix || str_ends_with($normalized, '.'.$suffix)) {
-                return DestinationRejectionReason::SpecialUseHost;
-            }
-        }
-
         foreach ($this->selfHosts as $selfHost) {
             $normalizedSelfHost = strtolower($selfHost);
 
             if ($normalized === $normalizedSelfHost || str_ends_with($normalized, '.'.$normalizedSelfHost)) {
                 return DestinationRejectionReason::SelfHost;
+            }
+        }
+
+        foreach (self::SPECIAL_USE_SUFFIXES as $suffix) {
+            if ($normalized === $suffix || str_ends_with($normalized, '.'.$suffix)) {
+                return DestinationRejectionReason::SpecialUseHost;
             }
         }
 
