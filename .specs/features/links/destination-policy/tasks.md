@@ -90,9 +90,9 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `league/uri` aparece em `require` com constraint `^7.8`
-- [ ] `composer.lock` atualizado **sem** mudança de versão de nenhum outro pacote (diff mostra apenas a promoção)
-- [ ] Gate check passa: `make lint && make test-backend-coverage`
+- [x] `league/uri` aparece em `require` com constraint `^7.8`
+- [x] `composer.lock` atualizado **sem** mudança de versão de nenhum outro pacote (diff mostra apenas a promoção)
+- [x] Gate check passa: `make lint && make test-backend-coverage` — verificado por partes (Gotcha 4: `lint-frontend` falha pré-existente `TS2353`); `lint-openapi`, `lint-backend`, `test-architecture` (17/17), `test-backend` (652/652), `test-backend-coverage` (Links 92.49%/91.09%) todos verdes
 
 **Tests**: none (camada de dependência — build gate)
 **Gate**: build
@@ -113,11 +113,11 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] 12 cases com os valores exatos do design (`TOO_LONG` … `INVALID_PORT`)
-- [ ] Teste assere o conjunto completo de valores (falha se um case for removido ou renomeado)
-- [ ] Teste assere que nenhum valor contém dado variável (cardinalidade fixa)
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: 2 testes passam (sem deleções silenciosas)
+- [x] 12 cases com os valores exatos do design (`TOO_LONG` … `INVALID_PORT`)
+- [x] Teste assere o conjunto completo de valores (falha se um case for removido ou renomeado)
+- [x] Teste assere que nenhum valor contém dado variável (cardinalidade fixa)
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 2 testes passam (verificado: 654/654, +2 sobre a baseline de 652; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -138,13 +138,13 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `invalidDestinationUrl(DestinationRejectionReason $reason): self`; assinatura **não aceita** string
-- [ ] `errorCode()` devolve `INVALID_DESTINATION_URL` para todos os motivos
-- [ ] Mensagem é exatamente `The destination URL is not allowed.` para todos os motivos (teste percorre os 12)
-- [ ] `reason()` devolve o motivo informado
-- [ ] Testes da fatia 1 que chamavam a assinatura antiga atualizados, sem enfraquecer asserção
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: 4 testes passam (sem deleções silenciosas)
+- [x] `invalidDestinationUrl(DestinationRejectionReason $reason): self`; assinatura **não aceita** string
+- [x] `errorCode()` devolve `INVALID_DESTINATION_URL` para todos os motivos
+- [x] Mensagem é exatamente `The destination URL is not allowed.` para todos os motivos (teste percorre os 12)
+- [x] `reason()` devolve o motivo informado
+- [x] Testes da fatia 1 que chamavam a assinatura antiga atualizados, sem enfraquecer asserção (`DestinationUrlTest.php:23`, `LinksDomainExceptionTest.php:9,41`)
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 4 testes passam (verificado: 656/656, +2 sobre a baseline de 654 — 2 testes existentes atualizados + 2 novos; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -165,12 +165,14 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `reject(string $host): ?DestinationRejectionReason` na ordem: IP literal → sintaxe → uso especial → host próprio
-- [ ] `selfHosts` recebido por construtor (`list<string>`), nunca lido de `config()` internamente
-- [ ] Testes cobrem: IPv4 (`127.0.0.1`, `10.0.0.5`, `8.8.8.8`), IPv6 (`[::1]`, `[fd00::1]`), formas inteiras (`2130706433`, `0x7f.1`), sintaxe (`intranet`, `a..b.com`, `-a.com`, `a-.com`, label 63/64, total 253/254, `exa_mple.com`), uso especial (os 9 sufixos, em caixa mista), host próprio (exato, subdomínio, caixa mista) e **aceitos** (`example.com`, `xn--caf-dma.com`, `mylocalhost.com`, `internal-tools.com`)
-- [ ] Teste prova ausência de I/O: nenhuma chamada de resolução; suíte passa sem rede
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥24 testes passam (sem deleções silenciosas)
+- [x] `reject(string $host): ?DestinationRejectionReason` na ordem: IP literal → sintaxe → uso especial → host próprio
+- [x] `selfHosts` recebido por construtor (`list<string>`), nunca lido de `config()` internamente
+- [x] Testes cobrem: IPv4 (`127.0.0.1`, `10.0.0.5`, `8.8.8.8`), IPv6 (`[::1]`, `[fd00::1]`), formas inteiras (`2130706433`, `0x7f.1`), sintaxe (`intranet`, `a..b.com`, `-a.com`, `a-.com`, label 63/64, total 253/254, `exa_mple.com`), uso especial (os 9 sufixos, em caixa mista), host próprio (exato, subdomínio, caixa mista) e **aceitos** (`example.com`, `xn--caf-dma.com`, `mylocalhost.com`, `internal-tools.com`)
+- [x] Teste prova ausência de I/O: nenhuma chamada de resolução; suíte passa sem rede
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: ≥24 testes passam (verificado: 42 testes no arquivo; 698/698 na suíte completa, +42 sobre a baseline de 656; sem deleções silenciosas)
+
+**Achado registrado durante T5 (não bloqueia T1–T5, relevante para T7):** a ordem "especial → próprio" faz com que os self_hosts reais (`go.localhost`, `app.localhost`) — ambos subdomínios do sufixo especial `localhost` — sejam classificados como `SpecialUseHost`, não `SelfHost`, contradizendo o AC7 do spec.md (`go.localhost` deve reprovar com motivo `SELF_HOST`). Quem implementar T7 precisará resolver isso (ex.: checar host próprio antes de uso especial).
 
 **Tests**: unit
 **Gate**: quick
@@ -191,12 +193,12 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `config('links.destination.self_hosts')` devolve os hosts de `SHORT_HOST` e `APP_URL`, em minúsculas, sem porta e sem duplicatas
-- [ ] `PublicHostClassifier` resolvido do container vem com a lista da config (provado por resolução, não por boot bem-sucedido)
-- [ ] `phpunit.xml` fixa `SHORT_HOST` e `APP_URL` determinísticos
-- [ ] Teste assere que a lista não é vazia no ambiente de teste
-- [ ] Gate check passa: `make test-backend && make test-architecture`
-- [ ] Test count: 3 testes passam (sem deleções silenciosas)
+- [x] `config('links.destination.self_hosts')` devolve os hosts de `SHORT_HOST` e `APP_URL`, em minúsculas, sem porta e sem duplicatas
+- [x] `PublicHostClassifier` resolvido do container vem com a lista da config (provado por resolução via `ReflectionProperty`, não por boot bem-sucedido)
+- [x] `phpunit.xml` fixa `SHORT_HOST` e `APP_URL` determinísticos
+- [x] Teste assere que a lista não é vazia no ambiente de teste
+- [x] Gate check passa: `make test-backend && make test-architecture`
+- [x] Test count: 3 testes passam (verificado: 701/701 em `test-backend`, +3 sobre a baseline de 698; 17/17 em `test-architecture`; sem deleções silenciosas)
 
 **Tests**: feature
 **Gate**: full
