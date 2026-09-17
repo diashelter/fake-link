@@ -4,44 +4,29 @@ declare(strict_types=1);
 
 namespace Modules\Links\Domain\ValueObjects;
 
-use Modules\Links\Domain\Enums\DestinationRejectionReason;
-use Modules\Links\Exceptions\LinksDomainException;
+use Modules\Links\Domain\Services\DestinationUrlPolicy;
+use Modules\Links\Domain\Services\PublicHostClassifier;
 
 final readonly class DestinationUrl
 {
-    private const MAX_LENGTH = 2048;
-
-    private const ALLOWED_SCHEMES = ['http', 'https'];
-
     private function __construct(private string $value) {}
 
-    public static function fromString(string $raw): self
+    /**
+     * Build a DestinationUrl from a raw string, running the full destination policy
+     * (parsing, host classification and normalization). There is no other way to
+     * construct this value object — a caller can never obtain one without the policy
+     * having run immediately before.
+     */
+    public static function fromString(string $raw, PublicHostClassifier $hosts): self
     {
-        if (strlen($raw) > self::MAX_LENGTH) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::TooLong);
-        }
+        $policy = new DestinationUrlPolicy($hosts);
 
-        $parsed = parse_url($raw);
-
-        if ($parsed === false) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
-        }
-
-        $scheme = isset($parsed['scheme']) ? strtolower($parsed['scheme']) : '';
-
-        if (! in_array($scheme, self::ALLOWED_SCHEMES, true)) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::SchemeNotAllowed);
-        }
-
-        $host = $parsed['host'] ?? '';
-
-        if ($host === '') {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidHostname);
-        }
-
-        return new self($raw);
+        return new self($policy->normalize($raw));
     }
 
+    /**
+     * The normalized value. There is no accessor for the raw input.
+     */
     public function value(): string
     {
         return $this->value;
