@@ -13,6 +13,7 @@ use Modules\Links\Contracts\Services\LinkDestinationVersionIdGenerator;
 use Modules\Links\Contracts\Services\RandomSlugSource;
 use Modules\Links\Contracts\Services\ReservedSlugs;
 use Modules\Links\Contracts\Services\ShortLinkIdGenerator;
+use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\Services\SlugGenerator;
 use Modules\Links\Domain\Services\SlugPolicy;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
@@ -42,6 +43,10 @@ final class LinksServiceProvider extends ServiceProvider
     {
         $this->app->singleton(DestinationKeyring::class, fn (): DestinationKeyring => DestinationKeyring::fromConfig(
             config('links.destination'),
+        ));
+
+        $this->app->singleton(PublicHostClassifier::class, fn (): PublicHostClassifier => new PublicHostClassifier(
+            config('links.destination.self_hosts'),
         ));
 
         $this->app->bind(SlugGenerator::class, fn (Application $app): SlugGenerator => new SlugGenerator(
