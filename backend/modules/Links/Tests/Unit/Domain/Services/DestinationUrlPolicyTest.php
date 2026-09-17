@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 use Modules\Links\Domain\Enums\DestinationRejectionReason;
 use Modules\Links\Domain\Services\DestinationUrlPolicy;
+use Modules\Links\Domain\Services\PublicHostClassifier;
+use Modules\Links\Exceptions\LinksDomainException;
 
-function destinationPolicyWith(): DestinationUrlPolicy
+/**
+ * @param  list<string>  $selfHosts
+ */
+function destinationPolicyWith(array $selfHosts = []): DestinationUrlPolicy
 {
-    return new DestinationUrlPolicy;
+    return new DestinationUrlPolicy(new PublicHostClassifier($selfHosts));
 }
 
 describe('DestinationUrlPolicy — pre-parse: raw length (LDST-02)', function () {
@@ -104,5 +109,140 @@ describe('DestinationUrlPolicy — pre-parse order: non-ASCII/control checked be
     it('reports NonAsciiInput (step 3) rather than InvalidPercentEncoding (step 4) when both are present', function () {
         expect(destinationPolicyWith()->reject('https://café.com/%zz'))
             ->toBe(DestinationRejectionReason::NonAsciiInput);
+    });
+});
+
+describe('DestinationUrlPolicy — scheme (LDST-01)', function () {
+    it('rejects disallowed or absent schemes as SchemeNotAllowed', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::SchemeNotAllowed);
+    })->with([
+        'ftp' => 'ftp://example.com/x',
+        'javascript' => 'javascript:alert(1)',
+        'data' => 'data:text/html,<h1>hi</h1>',
+        'file' => 'file:///etc/passwd',
+        'scheme absent' => 'example.com/path',
+    ]);
+
+    it('accepts http and https', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBeNull();
+    })->with([
+        'http://example.com/x',
+        'https://example.com/x',
+    ]);
+});
+
+describe('DestinationUrlPolicy — userinfo (LDST-05)', function () {
+    it('rejects every userinfo form as UserinfoPresent', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::UserinfoPresent);
+    })->with([
+        'user and password' => 'https://u:p@example.com/x',
+        'user only' => 'https://u@example.com/x',
+        'empty userinfo' => 'https://@example.com/x',
+        'empty user, empty password' => 'https://:@example.com/x',
+    ]);
+});
+
+describe('DestinationUrlPolicy — malformed URL (LDST-07)', function () {
+    it('rejects syntactically invalid URLs as MalformedUrl, without a PHP error or warning', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::MalformedUrl);
+    })->with([
+        'scheme with no authority nor host' => 'https://',
+        'triple slash, empty host' => 'http:///path',
+        'space inside the host' => 'https://ho st.com/',
+    ]);
+
+    it('never chains or propagates the parser SyntaxError: the raw URL does not leak into the public exception', function () {
+        $raw = 'https://ho st.com/secret-marker-should-not-leak';
+
+        try {
+            destinationPolicyWith()->normalize($raw);
+        } catch (LinksDomainException $e) {
+            expect($e->reason())->toBe(DestinationRejectionReason::MalformedUrl)
+                ->and($e->getMessage())->not->toContain('secret-marker-should-not-leak')
+                ->and($e->getPrevious())->toBeNull()
+                ->and($e->getTraceAsString())->not->toContain('secret-marker-should-not-leak');
+
+            return;
+        }
+
+        throw new RuntimeException('Expected LinksDomainException was not thrown.');
+    });
+
+    // SPEC_DEVIATION: verified with league/uri 7.8.1 — a non-numeric or negative port (e.g.
+    // ":-1", ":abc") is itself a URI syntax violation (RFC 3986 port = *DIGIT), so Uri::new()
+    // throws SyntaxError before step 9's port-range check is reachable. See the SPEC_DEVIATION
+    // comment in DestinationUrlPolicy::evaluate() for the full reasoning. Only a syntactically
+    // valid (all-digit) out-of-range port reaches InvalidPort — covered in the port describe
+    // block below. The public contract (422 INVALID_DESTINATION_URL) is unaffected.
+    it('classifies a syntactically invalid port as MalformedUrl, not InvalidPort', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::MalformedUrl);
+    })->with([
+        'negative port' => 'https://example.com:-1/x',
+        'non-numeric port' => 'https://example.com:abc/x',
+    ]);
+});
+
+describe('DestinationUrlPolicy — host classification delegated to PublicHostClassifier (LDST-08, LDST-10 … LDST-13)', function () {
+    it('rejects an IPv4 literal host as IpLiteral', function () {
+        expect(destinationPolicyWith()->reject('https://127.0.0.1/x'))->toBe(DestinationRejectionReason::IpLiteral);
+    });
+
+    it('rejects a bracketed IPv6 literal host as IpLiteral', function () {
+        expect(destinationPolicyWith()->reject('https://[::1]/x'))->toBe(DestinationRejectionReason::IpLiteral);
+    });
+
+    it('rejects a special-use suffix host as SpecialUseHost', function () {
+        expect(destinationPolicyWith()->reject('https://a.localhost/x'))->toBe(DestinationRejectionReason::SpecialUseHost);
+    });
+
+    it('rejects a configured self host as SelfHost', function () {
+        expect(destinationPolicyWith(['go.localhost'])->reject('https://go.localhost/x'))
+            ->toBe(DestinationRejectionReason::SelfHost);
+    });
+
+    it('rejects a self host in upper case with a trailing FQDN dot as SelfHost — proving the host is trimmed and normalized before classification (spec.md AC7)', function () {
+        expect(destinationPolicyWith(['go.localhost'])->reject('HTTPS://GO.LOCALHOST./abc'))
+            ->toBe(DestinationRejectionReason::SelfHost);
+    });
+
+    it('accepts a structurally valid public host', function () {
+        expect(destinationPolicyWith()->reject('https://example.com/x'))->toBeNull();
+    });
+});
+
+describe('DestinationUrlPolicy — port range (LDST-14)', function () {
+    it('rejects port 0 as InvalidPort', function () {
+        expect(destinationPolicyWith()->reject('https://example.com:0/x'))->toBe(DestinationRejectionReason::InvalidPort);
+    });
+
+    it('rejects a port greater than 65535 as InvalidPort', function () {
+        expect(destinationPolicyWith()->reject('https://example.com:65536/x'))->toBe(DestinationRejectionReason::InvalidPort);
+    });
+
+    it('accepts a valid custom port', function () {
+        expect(destinationPolicyWith()->reject('https://example.com:8443/x'))->toBeNull();
+    });
+});
+
+describe('DestinationUrlPolicy — fixed evaluation order (spec.md: "Ordem de avaliação")', function () {
+    it('reports the earlier rule in the chain when an input violates two rules at once', function () {
+        // Violates both scheme (ftp is not allowed) and userinfo (u:p@ present) — scheme is
+        // evaluated first (step 6), so SchemeNotAllowed must win over UserinfoPresent.
+        expect(destinationPolicyWith()->reject('ftp://u:p@example.com/x'))
+            ->toBe(DestinationRejectionReason::SchemeNotAllowed);
+    });
+
+    it('reports userinfo before host classification when both are violated', function () {
+        // Violates both userinfo (u@ present) and host (127.0.0.1 is an IP literal) — userinfo
+        // is evaluated first (step 7), so UserinfoPresent must win over IpLiteral.
+        expect(destinationPolicyWith()->reject('https://u@127.0.0.1/x'))
+            ->toBe(DestinationRejectionReason::UserinfoPresent);
+    });
+
+    it('reports host classification before port range when both are violated', function () {
+        // Violates both host (127.0.0.1 is an IP literal) and port (65536 is out of range) —
+        // host is evaluated first (step 8), so IpLiteral must win over InvalidPort.
+        expect(destinationPolicyWith()->reject('https://127.0.0.1:65536/x'))
+            ->toBe(DestinationRejectionReason::IpLiteral);
     });
 });

@@ -4,12 +4,21 @@ declare(strict_types=1);
 
 namespace Modules\Links\Domain\Services;
 
+use League\Uri\Exceptions\SyntaxError;
+use League\Uri\Uri;
 use Modules\Links\Domain\Enums\DestinationRejectionReason;
 use Modules\Links\Exceptions\LinksDomainException;
 
 final class DestinationUrlPolicy
 {
     private const MAX_LENGTH = 2048;
+
+    /**
+     * @var list<string>
+     */
+    private const ALLOWED_SCHEMES = ['http', 'https'];
+
+    public function __construct(private readonly PublicHostClassifier $hosts) {}
 
     /**
      * Run the full policy chain and return the normalized value.
@@ -59,6 +68,62 @@ final class DestinationUrlPolicy
         // which would otherwise silently rewrite a malformed "%" sequence (e.g. "%" -> "%25").
         if (preg_match('/%(?![0-9A-Fa-f]{2})/', $raw) === 1) {
             throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidPercentEncoding);
+        }
+
+        // Step 5: parse via the URL parser only — never by concatenation or textual search.
+        // The SyntaxError message contains the raw URL, so it is deliberately discarded here:
+        // never chained as $previous, never rethrown, never logged.
+        //
+        // SPEC_DEVIATION: spec.md's edge-case table pairs "https://example.com:-1/x" with
+        // INVALID_PORT, and AC11 names a non-numeric port as an INVALID_PORT case. Verified
+        // empirically (league/uri 7.8.1): RFC 3986 defines port as *DIGIT, so Uri::new() itself
+        // throws SyntaxError for ANY non-digit port content (a leading "-", letters, "+", a
+        // decimal point) before step 9's range check can ever run — there is no reachable code
+        // path, short of textually pre-parsing the authority ourselves (forbidden by LDST-07/
+        // AD-019), that turns a syntactically-invalid port into InvalidPort. Only a syntactically
+        // valid all-digit port that is out of the 1-65535 range (e.g. "0", "65536") reaches step
+        // 9. Non-digit/negative ports are classified MalformedUrl instead; the public contract
+        // (422 INVALID_DESTINATION_URL) is unaffected either way.
+        try {
+            $uri = Uri::new($raw);
+        } catch (SyntaxError) {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
+        }
+
+        // Step 6: scheme.
+        if (! in_array($uri->getScheme(), self::ALLOWED_SCHEMES, true)) {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::SchemeNotAllowed);
+        }
+
+        // Step 7: userinfo — league/uri returns '', ':', 'u', 'u:p', never null, for any of the
+        // userinfo forms, so a plain identity check against null covers all of them.
+        if ($uri->getUserInfo() !== null) {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::UserinfoPresent);
+        }
+
+        // Step 8: host — trailing FQDN dot is trimmed before classification (the classifier
+        // operates on an already-normalized host), then delegated to PublicHostClassifier.
+        $host = $uri->getHost();
+
+        if ($host === null || $host === '') {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
+        }
+
+        $host = rtrim($host, '.');
+
+        $hostRejection = $this->hosts->reject($host);
+
+        if ($hostRejection !== null) {
+            throw LinksDomainException::invalidDestinationUrl($hostRejection);
+        }
+
+        // Step 9: port range. league/uri already normalizes away the scheme's default port
+        // (and any redundant leading zeros that resolve to it), so a non-null value here is
+        // always a genuinely custom port.
+        $port = $uri->getPort();
+
+        if ($port !== null && ($port < 1 || $port > 65535)) {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidPort);
         }
 
         return $raw;
