@@ -126,6 +126,26 @@ final class DestinationUrlPolicy
             throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidPort);
         }
 
-        return $raw;
+        // Step 10: reconstruct the canonical value. withHost() applies the trailing-dot-trimmed
+        // host computed in step 8 (scheme and host case, and the default port, are already
+        // canonical courtesy of the parser). Path, query, fragment and percent-encoding are left
+        // untouched — only an empty path is rewritten to "/". This is the only mutation applied;
+        // toString() is idempotent when re-parsed, which is exercised by the property test below.
+        $normalizedUri = $uri->withHost($host);
+
+        if ($normalizedUri->getPath() === '') {
+            $normalizedUri = $normalizedUri->withPath('/');
+        }
+
+        $normalized = $normalizedUri->toString();
+
+        // Step 11: the normalization step only ever shortens or preserves length (it never adds
+        // characters beyond a single "/"), but the contract of link_destination_versions.
+        // destination_url requires the persisted, normalized value to itself be <=2048.
+        if (strlen($normalized) > self::MAX_LENGTH) {
+            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::TooLong);
+        }
+
+        return $normalized;
     }
 }

@@ -246,3 +246,111 @@ describe('DestinationUrlPolicy — fixed evaluation order (spec.md: "Ordem de av
             ->toBe(DestinationRejectionReason::IpLiteral);
     });
 });
+
+describe('DestinationUrlPolicy::normalize — table (LDST-15 … LDST-19)', function () {
+    it('normalizes an accepted input to the expected canonical value', function (string $raw, string $expected) {
+        expect(destinationPolicyWith()->normalize($raw))->toBe($expected);
+    })->with([
+        'scheme and host lowercased, path case preserved' => [
+            'HTTPS://Example.COM/Path', 'https://example.com/Path',
+        ],
+        'redundant default port removed on http' => [
+            'http://example.com:80/x', 'http://example.com/x',
+        ],
+        'redundant default port removed on https' => [
+            'https://example.com:443/x', 'https://example.com/x',
+        ],
+        'empty port treated as default and removed' => [
+            'https://example.com:/x', 'https://example.com/x',
+        ],
+        'default port with leading zero still removed' => [
+            'https://example.com:0443/x', 'https://example.com/x',
+        ],
+        'custom port preserved exactly' => [
+            'https://example.com:8443/x', 'https://example.com:8443/x',
+        ],
+        'custom port with leading zero preserved without the zero (scheme never changes)' => [
+            'https://example.com:00080/x', 'https://example.com:80/x',
+        ],
+        'empty path becomes a single slash' => [
+            'https://example.com', 'https://example.com/',
+        ],
+        'trailing FQDN dot removed' => [
+            'https://example.com./x', 'https://example.com/x',
+        ],
+        'empty fragment preserved' => [
+            'https://example.com/#', 'https://example.com/#',
+        ],
+        'empty query preserved' => [
+            'https://example.com/?', 'https://example.com/?',
+        ],
+        'percent-encoding preserved byte for byte, not decoded nor re-encoded' => [
+            'https://example.com/a%2Fb?q=%C3%A1&r=a+b', 'https://example.com/a%2Fb?q=%C3%A1&r=a+b',
+        ],
+        'dot segments and duplicated slashes not collapsed' => [
+            'https://example.com/a/./b/../c//d', 'https://example.com/a/./b/../c//d',
+        ],
+        'query and fragment preserved without reordering or removing empty keys' => [
+            'https://example.com/x?b=2&a=1&empty=&flag#frag', 'https://example.com/x?b=2&a=1&empty=&flag#frag',
+        ],
+    ]);
+
+    it('does not decode/re-encode a fully non-ASCII-free A-label host', function () {
+        // xn-- (punycode) is plain ASCII and must be accepted and left untouched.
+        expect(destinationPolicyWith()->normalize('https://xn--caf-dma.com/x'))
+            ->toBe('https://xn--caf-dma.com/x');
+    });
+});
+
+describe('DestinationUrlPolicy::normalize — idempotency (LDST-20)', function () {
+    it('is idempotent: normalizing an already-normalized value returns it unchanged', function (string $raw) {
+        $policy = destinationPolicyWith();
+        $once = $policy->normalize($raw);
+        $twice = $policy->normalize($once);
+
+        expect($twice)->toBe($once);
+    })->with([
+        'HTTPS://Example.COM/Path',
+        'http://example.com:80/x',
+        'https://example.com:443/x',
+        'https://example.com:/x',
+        'https://example.com:0443/x',
+        'https://example.com:8443/x',
+        'https://example.com:00080/x',
+        'https://example.com',
+        'https://example.com./x',
+        'https://example.com/#',
+        'https://example.com/?',
+        'https://example.com/a%2Fb?q=%C3%A1&r=a+b',
+        'https://example.com/a/./b/../c//d',
+        'https://example.com/x?b=2&a=1&empty=&flag#frag',
+        'https://xn--caf-dma.com/x',
+    ]);
+});
+
+describe('DestinationUrlPolicy::normalize — post-normalization length (LDST-03)', function () {
+    it('accepts a raw value of exactly 2048 characters whose normalization shrinks it (removing the default port)', function () {
+        // "https://example.com:443" (24 chars) + path padding up to exactly 2048; :443 is
+        // stripped by normalization, so the persisted value is shorter than the raw input.
+        $base = 'https://example.com:443/';
+        $raw = $base.str_repeat('a', 2048 - strlen($base));
+        expect(strlen($raw))->toBe(2048);
+
+        $normalized = destinationPolicyWith()->normalize($raw);
+
+        expect(strlen($normalized))->toBeLessThan(2048)
+            ->and($normalized)->toBe('https://example.com/'.str_repeat('a', 2048 - strlen($base)));
+    });
+
+    it('rejects as TooLong when a raw value of exactly 2048 characters has an empty path that normalization expands to "/"', function () {
+        // "https://example.com?" (20 chars) + query padding up to exactly 2048 raw characters.
+        // The path is empty (nothing between host and "?"), so normalization inserts a single
+        // "/" before the query, pushing the normalized length to 2049 — over the limit that
+        // step 2 (raw length) could not have caught, because the raw value was exactly 2048.
+        $base = 'https://example.com?';
+        $raw = $base.str_repeat('a', 2048 - strlen($base));
+        expect(strlen($raw))->toBe(2048);
+
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::TooLong);
+    });
+});
