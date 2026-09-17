@@ -167,19 +167,6 @@ describe('DestinationUrlPolicy — malformed URL (LDST-07)', function () {
 
         throw new RuntimeException('Expected LinksDomainException was not thrown.');
     });
-
-    // SPEC_DEVIATION: verified with league/uri 7.8.1 — a non-numeric or negative port (e.g.
-    // ":-1", ":abc") is itself a URI syntax violation (RFC 3986 port = *DIGIT), so Uri::new()
-    // throws SyntaxError before step 9's port-range check is reachable. See the SPEC_DEVIATION
-    // comment in DestinationUrlPolicy::evaluate() for the full reasoning. Only a syntactically
-    // valid (all-digit) out-of-range port reaches InvalidPort — covered in the port describe
-    // block below. The public contract (422 INVALID_DESTINATION_URL) is unaffected.
-    it('classifies a syntactically invalid port as MalformedUrl, not InvalidPort', function (string $raw) {
-        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::MalformedUrl);
-    })->with([
-        'negative port' => 'https://example.com:-1/x',
-        'non-numeric port' => 'https://example.com:abc/x',
-    ]);
 });
 
 describe('DestinationUrlPolicy — host classification delegated to PublicHostClassifier (LDST-08, LDST-10 … LDST-13)', function () {
@@ -222,6 +209,13 @@ describe('DestinationUrlPolicy — port range (LDST-14)', function () {
     it('accepts a valid custom port', function () {
         expect(destinationPolicyWith()->reject('https://example.com:8443/x'))->toBeNull();
     });
+
+    it('rejects a syntactically invalid port as InvalidPort (AC11)', function (string $raw) {
+        expect(destinationPolicyWith()->reject($raw))->toBe(DestinationRejectionReason::InvalidPort);
+    })->with([
+        'negative port' => 'https://example.com:-1/x',
+        'non-numeric port' => 'https://example.com:abc/x',
+    ]);
 });
 
 describe('DestinationUrlPolicy — fixed evaluation order (spec.md: "Ordem de avaliação")', function () {
@@ -293,6 +287,9 @@ describe('DestinationUrlPolicy::normalize — table (LDST-15 … LDST-19)', func
         'query and fragment preserved without reordering or removing empty keys' => [
             'https://example.com/x?b=2&a=1&empty=&flag#frag', 'https://example.com/x?b=2&a=1&empty=&flag#frag',
         ],
+        'percent-encoded CRLF in the path is accepted and left untouched (it cannot inject a header)' => [
+            'https://example.com/x%0d%0aSet-Cookie:%20a', 'https://example.com/x%0d%0aSet-Cookie:%20a',
+        ],
     ]);
 
     it('does not decode/re-encode a fully non-ASCII-free A-label host', function () {
@@ -325,6 +322,21 @@ describe('DestinationUrlPolicy::normalize — idempotency (LDST-20)', function (
         'https://example.com/a/./b/../c//d',
         'https://example.com/x?b=2&a=1&empty=&flag#frag',
         'https://xn--caf-dma.com/x',
+    ]);
+});
+
+describe('DestinationUrlPolicy — deterministic verdict on repeat evaluation (spec.md P1 Política, AC14)', function () {
+    it('returns the identical rejection reason when the same rejected input is evaluated twice', function (string $raw, DestinationRejectionReason $expected) {
+        $policy = destinationPolicyWith(['go.localhost']);
+
+        expect($policy->reject($raw))->toBe($expected)
+            ->and($policy->reject($raw))->toBe($expected);
+    })->with([
+        'TooLong' => ['https://example.com/'.str_repeat('a', 2049 - strlen('https://example.com/')), DestinationRejectionReason::TooLong],
+        'IpLiteral' => ['https://127.0.0.1/x', DestinationRejectionReason::IpLiteral],
+        'SpecialUseHost' => ['https://a.localhost/x', DestinationRejectionReason::SpecialUseHost],
+        'SelfHost' => ['https://go.localhost/x', DestinationRejectionReason::SelfHost],
+        'InvalidPort' => ['https://example.com:65536/x', DestinationRejectionReason::InvalidPort],
     ]);
 });
 

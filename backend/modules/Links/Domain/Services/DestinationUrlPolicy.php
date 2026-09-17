@@ -95,23 +95,28 @@ final class DestinationUrlPolicy
         }
 
         // Step 5: parse via the URL parser only — never by concatenation or textual search.
-        // The SyntaxError message contains the raw URL, so it is deliberately discarded here:
-        // never chained as $previous, never rethrown, never logged.
+        // The SyntaxError message usually contains the raw URL (e.g. "The uri `...` is invalid
+        // for the `https` scheme."), so it is never chained as $previous, never rethrown, never
+        // logged, and never used beyond the one narrow, bounded check below.
         //
-        // SPEC_DEVIATION: spec.md's edge-case table pairs "https://example.com:-1/x" with
-        // INVALID_PORT, and AC11 names a non-numeric port as an INVALID_PORT case. Verified
-        // empirically (league/uri 7.8.1): RFC 3986 defines port as *DIGIT, so Uri::new() itself
-        // throws SyntaxError for ANY non-digit port content (a leading "-", letters, "+", a
-        // decimal point) before step 9's range check can ever run — there is no reachable code
-        // path, short of textually pre-parsing the authority ourselves (forbidden by LDST-07/
-        // AD-019), that turns a syntactically-invalid port into InvalidPort. Only a syntactically
-        // valid all-digit port that is out of the 1-65535 range (e.g. "0", "65536") reaches step
-        // 9. Non-digit/negative ports are classified MalformedUrl instead; the public contract
-        // (422 INVALID_DESTINATION_URL) is unaffected either way.
+        // A non-numeric or negative port (e.g. ":-1", ":abc") is itself a URI syntax violation
+        // (RFC 3986 defines port as *DIGIT): league/uri 7.8.1 rejects it while parsing the
+        // authority, before step 9's port-range check could ever run, and — verified empirically
+        // — with a distinct, fixed message template that names only the port substring itself
+        // ("The port `-1` is invalid"), never the full URL. Matching that fixed prefix (not
+        // regexing the raw authority ourselves, which LDST-07/AD-019 forbids for untrusted
+        // input — this only inspects the parser's own diagnostic, and only far enough to route
+        // to the correct DestinationRejectionReason) lets a syntactically invalid port still be
+        // reported as InvalidPort, matching AC11 and the spec.md edge-case table, without ever
+        // touching the raw URL.
         try {
             $uri = Uri::new($raw);
-        } catch (SyntaxError) {
-            $this->fail(DestinationRejectionReason::MalformedUrl);
+        } catch (SyntaxError $e) {
+            $this->fail(
+                str_starts_with($e->getMessage(), 'The port `')
+                    ? DestinationRejectionReason::InvalidPort
+                    : DestinationRejectionReason::MalformedUrl,
+            );
         }
 
         // Step 6: scheme.
