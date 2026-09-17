@@ -44,6 +44,30 @@ final class DestinationUrlPolicy
         }
     }
 
+    /**
+     * Throws the domain exception for a rejection reason, after neutralizing PHP's own
+     * exception-trace capture for the rest of this request (LDST-24).
+     *
+     * PHP's Exception::getTrace()/getTraceAsString() record the *current* value of every
+     * live local variable passed as an argument to every function still on the call stack
+     * at the moment the exception is constructed — not just this method's. Verified
+     * empirically: without this, the raw destination URL (still sitting as the $raw
+     * parameter of evaluate(), normalize(), DestinationUrl::fromString(), and every caller
+     * above it) would appear in full in getTrace(), and as a partial prefix in
+     * getTraceAsString(), for every single rejection reason — not only the parser's own
+     * SyntaxError case that step 5 already guards against. ini_set('zend.exception_ignore_args')
+     * is per-request (PHP-FPM resets it for the next request) and, called here before the
+     * exception is constructed, suppresses argument capture for every frame on the current
+     * stack at once — the one point that can close this for every present and future caller
+     * of the policy, without relying on each of them to remember to redact their own copy.
+     */
+    private function fail(DestinationRejectionReason $reason): never
+    {
+        ini_set('zend.exception_ignore_args', '1');
+
+        throw LinksDomainException::invalidDestinationUrl($reason);
+    }
+
     private function evaluate(string $raw): string
     {
         // Step 1: trim border whitespace only — internal whitespace is a control character (step 3).
@@ -51,13 +75,13 @@ final class DestinationUrlPolicy
 
         // Step 2: raw length, after trim, before any parsing.
         if (strlen($raw) > self::MAX_LENGTH) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::TooLong);
+            $this->fail(DestinationRejectionReason::TooLong);
         }
 
         // Step 3: any byte outside printable ASCII (0x20-0x7E) is either a control character
         // (0x00-0x1F, 0x7F) or non-ASCII (>= 0x80) — classified by the first offending byte found.
         if (preg_match('/[^\x20-\x7E]/', $raw, $match) === 1) {
-            throw LinksDomainException::invalidDestinationUrl(
+            $this->fail(
                 ord($match[0]) >= 0x80
                     ? DestinationRejectionReason::NonAsciiInput
                     : DestinationRejectionReason::ControlCharacter,
@@ -67,7 +91,7 @@ final class DestinationUrlPolicy
         // Step 4: percent-encoding must be well-formed before the value ever reaches a URL parser,
         // which would otherwise silently rewrite a malformed "%" sequence (e.g. "%" -> "%25").
         if (preg_match('/%(?![0-9A-Fa-f]{2})/', $raw) === 1) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidPercentEncoding);
+            $this->fail(DestinationRejectionReason::InvalidPercentEncoding);
         }
 
         // Step 5: parse via the URL parser only — never by concatenation or textual search.
@@ -87,18 +111,18 @@ final class DestinationUrlPolicy
         try {
             $uri = Uri::new($raw);
         } catch (SyntaxError) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
+            $this->fail(DestinationRejectionReason::MalformedUrl);
         }
 
         // Step 6: scheme.
         if (! in_array($uri->getScheme(), self::ALLOWED_SCHEMES, true)) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::SchemeNotAllowed);
+            $this->fail(DestinationRejectionReason::SchemeNotAllowed);
         }
 
         // Step 7: userinfo — league/uri returns '', ':', 'u', 'u:p', never null, for any of the
         // userinfo forms, so a plain identity check against null covers all of them.
         if ($uri->getUserInfo() !== null) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::UserinfoPresent);
+            $this->fail(DestinationRejectionReason::UserinfoPresent);
         }
 
         // Step 8: host — trailing FQDN dot is trimmed before classification (the classifier
@@ -106,7 +130,7 @@ final class DestinationUrlPolicy
         $host = $uri->getHost();
 
         if ($host === null || $host === '') {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
+            $this->fail(DestinationRejectionReason::MalformedUrl);
         }
 
         $host = rtrim($host, '.');
@@ -114,7 +138,7 @@ final class DestinationUrlPolicy
         $hostRejection = $this->hosts->reject($host);
 
         if ($hostRejection !== null) {
-            throw LinksDomainException::invalidDestinationUrl($hostRejection);
+            $this->fail($hostRejection);
         }
 
         // Step 9: port range. league/uri already normalizes away the scheme's default port
@@ -123,7 +147,7 @@ final class DestinationUrlPolicy
         $port = $uri->getPort();
 
         if ($port !== null && ($port < 1 || $port > 65535)) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::InvalidPort);
+            $this->fail(DestinationRejectionReason::InvalidPort);
         }
 
         // Step 10: reconstruct the canonical value. withHost() applies the trailing-dot-trimmed
@@ -143,7 +167,7 @@ final class DestinationUrlPolicy
         // characters beyond a single "/"), but the contract of link_destination_versions.
         // destination_url requires the persisted, normalized value to itself be <=2048.
         if (strlen($normalized) > self::MAX_LENGTH) {
-            throw LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::TooLong);
+            $this->fail(DestinationRejectionReason::TooLong);
         }
 
         return $normalized;
