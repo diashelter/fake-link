@@ -20,7 +20,7 @@ describe('DestinationUrl', function () {
 
     it('rejects ftp scheme', function () {
         DestinationUrl::fromString('ftp://example.com');
-    })->throws(LinksDomainException::class, 'The provided destination URL is invalid.');
+    })->throws(LinksDomainException::class, 'The destination URL is not allowed.');
 
     it('rejects javascript scheme', function () {
         DestinationUrl::fromString('javascript:alert(1)');
