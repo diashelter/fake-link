@@ -444,7 +444,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
         '503':
-          $ref: '#/components/responses/ServiceUnavailable'
+          $ref: '#/components/responses/SlugGenerationFailed'
         '504':
           $ref: '#/components/responses/GatewayTimeout'
   /api/v1/links/{link}:
@@ -1200,6 +1200,32 @@ components:
               value:
                 code: IDEMPOTENCY_KEY_REUSED
                 message: The idempotency key was used with a different request.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+    SlugGenerationFailed:
+      description: |
+        Exaustão das tentativas de gerar um slug automático livre (falha transitória).
+        Também cobre indisponibilidade genérica do serviço nesta operação.
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestId'
+        Cache-Control:
+          $ref: '#/components/headers/PrivateCacheControl'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            slugGenerationFailed:
+              value:
+                code: SLUG_GENERATION_FAILED
+                message: Automatic slug generation could not complete. Retry later.
+                request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
+            serviceUnavailable:
+              value:
+                code: SERVICE_UNAVAILABLE
+                message: The service is temporarily unavailable.
                 request_id: 01K0C2Y7Q3R4S5T6V7W8X9Y0Z1
     PreconditionFailed:
       description: O ETag não representa mais o estado efetivo atual.
