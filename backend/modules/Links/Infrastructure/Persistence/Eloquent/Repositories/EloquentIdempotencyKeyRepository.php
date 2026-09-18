@@ -69,12 +69,12 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
         string $responseSnapshot,
         string $keyId,
     ): void {
-        // Bind as binary via PDO to keep the envelope opaque in bytea.
+        // Laravel binds strings as text; encode to hex so PostgreSQL stores opaque bytea.
         DB::update(
             'UPDATE idempotency_keys
-             SET response_snapshot = ?, key_id = ?
+             SET response_snapshot = decode(?, \'hex\'), key_id = ?
              WHERE user_id = ? AND key_hash = ?',
-            [$responseSnapshot, $keyId, $userId->value(), $keyHash],
+            [bin2hex($responseSnapshot), $keyId, $userId->value(), $keyHash],
         );
     }
 

@@ -142,15 +142,16 @@ describe('EloquentIdempotencyKeyRepository', function () {
             ->and($found->expiresAt->format('Y-m-d\TH:i:s\Z'))->toBe('2026-09-19T12:00:00Z');
 
         $raw = DB::selectOne(
-            'SELECT encode(response_snapshot, \'escape\') AS snap_escape,
-                    convert_from(response_snapshot, \'UTF8\') IS NOT NULL AS utf8_ok
+            'SELECT octet_length(response_snapshot) AS snap_len,
+                    encode(response_snapshot, \'hex\') AS snap_hex
              FROM idempotency_keys WHERE user_id = ? AND key_hash = ?',
             [$owner->value(), $keyHash],
         );
 
-        // Binary snapshot must not equal a naive plaintext JSON body.
-        expect($snapshot)->not->toContain('destination')
-            ->and($raw)->not->toBeNull();
+        // Opaque bytea round-trip: length and hex must match the binary envelope.
+        expect($raw)->not->toBeNull()
+            ->and((int) $raw->snap_len)->toBe(strlen($snapshot))
+            ->and($raw->snap_hex)->toBe(bin2hex($snapshot));
     });
 
     it('scopes uniqueness per user — same key_hash allowed for different users', function () {

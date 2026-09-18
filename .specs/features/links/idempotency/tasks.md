@@ -75,11 +75,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: Context7 · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] A migration possui `user_id`, hashes de 64 caracteres, `bytea` para snapshot, `key_id`, timestamps, unique `(user_id, key_hash)` e índice `expires_at`.
-- [ ] O valor bruto da chave não tem coluna, índice ou log.
-- [ ] Repository reserva/localiza/conclui/remove conforme contrato, preservando a transação do chamador.
-- [ ] Testes provam constraint, escopo por usuário, índice de expiração e persistência exclusivamente em `fake_link_testing`.
-- [ ] Gate: `make test-backend`.
+- [x] A migration possui `user_id`, hashes de 64 caracteres, `bytea` para snapshot, `key_id`, timestamps, unique `(user_id, key_hash)` e índice `expires_at`.
+- [x] O valor bruto da chave não tem coluna, índice ou log.
+- [x] Repository reserva/localiza/conclui/remove conforme contrato, preservando a transação do chamador.
+- [x] Testes provam constraint, escopo por usuário, índice de expiração e persistência exclusivamente em `fake_link_testing`.
+- [x] Gate: `make test-backend`.
 
 **Tests:** integration · **Gate:** full  
 **Commit:** `feat(links): persist encrypted idempotency records`
