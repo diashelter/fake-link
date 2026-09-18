@@ -98,8 +98,8 @@ Os nomes exatos dos domínios serão definidos antes do lançamento.
 
 - Landing page estática e concisa. *(implementada)*
 - Fluxos de login, cadastro, verificação, recuperação de senha, perfil e sessão. *(implementados — BFF + UI)*
-- Lista e criação de links. *(criação via API `POST /api/v1/links`; UI e demais endpoints de Links pendentes na Fase 2)*
-- Detalhe do link com abas Overview, Analytics e History. *(pendente — Fase 2/3)*
+- Lista e criação de links. *(API: `POST /api/v1/links`, `GET /api/v1/links` e `GET /api/v1/links/{link}`; UI e BFF pendentes no pacote `bff-links/`)*
+- Detalhe do link com abas Overview, Analytics e History. *(API de detalhe entregue; UI, analytics e histórico pendentes — Fase 2/3)*
 - Interface somente em pt-BR e tema somente claro.
 - Layout funcional a partir de 360 px e compatível com as duas versões mais recentes dos browsers suportados.
 - Conformidade com WCAG 2.2 AA.

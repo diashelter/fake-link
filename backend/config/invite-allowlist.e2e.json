@@ -1,5 +1,7 @@
 {
   "emails": [
-    "e2e-auth@fake-link.test"
+    "e2e-auth@fake-link.test",
+    "e2e-links-owner@fake-link.test",
+    "e2e-links-stranger@fake-link.test"
   ]
 }

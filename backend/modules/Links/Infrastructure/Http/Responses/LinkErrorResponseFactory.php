@@ -43,6 +43,16 @@ final class LinkErrorResponseFactory
         );
     }
 
+    public function notFound(?string $requestId = null): JsonResponse
+    {
+        return $this->errorResponse(
+            status: 404,
+            code: 'RESOURCE_NOT_FOUND',
+            message: 'The requested resource was not found.',
+            requestId: $requestId,
+        );
+    }
+
     public function serviceUnavailable(?string $requestId = null): JsonResponse
     {
         return $this->errorResponse(

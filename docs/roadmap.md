@@ -72,7 +72,7 @@
 
 ## Fase 2: Links + Redirect
 
-**Progresso (2026-09-18):** API backend em andamento. Fatias 1–4 verificadas: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26) e `link-creation` (`POST /api/v1/links`). Fatias 5–13 (`idempotency` → `module-closure`, inclusive redirect público) seguem em seed. O pacote frontend (`bff-links/`) ainda não foi aberto. Índice: `.specs/features/links/README.md`. Superfície HTTP: `docs/api.md` §1.1.
+**Progresso (2026-09-18):** API backend em andamento. Fatias 1–6 verificadas: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (PR #27), `idempotency` (PR #28) e `link-queries` (`GET /api/v1/links` e `GET /api/v1/links/{link}`). Fatias 7–13 (`link-update` → `module-closure`, inclusive redirect público) seguem em seed. O pacote frontend (`bff-links/`) ainda não foi aberto. Índice: `.specs/features/links/README.md`. Superfície HTTP: `docs/api.md` §1.1.
 
 ### Entregáveis
 

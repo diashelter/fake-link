@@ -7,6 +7,7 @@ namespace Modules\Links\Infrastructure\Http\Resources;
 use DateTimeImmutable;
 use DateTimeZone;
 use Modules\Links\DTOs\Output\CreatedLinkDto;
+use Modules\Links\DTOs\Output\LinkDetailDto;
 
 final class LinkDetailResource
 {
@@ -25,7 +26,7 @@ final class LinkDetailResource
      *     updated_at: string
      * }
      */
-    public static function toArray(CreatedLinkDto $link): array
+    public static function toArray(CreatedLinkDto|LinkDetailDto $link): array
     {
         $base = rtrim((string) config('links.short_url.base_url'), '/');
 

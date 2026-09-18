@@ -9,6 +9,17 @@ services:
       MAIL_FROM_ADDRESS: no-reply@fake-link.test
       QUEUE_CONNECTION: sync
       AUTH_INVITE_ALLOWLIST_PATH: /var/www/config/invite-allowlist.e2e.json
+      LINKS_DESTINATION_KEYRING: '{"dev-key-1":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}'
+      LINKS_DESTINATION_ACTIVE_KEY_ID: dev-key-1
+      LINKS_ETAG_HMAC_KEY: ${LINKS_ETAG_HMAC_KEY:-dev-links-etag-hmac-key}
+      LINKS_CURSOR_HMAC_KEY: ${LINKS_CURSOR_HMAC_KEY:-dev-links-cursor-hmac-key}
+      LINKS_RATE_LIMIT_HMAC_KEY: ${LINKS_RATE_LIMIT_HMAC_KEY:-dev-links-rate-limit-hmac-key}
+      LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY: ${LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY:-dev-links-idempotency-key-hash-hmac}
+      LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY: ${LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY:-dev-links-idempotency-fingerprint-hmac}
+      LINKS_IDEMPOTENCY_KEYRING: '{"dev-idem-1":"AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE="}'
+      LINKS_IDEMPOTENCY_ACTIVE_KEY_ID: ${LINKS_IDEMPOTENCY_ACTIVE_KEY_ID:-dev-idem-1}
+    volumes:
+      - ./backend/config/invite-allowlist.e2e.json:/var/www/config/invite-allowlist.e2e.json:ro
     depends_on:
       mailpit:
         condition: service_healthy

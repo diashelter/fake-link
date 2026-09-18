@@ -44,6 +44,7 @@
         </report>
     </coverage>
     <php>
+        <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_URL" value="https://app.localhost"/>
         <env name="SHORT_HOST" value="go.localhost"/>
@@ -72,6 +73,7 @@
         <env name="LINKS_DESTINATION_ACTIVE_KEY_ID" value="testing-key-1" force="true"/>
         <env name="SHORT_URL_BASE" value="https://go.localhost"/>
         <env name="LINKS_ETAG_HMAC_KEY" value="testing-links-etag-hmac-key"/>
+        <env name="LINKS_CURSOR_HMAC_KEY" value="testing-links-cursor-hmac-key"/>
         <env name="LINKS_RATE_LIMIT_HMAC_KEY" value="testing-links-rate-limit-hmac-key"/>
         <env name="LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY" value="testing-links-idempotency-key-hash-hmac"/>
         <env name="LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY" value="testing-links-idempotency-fingerprint-hmac"/>

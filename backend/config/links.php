@@ -90,11 +90,17 @@ return [
             'max_attempts' => 60,
             'decay_seconds' => 60,
         ],
+        'private_read' => [
+            'max_attempts' => 300,
+            'decay_seconds' => 60,
+        ],
     ],
 
     'rate_limit_hmac_key' => env('LINKS_RATE_LIMIT_HMAC_KEY'),
 
     'etag_hmac_key' => env('LINKS_ETAG_HMAC_KEY'),
+
+    'cursor_hmac_key' => env('LINKS_CURSOR_HMAC_KEY'),
 
     /*
     |--------------------------------------------------------------------------

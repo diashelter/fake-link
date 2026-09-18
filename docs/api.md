@@ -10,7 +10,7 @@
 - Não há CORS entre origens: clientes acessam a API no próprio host e integrações server-to-server não dependem de CORS.
 - A licença da especificação é MIT.
 
-O restante deste documento descreve o contrato design-first do MVP. A superfície Laravel realmente registrada em 2026-09-18 é menor: Auth completo e somente `POST /api/v1/links`. Detalhe em [Superfície entregue](#11-superfície-entregue).
+O restante deste documento descreve o contrato design-first do MVP. A superfície Laravel realmente registrada em 2026-09-18 é Auth completo, `POST /api/v1/links` e as consultas `GET /api/v1/links` e `GET /api/v1/links/{link}`. Detalhe em [Superfície entregue](#11-superfície-entregue).
 
 ### 1.1. Superfície entregue
 
@@ -18,8 +18,10 @@ O restante deste documento descreve o contrato design-first do MVP. A superfíci
 | --- | --- | --- |
 | Auth e `GET`/`PATCH /api/v1/me` | Entregue | Todos os endpoints da [§3](#3-autenticação-e-conta) |
 | `POST /api/v1/links` | Entregue | Token `session`; política de slug e destino; cifra AES-256-GCM; transação reserva + link + primeira versão; `201` com `Location`, `ETag` e `LinkDetail`; `409 ALIAS_UNAVAILABLE`; `503 SLUG_GENERATION_FAILED`; 60 criações/min por conta |
-| `Idempotency-Key` em `POST /links` | Contrato apenas | Header documentado; a fatia de idempotência ainda não processa o valor |
-| `GET`/`PATCH /api/v1/links`, `GET …/history` | Contrato apenas | Rotas ainda não registradas |
+| `GET /api/v1/links` | Entregue | Token `session`; cursor assinado; busca e filtro de estado efetivo; `LinkSummary` sem destino; 300 leituras/min por token |
+| `GET /api/v1/links/{link}` | Entregue | Token `session`; `LinkDetail` com destino e `ETag` forte; `404` uniforme; `503` se o envelope não decifrar; compartilha o limite de leitura |
+| `Idempotency-Key` em `POST /links` | Entregue | Replay cifrado por 24 h; `409 IDEMPOTENCY_KEY_REUSED` se o fingerprint divergir |
+| `PATCH /api/v1/links/{link}`, `GET …/history` | Contrato apenas | Rotas ainda não registradas |
 | Host curto (`GET`/`HEAD /{slug}`, `/`, `/robots.txt`) | Scaffold | Módulo `Redirects` existe sem resolução efetiva |
 | Analytics privados | Contrato apenas | Módulo `Analytics` ainda não existe |
 | Operations | Fora desta OpenAPI | Módulo ainda não existe |
@@ -123,7 +125,7 @@ O usuário retornado contém `id`, `name`, `email`, `status`, `email_verified_at
 
 ## 4. Links
 
-Runtime atual: somente `POST /api/v1/links`. Listagem, detalhe, atualização, histórico e replay idempotente permanecem no contrato.
+Runtime atual: `POST /api/v1/links` (com `Idempotency-Key`), `GET /api/v1/links` e `GET /api/v1/links/{link}`. Atualização e histórico permanecem no contrato.
 
 ### 4.1. Endpoints
 

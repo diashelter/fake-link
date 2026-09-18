@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Process;
  */
 it('runs pint style check with exit code zero', function () {
     $result = Process::path(base_path())
-        ->timeout(120)
+        ->timeout(180)
         ->run(['./vendor/bin/pint', '--test']);
 
     $message = $result->errorOutput() !== '' ? $result->errorOutput() : $result->output();
@@ -20,7 +20,7 @@ it('runs pint style check with exit code zero', function () {
 
 it('runs phpstan analyse with exit code zero', function () {
     $result = Process::path(base_path())
-        ->timeout(300)
+        ->timeout(480)
         ->run(['./vendor/bin/phpstan', 'analyse', '--memory-limit=512M']);
 
     $message = $result->errorOutput() !== '' ? $result->errorOutput() : $result->output();

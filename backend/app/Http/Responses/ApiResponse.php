@@ -21,6 +21,7 @@ final class ApiResponse
             'errors' => $errors,
         ], Response::HTTP_UNPROCESSABLE_ENTITY)->withHeaders([
             'Cache-Control' => 'private, no-store',
+            'X-Request-ID' => $requestId ?? 'stub-request-id',
         ]);
     }
 
