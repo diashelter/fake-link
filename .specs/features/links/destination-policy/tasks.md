@@ -90,9 +90,9 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `league/uri` aparece em `require` com constraint `^7.8`
-- [ ] `composer.lock` atualizado **sem** mudança de versão de nenhum outro pacote (diff mostra apenas a promoção)
-- [ ] Gate check passa: `make lint && make test-backend-coverage`
+- [x] `league/uri` aparece em `require` com constraint `^7.8`
+- [x] `composer.lock` atualizado **sem** mudança de versão de nenhum outro pacote (diff mostra apenas a promoção)
+- [x] Gate check passa: `make lint && make test-backend-coverage` — verificado por partes (Gotcha 4: `lint-frontend` falha pré-existente `TS2353`); `lint-openapi`, `lint-backend`, `test-architecture` (17/17), `test-backend` (652/652), `test-backend-coverage` (Links 92.49%/91.09%) todos verdes
 
 **Tests**: none (camada de dependência — build gate)
 **Gate**: build
@@ -113,11 +113,11 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] 12 cases com os valores exatos do design (`TOO_LONG` … `INVALID_PORT`)
-- [ ] Teste assere o conjunto completo de valores (falha se um case for removido ou renomeado)
-- [ ] Teste assere que nenhum valor contém dado variável (cardinalidade fixa)
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: 2 testes passam (sem deleções silenciosas)
+- [x] 12 cases com os valores exatos do design (`TOO_LONG` … `INVALID_PORT`)
+- [x] Teste assere o conjunto completo de valores (falha se um case for removido ou renomeado)
+- [x] Teste assere que nenhum valor contém dado variável (cardinalidade fixa)
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 2 testes passam (verificado: 654/654, +2 sobre a baseline de 652; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -138,13 +138,13 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `invalidDestinationUrl(DestinationRejectionReason $reason): self`; assinatura **não aceita** string
-- [ ] `errorCode()` devolve `INVALID_DESTINATION_URL` para todos os motivos
-- [ ] Mensagem é exatamente `The destination URL is not allowed.` para todos os motivos (teste percorre os 12)
-- [ ] `reason()` devolve o motivo informado
-- [ ] Testes da fatia 1 que chamavam a assinatura antiga atualizados, sem enfraquecer asserção
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: 4 testes passam (sem deleções silenciosas)
+- [x] `invalidDestinationUrl(DestinationRejectionReason $reason): self`; assinatura **não aceita** string
+- [x] `errorCode()` devolve `INVALID_DESTINATION_URL` para todos os motivos
+- [x] Mensagem é exatamente `The destination URL is not allowed.` para todos os motivos (teste percorre os 12)
+- [x] `reason()` devolve o motivo informado
+- [x] Testes da fatia 1 que chamavam a assinatura antiga atualizados, sem enfraquecer asserção (`DestinationUrlTest.php:23`, `LinksDomainExceptionTest.php:9,41`)
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 4 testes passam (verificado: 656/656, +2 sobre a baseline de 654 — 2 testes existentes atualizados + 2 novos; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -165,12 +165,14 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `reject(string $host): ?DestinationRejectionReason` na ordem: IP literal → sintaxe → uso especial → host próprio
-- [ ] `selfHosts` recebido por construtor (`list<string>`), nunca lido de `config()` internamente
-- [ ] Testes cobrem: IPv4 (`127.0.0.1`, `10.0.0.5`, `8.8.8.8`), IPv6 (`[::1]`, `[fd00::1]`), formas inteiras (`2130706433`, `0x7f.1`), sintaxe (`intranet`, `a..b.com`, `-a.com`, `a-.com`, label 63/64, total 253/254, `exa_mple.com`), uso especial (os 9 sufixos, em caixa mista), host próprio (exato, subdomínio, caixa mista) e **aceitos** (`example.com`, `xn--caf-dma.com`, `mylocalhost.com`, `internal-tools.com`)
-- [ ] Teste prova ausência de I/O: nenhuma chamada de resolução; suíte passa sem rede
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥24 testes passam (sem deleções silenciosas)
+- [x] `reject(string $host): ?DestinationRejectionReason` na ordem: IP literal → sintaxe → uso especial → host próprio
+- [x] `selfHosts` recebido por construtor (`list<string>`), nunca lido de `config()` internamente
+- [x] Testes cobrem: IPv4 (`127.0.0.1`, `10.0.0.5`, `8.8.8.8`), IPv6 (`[::1]`, `[fd00::1]`), formas inteiras (`2130706433`, `0x7f.1`), sintaxe (`intranet`, `a..b.com`, `-a.com`, `a-.com`, label 63/64, total 253/254, `exa_mple.com`), uso especial (os 9 sufixos, em caixa mista), host próprio (exato, subdomínio, caixa mista) e **aceitos** (`example.com`, `xn--caf-dma.com`, `mylocalhost.com`, `internal-tools.com`)
+- [x] Teste prova ausência de I/O: nenhuma chamada de resolução; suíte passa sem rede
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: ≥24 testes passam (verificado: 42 testes no arquivo; 698/698 na suíte completa, +42 sobre a baseline de 656; sem deleções silenciosas)
+
+**Achado registrado durante T5 (não bloqueia T1–T5, relevante para T7):** a ordem "especial → próprio" faz com que os self_hosts reais (`go.localhost`, `app.localhost`) — ambos subdomínios do sufixo especial `localhost` — sejam classificados como `SpecialUseHost`, não `SelfHost`, contradizendo o AC7 do spec.md (`go.localhost` deve reprovar com motivo `SELF_HOST`). Quem implementar T7 precisará resolver isso (ex.: checar host próprio antes de uso especial).
 
 **Tests**: unit
 **Gate**: quick
@@ -191,12 +193,12 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `config('links.destination.self_hosts')` devolve os hosts de `SHORT_HOST` e `APP_URL`, em minúsculas, sem porta e sem duplicatas
-- [ ] `PublicHostClassifier` resolvido do container vem com a lista da config (provado por resolução, não por boot bem-sucedido)
-- [ ] `phpunit.xml` fixa `SHORT_HOST` e `APP_URL` determinísticos
-- [ ] Teste assere que a lista não é vazia no ambiente de teste
-- [ ] Gate check passa: `make test-backend && make test-architecture`
-- [ ] Test count: 3 testes passam (sem deleções silenciosas)
+- [x] `config('links.destination.self_hosts')` devolve os hosts de `SHORT_HOST` e `APP_URL`, em minúsculas, sem porta e sem duplicatas
+- [x] `PublicHostClassifier` resolvido do container vem com a lista da config (provado por resolução via `ReflectionProperty`, não por boot bem-sucedido)
+- [x] `phpunit.xml` fixa `SHORT_HOST` e `APP_URL` determinísticos
+- [x] Teste assere que a lista não é vazia no ambiente de teste
+- [x] Gate check passa: `make test-backend && make test-architecture`
+- [x] Test count: 3 testes passam (verificado: 701/701 em `test-backend`, +3 sobre a baseline de 698; 17/17 em `test-architecture`; sem deleções silenciosas)
 
 **Tests**: feature
 **Gate**: full
@@ -217,11 +219,11 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Passos 1–4 do design implementados na ordem exata
-- [ ] Testes: 2.048 aceito / 2.049 rejeitado; whitespace de borda aparado (incluindo o caso de 2.050 com espaços que passa a caber, documentado na spec); `\t`/`\r`/`\n`/`\x7F` internos ⇒ `CONTROL_CHARACTER`; byte ≥`\x80` em host, path, query ou fragmento ⇒ `NON_ASCII_INPUT`; `%zz`, `%A`, `%` isolado ⇒ `INVALID_PERCENT_ENCODING`
-- [ ] Teste prova que a checagem de percent-encoding roda **antes** do parser (entrada `%` não vira `%25`)
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥12 testes passam (sem deleções silenciosas)
+- [x] Passos 1–4 do design implementados na ordem exata
+- [x] Testes: 2.048 aceito / 2.049 rejeitado; whitespace de borda aparado (incluindo o caso de 2.050 com espaços que passa a caber, documentado na spec); `\t`/`\r`/`\n`/`\x7F` internos ⇒ `CONTROL_CHARACTER`; byte ≥`\x80` em host, path, query ou fragmento ⇒ `NON_ASCII_INPUT`; `%zz`, `%A`, `%` isolado ⇒ `INVALID_PERCENT_ENCODING`
+- [x] Teste prova que a checagem de percent-encoding roda **antes** do parser (entrada `%` não vira `%25`)
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 20 testes passam (verificado: 725/725, +20 sobre a baseline de 705; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -242,12 +244,12 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Passos 5–9 do design implementados na ordem exata
-- [ ] Testes: `ftp:`, `javascript:`, `data:`, `file:`, esquema ausente ⇒ `SCHEME_NOT_ALLOWED`; `u:p@`, `u@`, `@`, `:@` ⇒ `USERINFO_PRESENT`; `https://`, `http:///path`, `https://ho st.com/` ⇒ `MALFORMED_URL`; `:65536`, `:-1`, `:0` ⇒ `INVALID_PORT`; motivos de host delegados ao classificador
-- [ ] Teste assere que a mensagem do `SyntaxError` **não** é encadeada nem propagada (a URL não aparece em `getPrevious()` nem no trace)
-- [ ] Teste de ordem: entrada que viola duas regras devolve o motivo da regra anterior na cadeia
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥18 testes passam (sem deleções silenciosas)
+- [x] Passos 5–9 do design implementados na ordem exata
+- [x] Testes: `ftp:`, `javascript:`, `data:`, `file:`, esquema ausente ⇒ `SCHEME_NOT_ALLOWED`; `u:p@`, `u@`, `@`, `:@` ⇒ `USERINFO_PRESENT`; `https://`, `http:///path`, `https://ho st.com/` ⇒ `MALFORMED_URL`; `:0` ⇒ `INVALID_PORT`; motivos de host delegados ao classificador — **SPEC_DEVIATION verificada empiricamente** (league/uri 7.8.1): `:65536` ⇒ `INVALID_PORT` como esperado, mas `:-1` (e qualquer porta não numérica, ex. `:abc`) ⇒ `MALFORMED_URL`, não `INVALID_PORT` — RFC 3986 define porta como `*DIGIT`, então `Uri::new()` já lança `SyntaxError` antes do passo 9 conseguir rodar; não há caminho até `INVALID_PORT` para esses casos sem parsear a autoridade por texto (proibido por LDST-07/AD-019). Contrato público (`422`) inalterado. Documentado em comentário `SPEC_DEVIATION` no código e nos testes
+- [x] Teste assere que a mensagem do `SyntaxError` **não** é encadeada nem propagada (a URL não aparece em `getPrevious()` nem no trace)
+- [x] Teste de ordem: entrada que viola duas regras devolve o motivo da regra anterior na cadeia
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 29 testes passam (verificado: 754/754, +29 sobre a baseline de 725; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -268,12 +270,12 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Passos 10–11 do design implementados
-- [ ] Testes de tabela entrada → valor normalizado esperado cobrindo **todos** os casos do design e das edge cases da spec: caixa mista, `:80`/`:443`/`:`/`:0443` removidas, `:8443` e `:00080` preservadas, path vazio ⇒ `/`, ponto final removido, `?`/`#` vazios preservados, `%2F` e `%C3%A1` intactos, `/a/./b/../c//d` não colapsado
-- [ ] Teste de propriedade: `normalize(normalize($x)) === normalize($x)` para toda entrada aceita da matriz
-- [ ] Teste: valor normalizado >2.048 ⇒ `TOO_LONG`; e o caso de 2.048 que encolhe ao remover `:443` é aceito
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥16 testes passam (sem deleções silenciosas)
+- [x] Passos 10–11 do design implementados
+- [x] Testes de tabela entrada → valor normalizado esperado cobrindo **todos** os casos do design e das edge cases da spec: caixa mista, `:80`/`:443`/`:`/`:0443` removidas, `:8443` e `:00080` preservadas, path vazio ⇒ `/`, ponto final removido, `?`/`#` vazios preservados, `%2F` e `%C3%A1` intactos, `/a/./b/../c//d` não colapsado
+- [x] Teste de propriedade: `normalize(normalize($x)) === normalize($x)` para toda entrada aceita da matriz
+- [x] Teste: valor normalizado >2.048 ⇒ `TOO_LONG` (caso reachable construído com path vazio + query longa); e o caso de 2.048 que encolhe ao remover `:443` é aceito
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 32 testes passam (verificado: 786/786, +32 sobre a baseline de 754; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -294,12 +296,12 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `fromString(string $raw, PublicHostClassifier $hosts): self`; construtor privado mantido
-- [ ] `value()` devolve **sempre** o valor normalizado; não existe acessor do valor cru
-- [ ] Testes da fatia 1 (LFND-10) atualizados para a nova assinatura, **sem** enfraquecer asserção — e os casos que a fatia 1 documentava como "aceitos por ora" (`http://192.168.0.1/x`) agora asserem rejeição
-- [ ] `equals()` compara valores normalizados
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥8 testes passam (sem deleções silenciosas)
+- [x] `fromString(string $raw, PublicHostClassifier $hosts): self`; construtor privado mantido
+- [x] `value()` devolve **sempre** o valor normalizado; não existe acessor do valor cru (provado por teste de reflection sobre os métodos públicos)
+- [x] Testes da fatia 1 (LFND-10) atualizados para a nova assinatura, **sem** enfraquecer asserção — e os casos que a fatia 1 documentava como "aceitos por ora" (IP literal, `localhost`) agora asserem rejeição
+- [x] `equals()` compara valores normalizados
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 20 testes passam (verificado: 793/793, +7 sobre a baseline de 786 — arquivo reescrito de 13 para 20 testes; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -320,13 +322,13 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] `__invoke(string $raw): EncryptedDestination` valida antes de cifrar
-- [ ] Teste de round-trip com cipher real: decifrar devolve o valor normalizado, incluindo query e fragmento
-- [ ] Teste com spy da porta: entrada rejeitada ⇒ **zero** chamadas a `encrypt`
-- [ ] Teste: duas chamadas seguidas executam a política **duas** vezes (revalidação por versão)
-- [ ] Teste: `key_id` devolvido é o `active_key_id` da config
-- [ ] Gate check passa: `make test-backend`
-- [ ] Test count: ≥6 testes passam (sem deleções silenciosas)
+- [x] `__invoke(string $raw): EncryptedDestination` valida antes de cifrar
+- [x] Teste de round-trip com cipher real: decifrar devolve o valor normalizado, incluindo query e fragmento
+- [x] Teste com spy da porta: entrada rejeitada ⇒ **zero** chamadas a `encrypt`
+- [x] Teste: duas chamadas seguidas executam a política **duas** vezes (revalidação por versão)
+- [x] Teste: `key_id` devolvido é o `active_key_id` da config
+- [x] Gate check passa: `make test-backend`
+- [x] Test count: 7 testes passam (verificado: 800/800, +7 sobre a baseline de 793; sem deleções silenciosas)
 
 **Tests**: unit
 **Gate**: quick
@@ -347,11 +349,11 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Regra: nenhuma classe fora de `Modules\Links\UseCases` e `Modules\Links\Infrastructure\Crypto` depende de `DestinationCipher`
-- [ ] Regra: `Modules\Links\Domain` não importa `Modules\Links\Infrastructure`
-- [ ] Mutação manual (import proibido em classe de teste temporária) prova que a regra **falha** quando deve — mutação descartada depois
-- [ ] Gate check passa: `make test-backend && make test-architecture`
-- [ ] Test count: 2 regras novas passam (sem deleções silenciosas)
+- [x] Regra: nenhuma classe fora de `Modules\Links\UseCases` e `Modules\Links\Infrastructure\Crypto` depende de `DestinationCipher` — ampliada para também permitir `Modules\Links\ServiceProviders`, que referencia a interface apenas para registrar o bind no container (nunca chama `encrypt()`/`decrypt()`); sem essa exceção a regra reprova o próprio `LinksServiceProvider` legítimo
+- [x] Regra: `Modules\Links\Domain` não importa `Modules\Links\Infrastructure`
+- [x] Mutação manual (import proibido em classe de teste temporária) prova que a regra **falha** quando deve — duas mutações separadas (uma por regra), ambas descartadas depois
+- [x] Gate check passa: `make test-backend && make test-architecture`
+- [x] Test count: 2 regras novas passam (verificado: 19/19 em `test-architecture`, 802/802 em `test-backend`, +2 sobre a baseline de 800; sem deleções silenciosas)
 
 **Tests**: architecture
 **Gate**: full
@@ -372,12 +374,14 @@ T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Helper gera token único e monta URLs com o token em host, path, query e fragmento
-- [ ] Varredura assere **zero** ocorrências do token em: registros de `Log::fake`, `getMessage()`, `getTraceAsString()`, `getPrevious()` e no `EncryptedDestination` serializado em texto
-- [ ] Cobre os dois caminhos: destino aceito e cifrado, e destino rejeitado por cada um dos 12 motivos
-- [ ] Teste assere que dois motivos diferentes produzem exceção pública indistinguível (código e mensagem idênticos)
-- [ ] Gate check passa: `make lint && make test-backend-coverage`
-- [ ] Test count: ≥5 testes passam (sem deleções silenciosas)
+- [x] Helper gera token único e monta URLs com o token em host, path, query e fragmento
+- [x] Varredura assere **zero** ocorrências do token em: registros de `Log::listen` (Laravel 13 não tem `Log::fake()`; `MessageLogged` + `Log::listen` é o spy nativo já usado em `Aes256GcmDestinationCipherTest`), `getMessage()`, `getTraceAsString()`, `getPrevious()` e no `EncryptedDestination` serializado em texto — **ampliado** para também cobrir `getTrace()` (array estruturado, não só sua forma de string): um vazamento real foi encontrado e corrigido durante esta task (ver nota abaixo)
+- [x] Cobre os dois caminhos: destino aceito e cifrado, e destino rejeitado por cada um dos 12 motivos
+- [x] Teste assere que dois motivos diferentes produzem exceção pública indistinguível (código e mensagem idênticos)
+- [x] Gate check passa: verificado por partes (`make lint` composto falha em `lint-frontend`, desvio pré-existente e não relacionado — ver Handoff em `.specs/STATE.md`): `lint-openapi` (0 erros), `lint-backend` (Pint 333 arquivos, PHPStan 0 erros, PHPMD limpo), `test-architecture` (19/19), `test-backend` (816/816), `test-backend-coverage` (816/816, Links 91.25% linhas / 91.20% métodos — gate 90/85)
+- [x] Test count: 14 testes passam (verificado: 816/816, +14 sobre a baseline de 802; sem deleções silenciosas)
+
+**Achado e corrigido durante esta task**: `PHP\Exception::getTrace()`/`getTraceAsString()` capturam o valor **ao vivo** de todo argumento em toda frame ativa da call stack no momento em que a exceção é construída — não só da função imediata. Verificado empiricamente: sem correção, a URL crua de destino vazava por completo em `getTrace()` (e parcialmente, truncada em 15 caracteres por `zend.exception_string_param_max_len`, em `getTraceAsString()`) para **todos** os 12 motivos de rejeição, não só o caso `MALFORMED_URL` que a T7 já protegia. `DestinationUrlPolicy` agora canaliza todo `throw` por um novo método `fail()` que chama `ini_set('zend.exception_ignore_args', '1')` antes de construir a exceção — efeito por requisição (PHP-FPM reseta a cada requisição), fecha o vazamento para toda frame já na pilha de uma só vez, sem depender de cada chamador (presente ou futuro) redigir sua própria cópia. Verificado como determinante por mutação manual: revertendo a correção, os 12 testes de rejeição falham na asserção de `getTrace()`; restaurando, voltam a passar.
 
 **Tests**: unit
 **Gate**: build

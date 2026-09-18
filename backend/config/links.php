@@ -10,12 +10,19 @@ return [
     | Configuration for encrypting destination URLs stored in the database.
     | keyring: JSON map of key_id => base64-encoded 32-byte key.
     | active_key_id: the key used for new encryptions.
+    | self_hosts: the product's own hosts (SHORT_HOST and the host of APP_URL),
+    | lowercased, port-free and deduplicated. A destination URL targeting one of
+    | these hosts (or a subdomain of one) is rejected to prevent a redirect loop.
     |
     */
 
     'destination' => [
         'keyring' => env('LINKS_DESTINATION_KEYRING', '{}'),
         'active_key_id' => env('LINKS_DESTINATION_ACTIVE_KEY_ID', ''),
+        'self_hosts' => array_values(array_unique(array_filter([
+            strtolower((string) env('SHORT_HOST', '')),
+            strtolower((string) parse_url((string) env('APP_URL', ''), PHP_URL_HOST)),
+        ]))),
     ],
 
     /*

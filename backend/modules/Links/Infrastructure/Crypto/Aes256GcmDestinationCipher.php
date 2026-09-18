@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Links\Infrastructure\Crypto;
 
 use Modules\Links\Contracts\Services\DestinationCipher;
+use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\ValueObjects\DestinationUrl;
 use Modules\Links\Domain\ValueObjects\EncryptedDestination;
 use Modules\Links\Exceptions\DestinationDecryptionFailed;
@@ -26,7 +27,10 @@ final class Aes256GcmDestinationCipher implements DestinationCipher
 
     private const ALGO = 'aes-256-gcm';
 
-    public function __construct(private readonly DestinationKeyring $keyring) {}
+    public function __construct(
+        private readonly DestinationKeyring $keyring,
+        private readonly PublicHostClassifier $hosts,
+    ) {}
 
     public function encrypt(DestinationUrl $url): EncryptedDestination
     {
@@ -104,6 +108,6 @@ final class Aes256GcmDestinationCipher implements DestinationCipher
             throw DestinationDecryptionFailed::tampered();
         }
 
-        return DestinationUrl::fromString($plaintext);
+        return DestinationUrl::fromString($plaintext, $this->hosts);
     }
 }

@@ -2,13 +2,30 @@
 
 declare(strict_types=1);
 
+use Modules\Links\Domain\Enums\DestinationRejectionReason;
 use Modules\Links\Exceptions\LinksDomainException;
 
 describe('LinksDomainException', function () {
     it('exposes error code INVALID_DESTINATION_URL', function () {
-        $exception = LinksDomainException::invalidDestinationUrl();
+        $exception = LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
 
         expect($exception->errorCode())->toBe(LinksDomainException::INVALID_DESTINATION_URL);
+    });
+
+    it('carries a fixed message identical for every rejection reason', function () {
+        foreach (DestinationRejectionReason::cases() as $reason) {
+            $exception = LinksDomainException::invalidDestinationUrl($reason);
+
+            expect($exception->getMessage())->toBe('The destination URL is not allowed.');
+        }
+    });
+
+    it('reason() returns the reason the exception was constructed with', function () {
+        foreach (DestinationRejectionReason::cases() as $reason) {
+            $exception = LinksDomainException::invalidDestinationUrl($reason);
+
+            expect($exception->reason())->toBe($reason);
+        }
     });
 
     it('exposes error code INVALID_SHORT_LINK_ID', function () {
@@ -38,7 +55,7 @@ describe('LinksDomainException', function () {
     });
 
     it('is a DomainException', function () {
-        $exception = LinksDomainException::invalidDestinationUrl();
+        $exception = LinksDomainException::invalidDestinationUrl(DestinationRejectionReason::MalformedUrl);
 
         expect($exception)->toBeInstanceOf(DomainException::class);
     });

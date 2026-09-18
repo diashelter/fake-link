@@ -220,34 +220,34 @@ Essa URL termina em um header `Location` público servido pelo host curto. Ela p
 
 | Requirement ID | Catálogo | Story | Requisito | Status |
 | --- | --- | --- | --- | --- |
-| LDST-01 | LNK-20 | P1: Política | Esquema `http`/`https` obrigatório | Pending |
-| LDST-02 | LNK-20 | P1: Política | Limite de 2.048 na entrada crua | Pending |
-| LDST-03 | LNK-20 | P1: Normalização | Limite de 2.048 no valor normalizado | Pending |
-| LDST-04 | LNK-23 | P1: Política | Rejeição de caracteres de controle | Pending |
-| LDST-05 | LNK-23 | P1: Política | Rejeição de `userinfo` em todas as formas | Pending |
-| LDST-06 | LNK-23 | P1: Política | Rejeição de percent-encoding malformado | Pending |
-| LDST-07 | LNK-21 | P1: Política | Parse por parser de URL, sem busca textual | Pending |
-| LDST-08 | LNK-21 | P1: Política | Sintaxe de hostname (labels, comprimento, hífen, TLD) | Pending |
-| LDST-09 | LNK-21 | P1: Política | Rejeição de qualquer byte não-ASCII na entrada; `xn--` aceito | Pending |
-| LDST-10 | LNK-22 | P1: Política | Rejeição de literal IPv4 em qualquer notação | Pending |
-| LDST-11 | LNK-22 | P1: Política | Rejeição de literal IPv6 | Pending |
-| LDST-12 | LNK-22 | P1: Política | Denylist de nomes de uso especial | Pending |
-| LDST-13 | LNK-22 | P1: Política | Bloqueio dos hosts próprios (`SHORT_HOST` + `APP_URL`) e subdomínios | Pending |
-| LDST-14 | LNK-24 | P1: Política | Validação de porta (1–65535) | Pending |
-| LDST-15 | LNK-24 | P1: Normalização | Remoção de porta padrão redundante e porta vazia | Pending |
-| LDST-16 | LNK-24 | P1: Normalização | Preservação de porta customizada válida | Pending |
-| LDST-17 | LNK-25 | P1: Normalização | Preservação byte a byte de query string e fragmento | Pending |
-| LDST-18 | LNK-25 | P1: Normalização | Preservação de path, percent-encoding e `.`/`..` | Pending |
-| LDST-19 | LNK-25 | P1: Normalização | Canonicalização de esquema, host e path vazio | Pending |
-| LDST-20 | LNK-25 | P1: Normalização | Idempotência da normalização | Pending |
-| LDST-21 | LNK-26 | P1: Cifra | Cifra somente a partir de valor validado, com `key_id` ativo | Pending |
-| LDST-22 | LNK-26 | P1: Cifra | Revalidação obrigatória antes de cada persistência de versão | Pending |
-| LDST-23 | LNK-20…26 | P2: Erro | Código público único `INVALID_DESTINATION_URL` + motivo interno | Pending |
-| LDST-24 | LNK-20…26 | P2: Erro | Zero vazamento de URL, query e fragmento em log, exceção e trace | Pending |
+| LDST-01 | LNK-20 | P1: Política | Esquema `http`/`https` obrigatório | Verified |
+| LDST-02 | LNK-20 | P1: Política | Limite de 2.048 na entrada crua | Verified |
+| LDST-03 | LNK-20 | P1: Normalização | Limite de 2.048 no valor normalizado | Verified |
+| LDST-04 | LNK-23 | P1: Política | Rejeição de caracteres de controle | Verified |
+| LDST-05 | LNK-23 | P1: Política | Rejeição de `userinfo` em todas as formas | Verified |
+| LDST-06 | LNK-23 | P1: Política | Rejeição de percent-encoding malformado | Verified |
+| LDST-07 | LNK-21 | P1: Política | Parse por parser de URL, sem busca textual | Verified |
+| LDST-08 | LNK-21 | P1: Política | Sintaxe de hostname (labels, comprimento, hífen, TLD) | Verified |
+| LDST-09 | LNK-21 | P1: Política | Rejeição de qualquer byte não-ASCII na entrada; `xn--` aceito | Verified |
+| LDST-10 | LNK-22 | P1: Política | Rejeição de literal IPv4 em qualquer notação | Verified |
+| LDST-11 | LNK-22 | P1: Política | Rejeição de literal IPv6 | Verified |
+| LDST-12 | LNK-22 | P1: Política | Denylist de nomes de uso especial | Verified |
+| LDST-13 | LNK-22 | P1: Política | Bloqueio dos hosts próprios (`SHORT_HOST` + `APP_URL`) e subdomínios | Verified |
+| LDST-14 | LNK-24 | P1: Política | Validação de porta (1–65535) | Verified |
+| LDST-15 | LNK-24 | P1: Normalização | Remoção de porta padrão redundante e porta vazia | Verified |
+| LDST-16 | LNK-24 | P1: Normalização | Preservação de porta customizada válida | Verified |
+| LDST-17 | LNK-25 | P1: Normalização | Preservação byte a byte de query string e fragmento | Verified |
+| LDST-18 | LNK-25 | P1: Normalização | Preservação de path, percent-encoding e `.`/`..` | Verified |
+| LDST-19 | LNK-25 | P1: Normalização | Canonicalização de esquema, host e path vazio | Verified |
+| LDST-20 | LNK-25 | P1: Normalização | Idempotência da normalização | Verified |
+| LDST-21 | LNK-26 | P1: Cifra | Cifra somente a partir de valor validado, com `key_id` ativo | Verified |
+| LDST-22 | LNK-26 | P1: Cifra | Revalidação obrigatória antes de cada persistência de versão | Verified |
+| LDST-23 | LNK-20…26 | P2: Erro | Código público único `INVALID_DESTINATION_URL` + motivo interno | Verified |
+| LDST-24 | LNK-20…26 | P2: Erro | Zero vazamento de URL, query e fragmento em log, exceção e trace | Verified |
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 24 requisitos, 0 mapeados para tasks (Tasks ainda não gerado).
+**Coverage:** 24 requisitos, 24/24 verificados pelo Verifier independente (`.specs/features/links/destination-policy/validation.md`, 2026-09-17, PASS).
 
 ---
 

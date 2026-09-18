@@ -24,6 +24,19 @@ declare(strict_types=1);
 | A mutant that couples Redirects to Links domain or infrastructure is
 | killed by that expectation.
 |
+| Discrimination (destination-policy gate, LDST-21/LDST-22): a class
+| anywhere outside Modules\Links\UseCases, Modules\Links\Infrastructure\Crypto
+| or Modules\Links\ServiceProviders (which only references the interface to
+| register its container binding, never to call it) that adds
+| `use Modules\Links\Contracts\Services\DestinationCipher` must fail the
+| "DestinationCipher is only depended on by ..." rule below -- proving the
+| policy cannot be bypassed by a caller that reaches the cipher directly.
+| A class inside Modules\Links\Domain that adds
+| `use Modules\Links\Infrastructure\...` must fail the "Links Domain does
+| not depend on Links Infrastructure" rule. Both were verified to fail
+| against a temporary mutation before being committed; the mutation was
+| discarded afterwards.
+|
 */
 
 $domainModules = [
@@ -73,3 +86,18 @@ arch('shared does not depend on domain modules')
         'Modules\Analytics',
         'Modules\Operations',
     ]);
+
+arch('DestinationCipher is only depended on by Links UseCases and Links Infrastructure/Crypto')
+    ->expect('Modules\Links\Contracts\Services\DestinationCipher')
+    ->toOnlyBeUsedIn([
+        'Modules\Links\UseCases',
+        'Modules\Links\Infrastructure\Crypto',
+        // LinksServiceProvider references the interface only to register its container
+        // binding (an array key/value pair) — it never calls encrypt()/decrypt() itself,
+        // so it is not a caller that could bypass the policy.
+        'Modules\Links\ServiceProviders',
+    ]);
+
+arch('Links Domain does not depend on Links Infrastructure')
+    ->expect('Modules\Links\Domain')
+    ->not->toUse('Modules\Links\Infrastructure');

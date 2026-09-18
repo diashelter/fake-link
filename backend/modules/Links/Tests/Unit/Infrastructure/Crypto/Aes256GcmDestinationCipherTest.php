@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Log;
+use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\ValueObjects\DestinationUrl;
 use Modules\Links\Domain\ValueObjects\EncryptedDestination;
 use Modules\Links\Exceptions\DestinationDecryptionFailed;
@@ -29,13 +30,18 @@ function makeCipher(array $keys, string $activeKeyId): Aes256GcmDestinationCiphe
         'active_key_id' => $activeKeyId,
     ]);
 
-    return new Aes256GcmDestinationCipher($keyring);
+    return new Aes256GcmDestinationCipher($keyring, new PublicHostClassifier([]));
+}
+
+function destinationUrl(string $raw): DestinationUrl
+{
+    return DestinationUrl::fromString($raw, new PublicHostClassifier([]));
 }
 
 describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
     it('round-trip preserves plaintext including query string and fragment', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com/path?a=1&b=2#frag');
+        $url = destinationUrl('https://example.com/path?a=1&b=2#frag');
 
         $encrypted = $cipher->encrypt($url);
         $decrypted = $cipher->decrypt($encrypted);
@@ -45,7 +51,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('round-trip preserves percent-encoding', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com/path?q=hello%20world');
+        $url = destinationUrl('https://example.com/path?q=hello%20world');
 
         $encrypted = $cipher->encrypt($url);
         $decrypted = $cipher->decrypt($encrypted);
@@ -55,7 +61,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('two encryptions of the same url produce different envelopes (unique nonce)', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
 
         $enc1 = $cipher->encrypt($url);
         $enc2 = $cipher->encrypt($url);
@@ -65,7 +71,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('returns active key_id in the encrypted destination', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
 
         $encrypted = $cipher->encrypt($url);
 
@@ -74,7 +80,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws when decrypting with a key_id not in keyring', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
         $encrypted = $cipher->encrypt($url);
 
         // Simulate an envelope referencing a key that is not in this keyring instance
@@ -85,7 +91,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws when decrypting with a different key than used for encryption', function () use ($keyA, $keyB) {
         $cipherA = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
 
         $encrypted = $cipherA->encrypt($url);
 
@@ -97,7 +103,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws when nonce is tampered', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
         $encrypted = $cipher->encrypt($url);
 
         $binary = base64_decode($encrypted->envelope(), strict: true);
@@ -110,7 +116,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws when tag is tampered', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
         $encrypted = $cipher->encrypt($url);
 
         $binary = base64_decode($encrypted->envelope(), strict: true);
@@ -123,7 +129,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws when ciphertext is tampered', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
         $encrypted = $cipher->encrypt($url);
 
         $binary = base64_decode($encrypted->envelope(), strict: true);
@@ -137,7 +143,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
 
     it('throws on unknown version byte', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
-        $url = DestinationUrl::fromString('https://example.com');
+        $url = destinationUrl('https://example.com');
         $encrypted = $cipher->encrypt($url);
 
         $binary = base64_decode($encrypted->envelope(), strict: true);
@@ -166,7 +172,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
     it('decrypts envelope encrypted with an old key when keyring contains both keys', function () use ($keyA, $keyB) {
         // Encrypt with key A (old key)
         $cipherOld = makeCipher(['k1' => $keyA, 'k2' => $keyB], 'k1');
-        $url = DestinationUrl::fromString('https://example.com/old-key');
+        $url = destinationUrl('https://example.com/old-key');
         $encrypted = $cipherOld->encrypt($url);
 
         // Create cipher with active_key_id pointing to new key B, but k1 still in keyring
@@ -180,7 +186,7 @@ describe('Aes256GcmDestinationCipher', function () use ($keyA, $keyB) {
     it('envelope does not contain the plaintext URL as a substring', function () use ($keyA) {
         $cipher = makeCipher(['k1' => $keyA], 'k1');
         $plaintext = 'https://supersecret.example.com/do-not-leak';
-        $url = DestinationUrl::fromString($plaintext);
+        $url = destinationUrl($plaintext);
 
         $encrypted = $cipher->encrypt($url);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Links\Exceptions;
 
 use DomainException;
+use Modules\Links\Domain\Enums\DestinationRejectionReason;
 
 final class LinksDomainException extends DomainException
 {
@@ -17,15 +18,17 @@ final class LinksDomainException extends DomainException
     private function __construct(
         private readonly string $errorCode,
         string $message,
+        private readonly ?DestinationRejectionReason $reason = null,
     ) {
         parent::__construct($message);
     }
 
-    public static function invalidDestinationUrl(): self
+    public static function invalidDestinationUrl(DestinationRejectionReason $reason): self
     {
         return new self(
             errorCode: self::INVALID_DESTINATION_URL,
-            message: 'The provided destination URL is invalid.',
+            message: 'The destination URL is not allowed.',
+            reason: $reason,
         );
     }
 
@@ -48,5 +51,10 @@ final class LinksDomainException extends DomainException
     public function errorCode(): string
     {
         return $this->errorCode;
+    }
+
+    public function reason(): ?DestinationRejectionReason
+    {
+        return $this->reason;
     }
 }

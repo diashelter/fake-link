@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
+use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\ValueObjects\DestinationUrl;
 use Modules\Links\Domain\ValueObjects\EncryptedDestination;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
@@ -175,10 +176,10 @@ describe('link_destination_versions schema contract', function () {
         $link = makeShortLink();
 
         $keyring = DestinationKeyring::fromConfig(config('links.destination'));
-        $cipher = new Aes256GcmDestinationCipher($keyring);
+        $cipher = new Aes256GcmDestinationCipher($keyring, new PublicHostClassifier([]));
 
         $originalUrl = 'https://example.com/secret-destination';
-        $destinationUrl = DestinationUrl::fromString($originalUrl);
+        $destinationUrl = DestinationUrl::fromString($originalUrl, new PublicHostClassifier([]));
         $encrypted = $cipher->encrypt($destinationUrl);
 
         DB::table('link_destination_versions')->insert([
