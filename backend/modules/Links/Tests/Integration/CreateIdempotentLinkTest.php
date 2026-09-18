@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -140,6 +141,34 @@ function sampleCreateLinkInput(string $destination = 'https://example.com/idem')
     );
 }
 
+function seedIdemConcurrencyOwner(ConnectionInterface $conn): UserId
+{
+    $userId = (string) Str::uuid7();
+
+    $conn->table('users')->insert([
+        'id' => $userId,
+        'name' => 'Idempotency Concurrency User',
+        'email' => 'idem-concurrency-'.$userId.'@idem-concurrency.example.com',
+        'password' => 'hash',
+        'status' => 'active',
+        'terms_version' => '2026-01',
+        'terms_accepted_at' => now(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return UserId::fromString($userId);
+}
+
+function scrubIdemConcurrencyArtifacts(ConnectionInterface $conn): void
+{
+    $conn->table('idempotency_keys')->delete();
+    $conn->table('link_destination_versions')->delete();
+    $conn->table('short_links')->delete();
+    $conn->table('slug_reservations')->delete();
+    $conn->table('users')->where('email', 'like', '%@idem-concurrency.example.com')->delete();
+}
+
 describe('CreateIdempotentLink', function () {
     it('creates a link and stores an encrypted snapshot on first use of a key', function () {
         $owner = idempotentCreateOwner('first');
@@ -264,5 +293,94 @@ describe('CreateIdempotentLink', function () {
             ->and($resultA->created?->id)->not->toBe($resultB->created?->id)
             ->and(DB::table('short_links')->count())->toBe(2)
             ->and(DB::table('idempotency_keys')->count())->toBe(2);
+    });
+});
+
+describe('CreateIdempotentLink concurrency across two connections', function () {
+    beforeEach(function () {
+        $base = config('database.connections.pgsql');
+
+        config([
+            'database.connections.pgsql_idem_a' => $base,
+            'database.connections.pgsql_idem_b' => $base,
+        ]);
+
+        $this->connA = DB::connection('pgsql_idem_a');
+        $this->connB = DB::connection('pgsql_idem_b');
+    });
+
+    afterEach(function () {
+        scrubIdemConcurrencyArtifacts($this->connA);
+
+        DB::setDefaultConnection('pgsql');
+        $this->connA->disconnect();
+        $this->connB->disconnect();
+        DB::purge('pgsql_idem_a');
+        DB::purge('pgsql_idem_b');
+    });
+
+    it('creates one link and replays the second caller on another connection', function () {
+        $owner = seedIdemConcurrencyOwner($this->connA);
+        $key = IdempotencyKey::fromString('idem-key-concurrency-01');
+        $input = sampleCreateLinkInput('https://example.com/concurrency');
+        $source = new IdempotentCreateSequencedSlugSource(['conc0001', 'conc0002']);
+        $useCase = makeCreateIdempotentLink(makeCreateLinkForIdempotency($source));
+
+        $previous = DB::getDefaultConnection();
+
+        DB::setDefaultConnection('pgsql_idem_a');
+        $first = $useCase->execute($owner, $input, $key);
+
+        DB::setDefaultConnection('pgsql_idem_b');
+        $second = $useCase->execute($owner, $input, $key);
+
+        DB::setDefaultConnection($previous);
+
+        expect($first->replayed)->toBeFalse()
+            ->and($second->replayed)->toBeTrue()
+            ->and($second->snapshot->body)->toBe($first->snapshot->body)
+            ->and($second->snapshot->headers)->toBe($first->snapshot->headers)
+            ->and($this->connA->table('short_links')->count())->toBe(1)
+            ->and($this->connA->table('idempotency_keys')->count())->toBe(1)
+            ->and($source->calls)->toBe(1);
+    });
+
+    it('clears author residue after rollback and allows a later create with the same key', function () {
+        $owner = seedIdemConcurrencyOwner($this->connA);
+        $key = IdempotencyKey::fromString('idem-key-concurrency-rb');
+        $input = sampleCreateLinkInput('https://example.com/concurrency-rb');
+
+        $failing = makeCreateIdempotentLink(
+            makeCreateLinkForIdempotency(new IdempotentCreateSequencedSlugSource(['fail0001'])),
+            new ThrowingIdempotencySnapshotCipher(app(IdempotencySnapshotCipher::class)),
+        );
+
+        $previous = DB::getDefaultConnection();
+        DB::setDefaultConnection('pgsql_idem_a');
+
+        try {
+            $failing->execute($owner, $input, $key);
+            expect(false)->toBeTrue();
+        } catch (RuntimeException $exception) {
+            expect($exception->getMessage())->toBe('forced snapshot encrypt failure');
+        }
+
+        expect($this->connA->table('short_links')->count())->toBe(0)
+            ->and($this->connA->table('link_destination_versions')->count())->toBe(0)
+            ->and($this->connA->table('slug_reservations')->count())->toBe(0)
+            ->and($this->connA->table('idempotency_keys')->count())->toBe(0);
+
+        DB::setDefaultConnection('pgsql_idem_b');
+
+        $succeeding = makeCreateIdempotentLink(
+            makeCreateLinkForIdempotency(new IdempotentCreateSequencedSlugSource(['ok000001'])),
+        );
+        $result = $succeeding->execute($owner, $input, $key);
+
+        DB::setDefaultConnection($previous);
+
+        expect($result->replayed)->toBeFalse()
+            ->and($this->connB->table('short_links')->count())->toBe(1)
+            ->and($this->connB->table('idempotency_keys')->count())->toBe(1);
     });
 });

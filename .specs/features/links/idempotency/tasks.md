@@ -223,11 +223,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: NONE · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Mesma chave/comando concorrentes criam um link; a segunda resposta é replay.
-- [ ] Rollback da autora não deixa resíduo e permite nova execução.
-- [ ] Snapshot adulterado retorna `503` sem segundo link, corpo parcial, `Location` ou `ETag`.
-- [ ] Sentinelas não encontram chave, URL, título, corpo ou fingerprint em PostgreSQL em claro, logs, métricas ou traces.
-- [ ] Gate: `make test-backend`.
+- [x] Mesma chave/comando concorrentes criam um link; a segunda resposta é replay.
+- [x] Rollback da autora não deixa resíduo e permite nova execução.
+- [x] Snapshot adulterado retorna `503` sem segundo link, corpo parcial, `Location` ou `ETag`.
+- [x] Sentinelas não encontram chave, URL, título, corpo ou fingerprint em PostgreSQL em claro, logs, métricas ou traces.
+- [x] Gate: `make test-backend`.
 
 **Tests:** integration + Feature · **Gate:** full  
 **Commit:** `test(links): cover idempotency concurrency and privacy boundaries`
