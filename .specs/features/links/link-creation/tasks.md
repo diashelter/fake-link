@@ -257,12 +257,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Linha gravada com `valid_to = null`, `valid_from` = instante da criação e `key_id` preenchido
-- [ ] Teste inspeciona a coluna e prova que a URL **não** está em texto claro
-- [ ] Segunda versão vigente para o mesmo link viola o índice parcial único e falha
-- [ ] Participa da transação corrente
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam
+- [x] Linha gravada com `valid_to = null`, `valid_from` = instante da criação e `key_id` preenchido
+- [x] Teste inspeciona a coluna e prova que a URL **não** está em texto claro
+- [x] Segunda versão vigente para o mesmo link viola o índice parcial único e falha
+- [x] Participa da transação corrente
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): persist first encrypted destination version`
