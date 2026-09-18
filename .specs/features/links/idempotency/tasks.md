@@ -202,11 +202,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: Context7 · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Command remove somente registros com `expires_at <= now()` em lote configurado.
-- [ ] Agenda executa a cada minuto e não sobrepõe instâncias.
-- [ ] Duas execuções deixam o mesmo estado final e falha não apaga chaves válidas.
-- [ ] Testes controlam relógio e provam limites antes/no instante/depois da expiração.
-- [ ] Gate: `make test-backend`.
+- [x] Command remove somente registros com `expires_at <= now()` em lote configurado.
+- [x] Agenda executa a cada minuto e não sobrepõe instâncias.
+- [x] Duas execuções deixam o mesmo estado final e falha não apaga chaves válidas.
+- [x] Testes controlam relógio e provam limites antes/no instante/depois da expiração.
+- [x] Gate: `make test-backend`.
 
 **Tests:** integration · **Gate:** full  
 **Commit:** `feat(links): prune expired idempotency records`

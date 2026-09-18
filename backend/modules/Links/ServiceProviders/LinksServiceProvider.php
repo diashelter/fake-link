@@ -26,6 +26,7 @@ use Modules\Links\Domain\Services\LinkETag;
 use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\Services\SlugGenerator;
 use Modules\Links\Domain\Services\SlugPolicy;
+use Modules\Links\Infrastructure\Console\Commands\PruneExpiredIdempotencyKeys;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmIdempotencySnapshotCipher;
 use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
@@ -160,6 +161,12 @@ final class LinksServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PruneExpiredIdempotencyKeys::class,
+            ]);
+        }
+
         Route::prefix('api/v1/links')
             ->middleware('api')
             ->group(function (): void {

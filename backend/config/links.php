@@ -112,6 +112,7 @@ return [
         'fingerprint_hmac_key' => env('LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY'),
         'keyring' => env('LINKS_IDEMPOTENCY_KEYRING', '{}'),
         'active_key_id' => env('LINKS_IDEMPOTENCY_ACTIVE_KEY_ID', ''),
+        'prune_batch_size' => (int) env('LINKS_IDEMPOTENCY_PRUNE_BATCH_SIZE', 1000),
     ],
 
 ];
