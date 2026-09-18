@@ -109,7 +109,7 @@ Possui criação de Short Link, reserva de slug, destino atual, histórico de de
 
 O contrato não conhece HTTP, Redis, headers ou templates de erro. Essa fronteira garante que todas as regras que tornam um link utilizável permaneçam em `Links`.
 
-**Estado (2026-09-18):** domínio de slug, política de destino e cifra AES-256-GCM entregues. Superfície HTTP registrada: somente `POST /api/v1/links` (transação de reserva, link e primeira versão, `ETag` e `LinkDetail`). Consultas, `PATCH`, histórico, porta de resolução e idempotência ainda não.
+**Estado (2026-09-18):** domínio de slug, política de destino e cifra AES-256-GCM entregues. Superfície HTTP registrada: `POST /api/v1/links` (transação de reserva, link e primeira versão, `ETag` e `LinkDetail`) e consultas privadas `GET /api/v1/links` e `GET /api/v1/links/{link}`. `PATCH`, histórico, porta de resolução e idempotência ainda não.
 
 ### 4.3 Redirects
 
@@ -176,7 +176,7 @@ Não são eventos de integração distribuídos e não exigem outbox. Workflows 
 
 Exclusão não libera slug. A reserva mínima sobrevive sem owner nem destino.
 
-**Runtime (2026-09-18):** os passos 1–3 e a resposta `201` de criação estão implementados. Troca de destino, invalidação de cache e consultas privadas ainda não.
+**Runtime (2026-09-18):** os passos 1–3 e a resposta `201` de criação estão implementados, bem como as consultas privadas `GET /api/v1/links` e `GET /api/v1/links/{link}`. Troca de destino e invalidação de cache ainda não.
 
 ### 6.2 Redirect
 

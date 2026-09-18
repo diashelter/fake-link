@@ -22,10 +22,10 @@ info:
     analytics 60/min por conta; redirect 120/min
     por IP+slug na aplicação, além da proteção do Nginx.
 
-    Superfície Laravel entregue em 2026-09-18: todos os endpoints Auth e
-    `POST /api/v1/links` (incluindo `Idempotency-Key`). Listagem, detalhe,
-    PATCH, histórico, analytics e redirect público permanecem neste contrato
-    e ainda não estão registrados na aplicação.
+    Superfície Laravel entregue em 2026-09-18: todos os endpoints Auth,
+    `POST /api/v1/links` (incluindo `Idempotency-Key`), `GET /api/v1/links`
+    e `GET /api/v1/links/{link}`. PATCH, histórico, analytics e redirect
+    público permanecem neste contrato e ainda não estão registrados na aplicação.
   license:
     name: MIT
     identifier: MIT

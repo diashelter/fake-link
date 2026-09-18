@@ -222,10 +222,10 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Todas as portas são resolvíveis sem service locator.
-- [ ] OpenAPI, docs de superfície e runtime concordam sobre ambos os GETs.
-- [ ] Provider e contract tests falham se binding/contrato divergir.
-- [ ] Gate build passa.
+- [x] Todas as portas são resolvíveis sem service locator.
+- [x] OpenAPI, docs de superfície e runtime concordam sobre ambos os GETs.
+- [x] Provider e contract tests falham se binding/contrato divergir.
+- [x] Gate build passa.
 
 **Tests**: feature + contract  
 **Gate**: build  
