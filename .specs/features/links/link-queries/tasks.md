@@ -246,10 +246,10 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Target não executa no host e usa composição efêmera.
-- [ ] E2E comprova lista paginada e detalhe do próprio link; acesso cruzado não vaza conteúdo.
-- [ ] Artefatos são sanitizados e estáveis.
-- [ ] Gate E2E e build passam.
+- [x] Target não executa no host e usa composição efêmera.
+- [x] E2E comprova lista paginada e detalhe do próprio link; acesso cruzado não vaza conteúdo.
+- [x] Artefatos são sanitizados e estáveis.
+- [x] Gate E2E e build passam.
 
 **Tests**: e2e  
 **Gate**: e2e + build  

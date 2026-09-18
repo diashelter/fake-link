@@ -5,7 +5,7 @@ REPO_ROOT := $(CURDIR)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-openapi lint-backend lint-frontend analyse-backend md-backend format-backend test-e2e-auth
+.PHONY: help trust-ca build up up-docs down ps logs shell-backend shell-frontend migrate smoke smoke-docs test test-backend test-backend-coverage test-frontend test-frontend-coverage lint lint-openapi lint-backend lint-frontend analyse-backend md-backend format-backend test-e2e-auth test-e2e-links
 
 help: ## List available operational targets
 	@printf "Fake Link — Docker environment targets\n\n"
@@ -153,6 +153,44 @@ test-e2e-auth: ## Run the Playwright Auth security gate (profile e2e)
 	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e ; status=$$? ; \
 	  mkdir -p ./frontend/e2e/.artifacts ; \
 	  $(COMPOSE_E2E) cp frontend:/app/e2e/.artifacts ./frontend/e2e/.artifacts 2>/dev/null || true ; \
+	  $(COMPOSE_E2E) logs frontend backend analytics-worker notification-worker scheduler \
+	    > ./frontend/e2e/.artifacts/compose.log 2>&1 || true ; \
+	  $(COMPOSE_E2E) down -v ; \
+	  if [ -f ./frontend/e2e/.artifacts/sentinel.txt ] && [ -s ./frontend/e2e/.artifacts/sentinel.txt ]; then \
+	    SENTINEL=$$(cat ./frontend/e2e/.artifacts/sentinel.txt) ; \
+	    SCAN_FAIL=0 ; \
+	    if grep -rl "$$SENTINEL" ./frontend/e2e/.artifacts/ \
+	        --exclude="sentinel.txt" --exclude="session-cookie.txt" \
+	        2>/dev/null | grep -q .; then \
+	      echo "ERROR: Bearer sentinel found in E2E artefacts — see grep output:" >&2 ; \
+	      grep -rl "$$SENTINEL" ./frontend/e2e/.artifacts/ \
+	          --exclude="sentinel.txt" --exclude="session-cookie.txt" 2>/dev/null >&2 ; \
+	      SCAN_FAIL=1 ; \
+	    fi ; \
+	    if [ -f ./frontend/e2e/.artifacts/session-cookie.txt ] && [ -s ./frontend/e2e/.artifacts/session-cookie.txt ]; then \
+	      COOKIE=$$(cat ./frontend/e2e/.artifacts/session-cookie.txt) ; \
+	      if grep -rl "$$COOKIE" ./frontend/e2e/.artifacts/ \
+	          --exclude="sentinel.txt" --exclude="session-cookie.txt" \
+	          2>/dev/null | grep -q .; then \
+	        echo "ERROR: Session cookie value found in E2E artefacts — see grep output:" >&2 ; \
+	        grep -rl "$$COOKIE" ./frontend/e2e/.artifacts/ \
+	            --exclude="sentinel.txt" --exclude="session-cookie.txt" 2>/dev/null >&2 ; \
+	        SCAN_FAIL=1 ; \
+	      fi ; \
+	    fi ; \
+	    if [ "$$SCAN_FAIL" -eq 1 ]; then echo "FAIL: secret leak detected in artefacts" >&2 ; exit 1 ; fi ; \
+	  fi ; \
+	  exit $$status
+
+test-e2e-links: ## Run the Playwright Links query gate (profile e2e)
+	rm -rf ./frontend/e2e/.artifacts
+	$(COMPOSE_E2E) build backend frontend
+	$(COMPOSE_E2E) run --rm --no-deps backend composer install --no-interaction --prefer-dist
+	$(COMPOSE_E2E) run --rm --no-deps frontend pnpm install --frozen-lockfile
+	$(COMPOSE_E2E) up -d --wait --scale openapi-tooling=0
+	$(COMPOSE_E2E) exec -T backend php artisan migrate:fresh --force --env=testing
+	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e:links ; status=$$? ; \
+	  mkdir -p ./frontend/e2e/.artifacts ; \
 	  $(COMPOSE_E2E) logs frontend backend analytics-worker notification-worker scheduler \
 	    > ./frontend/e2e/.artifacts/compose.log 2>&1 || true ; \
 	  $(COMPOSE_E2E) down -v ; \
