@@ -99,11 +99,11 @@ describe('LinkDetailResource', function () {
 describe('LinkResponseFactory::created', function () {
     it('returns 201 with Location, ETag, Cache-Control and X-Request-ID', function () {
         $link = sampleCreatedLink();
-        $response = (new LinkResponseFactory)->created($link, '"abcdef0123456789"', 'req-1');
+        $response = app(LinkResponseFactory::class)->created($link, 'req-1');
 
         expect($response->getStatusCode())->toBe(201)
             ->and($response->headers->get('Location'))->toBe('/api/v1/links/'.$link->id)
-            ->and($response->headers->get('ETag'))->toBe('"abcdef0123456789"')
+            ->and($response->headers->get('ETag'))->toMatch('/^"[^"]+"$/')
             ->and($response->headers->get('Cache-Control'))->toContain('private')
             ->and($response->headers->get('Cache-Control'))->toContain('no-store')
             ->and($response->headers->get('X-Request-ID'))->toBe('req-1');
@@ -111,7 +111,7 @@ describe('LinkResponseFactory::created', function () {
 
     it('wraps LinkDetail under data', function () {
         $link = sampleCreatedLink();
-        $payload = (new LinkResponseFactory)->created($link, '"etag"')->getData(true);
+        $payload = json_decode(app(LinkResponseFactory::class)->created($link)->getContent(), true);
 
         expect($payload)->toHaveKey('data')
             ->and($payload['data']['id'])->toBe($link->id)
@@ -119,22 +119,21 @@ describe('LinkResponseFactory::created', function () {
     });
 
     it('uses a strong ETag format without W/ prefix', function () {
-        $etag = '"deadbeefcafebabe"';
-        $response = (new LinkResponseFactory)->created(sampleCreatedLink(), $etag);
+        $response = app(LinkResponseFactory::class)->created(sampleCreatedLink());
 
         expect($response->headers->get('ETag'))->toMatch('/^"[^"]+"$/')
             ->and($response->headers->get('ETag'))->not->toStartWith('W/');
     });
 
     it('defaults request id when omitted', function () {
-        $response = (new LinkResponseFactory)->created(sampleCreatedLink(), '"x"');
+        $response = app(LinkResponseFactory::class)->created(sampleCreatedLink());
 
         expect($response->headers->get('X-Request-ID'))->toBe('stub-request-id');
     });
 
     it('Location path is relative and includes the link id', function () {
         $link = sampleCreatedLink(['id' => '01900000-0000-7000-8000-000000000099']);
-        $response = (new LinkResponseFactory)->created($link, '"e"');
+        $response = app(LinkResponseFactory::class)->created($link);
 
         expect($response->headers->get('Location'))->toBe('/api/v1/links/01900000-0000-7000-8000-000000000099');
     });

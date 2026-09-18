@@ -160,11 +160,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: NONE · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Criação e replay usam a mesma serialização de corpo UTF-8.
-- [ ] `Location`, `ETag` e `Cache-Control` são reproduzidos literalmente.
-- [ ] `X-Request-ID` não integra o snapshot e é aplicado na resposta corrente.
-- [ ] Testes unitários discriminam mutações no status, bytes e cada header semântico.
-- [ ] Gate: `make test-backend`.
+- [x] Criação e replay usam a mesma serialização de corpo UTF-8.
+- [x] `Location`, `ETag` e `Cache-Control` são reproduzidos literalmente.
+- [x] `X-Request-ID` não integra o snapshot e é aplicado na resposta corrente.
+- [x] Testes unitários discriminam mutações no status, bytes e cada header semântico.
+- [x] Gate: `make test-backend`.
 
 **Tests:** unit · **Gate:** quick  
 **Commit:** `refactor(links): replay idempotent creation responses exactly`

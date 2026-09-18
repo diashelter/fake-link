@@ -33,6 +33,7 @@ use Modules\Links\Infrastructure\Crypto\ConfigIdempotencyHmacSecrets;
 use Modules\Links\Infrastructure\Crypto\DestinationKeyring;
 use Modules\Links\Infrastructure\Crypto\IdempotencyKeyring;
 use Modules\Links\Infrastructure\Http\Responses\LinkCreationSnapshotFactory;
+use Modules\Links\Infrastructure\Http\Responses\LinkResponseFactory;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
@@ -138,6 +139,11 @@ final class LinksServiceProvider extends ServiceProvider
         $this->app->bind(LinkCreationSnapshotFactory::class, fn (Application $app): LinkCreationSnapshotFactory => new LinkCreationSnapshotFactory(
             $app->make(LinkETag::class),
         ));
+
+        $this->app->bind(LinkResponseFactory::class, fn (Application $app): LinkResponseFactory => new LinkResponseFactory(
+            $app->make(LinkCreationSnapshotFactory::class),
+        ));
+
 
         $this->app->bind(CreateIdempotentLink::class, fn (Application $app): CreateIdempotentLink => new CreateIdempotentLink(
             $app->make(TransactionManager::class),
