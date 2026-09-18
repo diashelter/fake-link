@@ -127,13 +127,16 @@ test: ## Run unit tests, compose validation, and integration smoke checks
 	$(MAKE) smoke-docs
 
 test-e2e-auth: ## Run the Playwright Auth security gate (profile e2e)
-	$(COMPOSE_E2E) build frontend
+	$(COMPOSE_E2E) build backend frontend
+	$(COMPOSE_E2E) run --rm --no-deps backend composer install --no-interaction --prefer-dist
+	$(COMPOSE_E2E) run --rm --no-deps frontend pnpm install --frozen-lockfile
 	$(COMPOSE_E2E) up -d --wait --scale openapi-tooling=0
 	$(COMPOSE_E2E) exec -T backend php artisan migrate:fresh --force --env=testing
 	-$(COMPOSE_E2E) exec -T frontend pnpm test:e2e ; status=$$? ; \
 	  mkdir -p ./frontend/e2e/.artifacts ; \
 	  $(COMPOSE_E2E) cp frontend:/app/e2e/.artifacts ./frontend/e2e/.artifacts 2>/dev/null || true ; \
-	  $(COMPOSE_E2E) logs frontend > ./frontend/e2e/.artifacts/frontend.log 2>&1 || true ; \
+	  $(COMPOSE_E2E) logs frontend backend analytics-worker notification-worker scheduler \
+	    > ./frontend/e2e/.artifacts/compose.log 2>&1 || true ; \
 	  $(COMPOSE_E2E) down -v ; \
 	  if [ -f ./frontend/e2e/.artifacts/sentinel.txt ] && [ -s ./frontend/e2e/.artifacts/sentinel.txt ]; then \
 	    SENTINEL=$$(cat ./frontend/e2e/.artifacts/sentinel.txt) ; \
