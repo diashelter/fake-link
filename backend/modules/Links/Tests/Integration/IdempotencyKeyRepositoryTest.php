@@ -52,7 +52,14 @@ describe('IdempotencyKeyRepository port', function () {
             ->values()
             ->all();
 
-        expect($methods)->toBe(['complete', 'deleteExpired', 'findActive', 'reserve']);
+        expect($methods)->toBe([
+            'complete',
+            'deleteExpired',
+            'deleteExpiredForKey',
+            'findActive',
+            'findNonExpired',
+            'reserve',
+        ]);
     });
 });
 

@@ -6,6 +6,7 @@ namespace Modules\Links\Contracts\Repositories;
 
 use DateTimeImmutable;
 use Modules\Auth\Domain\ValueObjects\UserId;
+use Modules\Links\DTOs\Output\IdempotencyLookup;
 use Modules\Links\DTOs\Output\IdempotencyRecord;
 
 /**
@@ -24,6 +25,15 @@ interface IdempotencyKeyRepository
         string $keyHash,
         DateTimeImmutable $now,
     ): ?IdempotencyRecord;
+
+    /**
+     * Locate any non-expired row (reserved or completed) for conflict / replay lookup.
+     */
+    public function findNonExpired(
+        UserId $userId,
+        string $keyHash,
+        DateTimeImmutable $now,
+    ): ?IdempotencyLookup;
 
     /**
      * Reserve (user_id, key_hash) with the command fingerprint and TTL.
@@ -47,6 +57,16 @@ interface IdempotencyKeyRepository
         string $keyHash,
         string $responseSnapshot,
         string $keyId,
+    ): void;
+
+    /**
+     * Delete the row for (user_id, key_hash) when it has already expired.
+     * Enables atomic reuse of the same key after TTL without waiting for the pruner.
+     */
+    public function deleteExpiredForKey(
+        UserId $userId,
+        string $keyHash,
+        DateTimeImmutable $now,
     ): void;
 
     /**

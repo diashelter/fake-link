@@ -7,6 +7,7 @@ namespace Modules\Links\Infrastructure\Persistence\Eloquent\Mappers;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 use Modules\Auth\Domain\ValueObjects\UserId;
+use Modules\Links\DTOs\Output\IdempotencyLookup;
 use Modules\Links\DTOs\Output\IdempotencyRecord;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\IdempotencyKeyModel;
 use RuntimeException;
@@ -47,6 +48,19 @@ final class IdempotencyKeyMapper
             keyHash: $model->key_hash,
             requestFingerprint: $model->request_fingerprint,
             responseSnapshot: $snapshot,
+            keyId: $model->key_id,
+            createdAt: DateTimeImmutable::createFromInterface($model->created_at),
+            expiresAt: DateTimeImmutable::createFromInterface($model->expires_at),
+        );
+    }
+
+    public function toLookup(IdempotencyKeyModel $model): IdempotencyLookup
+    {
+        return new IdempotencyLookup(
+            userId: UserId::fromString($model->user_id),
+            keyHash: $model->key_hash,
+            requestFingerprint: $model->request_fingerprint,
+            responseSnapshot: $this->normalizeSnapshot($model->response_snapshot),
             keyId: $model->key_id,
             createdAt: DateTimeImmutable::createFromInterface($model->created_at),
             expiresAt: DateTimeImmutable::createFromInterface($model->expires_at),

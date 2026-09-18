@@ -32,6 +32,7 @@ use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
 use Modules\Links\Infrastructure\Crypto\ConfigIdempotencyHmacSecrets;
 use Modules\Links\Infrastructure\Crypto\DestinationKeyring;
 use Modules\Links\Infrastructure\Crypto\IdempotencyKeyring;
+use Modules\Links\Infrastructure\Http\Responses\LinkCreationSnapshotFactory;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
@@ -45,6 +46,7 @@ use Modules\Links\Infrastructure\Persistence\LaravelTransactionManager;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
 use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
 use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
+use Modules\Links\UseCases\CreateIdempotentLink;
 use Modules\Links\UseCases\CreateLink;
 use Modules\Links\UseCases\ReserveSlug;
 use Modules\Links\UseCases\SealDestinationUrl;
@@ -131,6 +133,19 @@ final class LinksServiceProvider extends ServiceProvider
             $app->make(DestinationVersionRepository::class),
             $app->make(EffectiveStatus::class),
             $app->make(TransactionManager::class),
+        ));
+
+        $this->app->bind(LinkCreationSnapshotFactory::class, fn (Application $app): LinkCreationSnapshotFactory => new LinkCreationSnapshotFactory(
+            $app->make(LinkETag::class),
+        ));
+
+        $this->app->bind(CreateIdempotentLink::class, fn (Application $app): CreateIdempotentLink => new CreateIdempotentLink(
+            $app->make(TransactionManager::class),
+            $app->make(CreateLink::class),
+            $app->make(IdempotencyKeyRepository::class),
+            $app->make(CanonicalCreateLinkCommand::class),
+            $app->make(IdempotencySnapshotCipher::class),
+            $app->make(LinkCreationSnapshotFactory::class),
         ));
 
         $this->app->bind(ShortLinkMapper::class);

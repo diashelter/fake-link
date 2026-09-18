@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
+use Modules\Links\DTOs\Output\IdempotencyLookup;
 use Modules\Links\DTOs\Output\IdempotencyRecord;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\IdempotencyKeyModel;
@@ -48,6 +49,28 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
         return $this->mapper->toRecord($model);
     }
 
+    public function findNonExpired(
+        UserId $userId,
+        string $keyHash,
+        DateTimeImmutable $now,
+    ): ?IdempotencyLookup {
+        $row = DB::table('idempotency_keys')
+            ->where('user_id', $userId->value())
+            ->where('key_hash', $keyHash)
+            ->where('expires_at', '>', Carbon::instance($now))
+            ->first();
+
+        if ($row === null) {
+            return null;
+        }
+
+        $model = new IdempotencyKeyModel;
+        $model->forceFill((array) $row);
+        $model->exists = true;
+
+        return $this->mapper->toLookup($model);
+    }
+
     public function reserve(
         UserId $userId,
         string $keyHash,
@@ -79,6 +102,18 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
              WHERE user_id = ? AND key_hash = ?',
             [bin2hex($responseSnapshot), $keyId, $userId->value(), $keyHash],
         );
+    }
+
+    public function deleteExpiredForKey(
+        UserId $userId,
+        string $keyHash,
+        DateTimeImmutable $now,
+    ): void {
+        DB::table('idempotency_keys')
+            ->where('user_id', $userId->value())
+            ->where('key_hash', $keyHash)
+            ->where('expires_at', '<=', Carbon::instance($now))
+            ->delete();
     }
 
     public function deleteExpired(DateTimeImmutable $now, int $limit): int

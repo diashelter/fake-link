@@ -138,12 +138,12 @@ T7 → T8 → T9
 
 **Tools:** MCP: Context7 · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Mesmo comando ativo retorna resultado de replay sem chamar criação.
-- [ ] Fingerprint divergente retorna falha tipada mapeável para `409`.
-- [ ] Falha durante criação ou snapshot reverte chave, reserva, link e versão.
-- [ ] Registro expirado não faz replay/conflito e pode ser substituído atomically.
-- [ ] Testes com PostgreSQL real cobrem happy path, rollback, conflito, expiração e isolamento por usuário.
-- [ ] Gate: `make test-backend`.
+- [x] Mesmo comando ativo retorna resultado de replay sem chamar criação.
+- [x] Fingerprint divergente retorna falha tipada mapeável para `409`.
+- [x] Falha durante criação ou snapshot reverte chave, reserva, link e versão.
+- [x] Registro expirado não faz replay/conflito e pode ser substituído atomically.
+- [x] Testes com PostgreSQL real cobrem happy path, rollback, conflito, expiração e isolamento por usuário.
+- [x] Gate: `make test-backend`.
 
 **Tests:** integration · **Gate:** full  
 **Commit:** `feat(links): create links through idempotent transaction`
