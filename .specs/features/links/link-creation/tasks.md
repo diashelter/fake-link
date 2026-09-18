@@ -281,13 +281,13 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Caminho feliz cria exatamente uma linha em cada uma das três tabelas
-- [ ] Falha no insert da versão de destino reverte link e reserva; falha no insert do link reverte a reserva
-- [ ] Validação e cifra do destino ocorrem antes de abrir a transação
-- [ ] `SlugUnavailable` e `SlugGenerationExhausted` propagam tipadas, sem estado parcial
-- [ ] Estado inicial: `is_enabled=true`, `blocked_at=null`, `version=1`, `slug_source` correto
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥10 testes passam
+- [x] Caminho feliz cria exatamente uma linha em cada uma das três tabelas
+- [x] Falha no insert da versão de destino reverte link e reserva; falha no insert do link reverte a reserva
+- [x] Validação e cifra do destino ocorrem antes de abrir a transação
+- [x] `SlugUnavailable` e `SlugGenerationExhausted` propagam tipadas, sem estado parcial
+- [x] Estado inicial: `is_enabled=true`, `blocked_at=null`, `version=1`, `slug_source` correto
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥10 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): create link, reservation and first destination in one transaction`
