@@ -21,6 +21,9 @@
             <directory>modules/Auth/Tests/Integration</directory>
             <directory>modules/Links/Tests/Integration</directory>
         </testsuite>
+        <testsuite name="Contract">
+            <directory>modules/Links/Tests/Contract</directory>
+        </testsuite>
         <testsuite name="Architecture">
             <directory>tests/Architecture</directory>
         </testsuite>
@@ -66,5 +69,8 @@
         <env name="OPENAPI_SPEC_PATH" value="/var/www/docs/openapi.yaml"/>
         <env name="LINKS_DESTINATION_KEYRING" value="{&quot;testing-key-1&quot;:&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=&quot;}"/>
         <env name="LINKS_DESTINATION_ACTIVE_KEY_ID" value="testing-key-1"/>
+        <env name="SHORT_URL_BASE" value="https://go.localhost"/>
+        <env name="LINKS_ETAG_HMAC_KEY" value="testing-links-etag-hmac-key"/>
+        <env name="LINKS_RATE_LIMIT_HMAC_KEY" value="testing-links-rate-limit-hmac-key"/>
     </php>
 </phpunit>

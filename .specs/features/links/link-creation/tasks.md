@@ -378,17 +378,17 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `POST /api/v1/links` com `auth.bearer` + `token.kind:session` responde `201` com headers e corpo corretos
-- [ ] Alias em caixa mista normaliza; `slug_source` correto nos dois caminhos
-- [ ] Alias ocupado → `409` idêntico para reserva com link e órfã; alias inválido **e** ocupado → `422`
-- [ ] Exaustão de geração → `503 SLUG_GENERATION_FAILED` com `Retry-After`
-- [ ] `401 UNAUTHENTICATED`, `403 TOKEN_RESTRICTED`, `403 ACCOUNT_SUSPENDED`, `403 ACCOUNT_PENDING_DELETION` cobertos
-- [ ] Todo `422` não deixa linha em nenhuma das três tabelas
-- [ ] Suítes de `modules/Links` registradas em `phpunit.xml` (Unit/Feature/Integration/Contract) e `<source>` inclui `modules/Links`
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥25 testes passam
+- [x] `POST /api/v1/links` com `auth.bearer` + `token.kind:session` responde `201` com headers e corpo corretos
+- [x] Alias em caixa mista normaliza; `slug_source` correto nos dois caminhos
+- [x] Alias ocupado → `409` idêntico para reserva com link e órfã; alias inválido **e** ocupado → `422`
+- [x] Exaustão de geração → `503 SLUG_GENERATION_FAILED` com `Retry-After`
+- [x] `401 UNAUTHENTICATED`, `403 TOKEN_RESTRICTED`, `403 ACCOUNT_SUSPENDED`, `403 ACCOUNT_PENDING_DELETION` cobertos
+- [x] Todo `422` não deixa linha em nenhuma das três tabelas
+- [x] Suítes de `modules/Links` registradas em `phpunit.xml` (Unit/Feature/Integration/Contract) e `<source>` inclui `modules/Links`
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥25 testes passam
 
-**Tests**: e2e · **Gate**: full  
+**Tests**: e2e · **Gate**: full
 **Commit**: `feat(links): expose POST /api/v1/links`
 
 ---

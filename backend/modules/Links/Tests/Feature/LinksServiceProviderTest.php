@@ -3,18 +3,26 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
+use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Repositories\SlugReservationRepository;
 use Modules\Links\Contracts\Services\DestinationCipher;
+use Modules\Links\Contracts\Services\ETagSigningKey;
 use Modules\Links\Contracts\Services\LinkDestinationVersionIdGenerator;
 use Modules\Links\Contracts\Services\RandomSlugSource;
 use Modules\Links\Contracts\Services\ReservedSlugs;
 use Modules\Links\Contracts\Services\ShortLinkIdGenerator;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
+use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
+use Modules\Links\Infrastructure\Http\Controllers\CreateLinkController;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentDestinationVersionRepository;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentShortLinkRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
 use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
+use Modules\Links\UseCases\CreateLink;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -50,20 +58,33 @@ describe('LinksServiceProvider', function () {
         expect(app(SlugReservationRepository::class))->toBeInstanceOf(EloquentSlugReservationRepository::class);
     });
 
-    it('registers no routes under api/v1/links', function () {
+    it('resolves ShortLinkRepository to EloquentShortLinkRepository', function () {
+        expect(app(ShortLinkRepository::class))->toBeInstanceOf(EloquentShortLinkRepository::class);
+    });
+
+    it('resolves DestinationVersionRepository to EloquentDestinationVersionRepository', function () {
+        expect(app(DestinationVersionRepository::class))->toBeInstanceOf(EloquentDestinationVersionRepository::class);
+    });
+
+    it('resolves ETagSigningKey to ConfigETagSigningKey', function () {
+        expect(app(ETagSigningKey::class))->toBeInstanceOf(ConfigETagSigningKey::class);
+    });
+
+    it('resolves CreateLink from the container', function () {
+        expect(app(CreateLink::class))->toBeInstanceOf(CreateLink::class);
+    });
+
+    it('registers POST api/v1/links to CreateLinkController', function () {
         $routes = collect(Route::getRoutes()->getRoutes())
             ->filter(fn ($route) => str_starts_with($route->uri(), 'api/v1/links'));
 
-        expect($routes)->toBeEmpty();
-    });
+        expect($routes)->not->toBeEmpty();
 
-    it('links routes file exists and defines no routes', function () {
-        $routesPath = __DIR__.'/../../Infrastructure/Http/routes/links.php';
+        $post = $routes->first(
+            fn ($route) => in_array('POST', $route->methods(), true) && $route->uri() === 'api/v1/links',
+        );
 
-        expect(file_exists($routesPath))->toBeTrue();
-
-        // The file should define no routes (confirmed by empty route collection above)
-        $routesContent = file_get_contents($routesPath);
-        expect($routesContent)->not->toBeEmpty();
+        expect($post)->not->toBeNull()
+            ->and($post->getActionName())->toContain(CreateLinkController::class);
     });
 });
