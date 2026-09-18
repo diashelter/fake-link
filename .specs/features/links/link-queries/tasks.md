@@ -123,11 +123,11 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Repositório de escrita não ganha métodos de leitura.
-- [ ] Lista aplica owner, filtros e keyset antes do limite; detalhe aplica owner no lookup.
-- [ ] Lista não seleciona `link_destination_versions.destination_url`.
-- [ ] Integration tests PostgreSQL cobrem ordenação, âncora ausente, título nulo, OR, acentos, estados e isolamento.
-- [ ] Gate full passa.
+- [x] Repositório de escrita não ganha métodos de leitura.
+- [x] Lista aplica owner, filtros e keyset antes do limite; detalhe aplica owner no lookup.
+- [x] Lista não seleciona `link_destination_versions.destination_url`.
+- [x] Integration tests PostgreSQL cobrem ordenação, âncora ausente, título nulo, OR, acentos, estados e isolamento.
+- [x] Gate full passa.
 
 **Tests**: integration  
 **Gate**: full  
