@@ -616,6 +616,7 @@ describe('POST /api/v1/links ownership and route registration', function () {
 
         expect($route)->not->toBeNull()
             ->and($route->gatherMiddleware())->toContain('auth.bearer')
-            ->and($route->gatherMiddleware())->toContain('token.kind:session');
+            ->and($route->gatherMiddleware())->toContain('token.kind:session')
+            ->and($route->gatherMiddleware())->toContain('throttle.links.create');
     });
 });

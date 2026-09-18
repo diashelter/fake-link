@@ -405,16 +405,16 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] 60 requisições passam e a 61ª retorna `429 RATE_LIMIT_EXCEEDED` com `Retry-After` ≥ 1
-- [ ] Requisições que terminam em `422`/`409`/`503` consomem tentativa
-- [ ] Requisição sem Bearer válido não consome cota de conta alguma
-- [ ] Contas distintas têm contadores independentes
-- [ ] Chave é HMAC; teste prova ausência de `user_id` em texto claro na chave
-- [ ] Driver de rate limit indisponível → requisição segue (fail-open) e métrica é emitida
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] 60 requisições passam e a 61ª retorna `429 RATE_LIMIT_EXCEEDED` com `Retry-After` ≥ 1
+- [x] Requisições que terminam em `422`/`409`/`503` consomem tentativa
+- [x] Requisição sem Bearer válido não consome cota de conta alguma
+- [x] Contas distintas têm contadores independentes
+- [x] Chave é HMAC; teste prova ausência de `user_id` em texto claro na chave
+- [x] Driver de rate limit indisponível → requisição segue (fail-open) e métrica é emitida
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
-**Tests**: e2e · **Gate**: full  
+**Tests**: e2e · **Gate**: full
 **Commit**: `feat(links): throttle link creation at 60 per minute per account`
 
 ---
