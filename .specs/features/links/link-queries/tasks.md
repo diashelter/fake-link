@@ -173,10 +173,10 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Endpoint aplica autenticação, token `session`, validações e 300/min por token antes do controller.
-- [ ] `422 INVALID_CURSOR` possui exatamente o path de erro e código contratados.
-- [ ] Feature/contract tests cobrem 200, 401, 403, 422, 429, schema, meta e redação da seam.
-- [ ] Gate full passa.
+- [x] Endpoint aplica autenticação, token `session`, validações e 300/min por token antes do controller.
+- [x] `422 INVALID_CURSOR` possui exatamente o path de erro e código contratados.
+- [x] Feature/contract tests cobrem 200, 401, 403, 422, 429, schema, meta e redação da seam.
+- [x] Gate full passa.
 
 **Tests**: feature + contract + e2e  
 **Gate**: full + e2e  

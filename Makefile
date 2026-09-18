@@ -72,12 +72,13 @@ test-backend: ## Run Pest tests in the backend container
 		-e LINKS_DESTINATION_KEYRING='{"testing-key-1":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}' \
 		-e LINKS_DESTINATION_ACTIVE_KEY_ID=testing-key-1 \
 		-e LINKS_ETAG_HMAC_KEY=testing-links-etag-hmac-key \
+		-e LINKS_CURSOR_HMAC_KEY=testing-links-cursor-hmac-key \
 		-e LINKS_RATE_LIMIT_HMAC_KEY=testing-links-rate-limit-hmac-key \
 		-e LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY=testing-links-idempotency-key-hash-hmac \
 		-e LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY=testing-links-idempotency-fingerprint-hmac \
 		-e LINKS_IDEMPOTENCY_KEYRING='{"testing-idem-1":"AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE="}' \
 		-e LINKS_IDEMPOTENCY_ACTIVE_KEY_ID=testing-idem-1 \
-		backend php artisan test
+		backend php -d memory_limit=512M artisan test
 
 test-architecture: ## Run Pest Architecture suite in the backend container
 	@test -f .env || cp .env.example .env
@@ -104,6 +105,7 @@ test-backend-coverage: ## Run Pest tests with PCOV coverage in the backend conta
 		-e LINKS_DESTINATION_KEYRING='{"testing-key-1":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}' \
 		-e LINKS_DESTINATION_ACTIVE_KEY_ID=testing-key-1 \
 		-e LINKS_ETAG_HMAC_KEY=testing-links-etag-hmac-key \
+		-e LINKS_CURSOR_HMAC_KEY=testing-links-cursor-hmac-key \
 		-e LINKS_RATE_LIMIT_HMAC_KEY=testing-links-rate-limit-hmac-key \
 		-e LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY=testing-links-idempotency-key-hash-hmac \
 		-e LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY=testing-links-idempotency-fingerprint-hmac \

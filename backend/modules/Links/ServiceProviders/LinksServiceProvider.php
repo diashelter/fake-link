@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
 use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
+use Modules\Links\Contracts\Repositories\LinkQueryRepository;
 use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Repositories\SlugReservationRepository;
+use Modules\Links\Contracts\Services\Clock;
 use Modules\Links\Contracts\Services\CursorCodec;
 use Modules\Links\Contracts\Services\CursorSigningKey;
 use Modules\Links\Contracts\Services\DestinationCipher;
@@ -46,14 +48,18 @@ use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\LinkDestinationVer
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\ShortLinkMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentDestinationVersionRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentIdempotencyKeyRepository;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentLinkQueryRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentShortLinkRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
 use Modules\Links\Infrastructure\Persistence\LaravelTransactionManager;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
 use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
 use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
+use Modules\Links\Infrastructure\Telemetry\LinkQueryMetrics;
+use Modules\Links\Infrastructure\Time\SystemClock;
 use Modules\Links\UseCases\CreateIdempotentLink;
 use Modules\Links\UseCases\CreateLink;
+use Modules\Links\UseCases\ListLinks;
 use Modules\Links\UseCases\ReserveSlug;
 use Modules\Links\UseCases\SealDestinationUrl;
 
@@ -74,11 +80,14 @@ final class LinksServiceProvider extends ServiceProvider
         ShortLinkRepository::class => EloquentShortLinkRepository::class,
         DestinationVersionRepository::class => EloquentDestinationVersionRepository::class,
         IdempotencyKeyRepository::class => EloquentIdempotencyKeyRepository::class,
+        LinkQueryRepository::class => EloquentLinkQueryRepository::class,
+        Clock::class => SystemClock::class,
     ];
 
     public function register(): void
     {
         $this->app->singleton(LinkCreationMetrics::class);
+        $this->app->singleton(LinkQueryMetrics::class);
 
         $this->app->singleton(DestinationKeyring::class, fn (): DestinationKeyring => DestinationKeyring::fromConfig(
             config('links.destination'),
@@ -137,6 +146,12 @@ final class LinksServiceProvider extends ServiceProvider
         $this->app->bind(SealDestinationUrl::class, fn (Application $app): SealDestinationUrl => new SealDestinationUrl(
             $app->make(PublicHostClassifier::class),
             $app->make(DestinationCipher::class),
+        ));
+
+        $this->app->bind(ListLinks::class, fn (Application $app): ListLinks => new ListLinks(
+            $app->make(LinkQueryRepository::class),
+            $app->make(CursorCodec::class),
+            $app->make(Clock::class),
         ));
 
         $this->app->bind(CreateLink::class, fn (Application $app): CreateLink => new CreateLink(

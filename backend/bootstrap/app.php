@@ -17,6 +17,7 @@ use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePrivateAuthRead;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottlePrivateAuthWrite;
 use Modules\Auth\Infrastructure\Http\Middleware\ThrottleRegistration;
 use Modules\Links\Infrastructure\Http\Middleware\ThrottleLinkCreation;
+use Modules\Links\Infrastructure\Http\Middleware\ThrottleLinkPrivateRead;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -50,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle.private_auth.write' => ThrottlePrivateAuthWrite::class,
             'throttle.private_auth.read' => ThrottlePrivateAuthRead::class,
             'throttle.links.create' => ThrottleLinkCreation::class,
+            'throttle.links.read' => ThrottleLinkPrivateRead::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

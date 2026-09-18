@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use Modules\Links\Infrastructure\Http\Controllers\CreateLinkController;
+use Modules\Links\Infrastructure\Http\Controllers\ListLinksController;
+
+Route::get('/', ListLinksController::class)
+    ->middleware(['auth.bearer', 'token.kind:session', 'throttle.links.read']);
 
 Route::post('/', CreateLinkController::class)
     ->middleware(['auth.bearer', 'token.kind:session', 'throttle.links.create']);
