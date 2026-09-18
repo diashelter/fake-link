@@ -431,12 +431,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Exatamente um `201` e um `409` entre as duas transações concorrentes
-- [ ] Uma única linha em `slug_reservations` e um único `short_link` para o slug
-- [ ] A perdedora não altera nem remove a reserva vencedora
-- [ ] A falha não revela o proprietário do slug vencedor
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥4 testes passam
+- [x] Exatamente um `201` e um `409` entre as duas transações concorrentes
+- [x] Uma única linha em `slug_reservations` e um único `short_link` para o slug
+- [x] A perdedora não altera nem remove a reserva vencedora
+- [x] A falha não revela o proprietário do slug vencedor
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥4 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `test(links): cover concurrent creation of equivalent aliases`
