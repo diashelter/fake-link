@@ -6,22 +6,38 @@ namespace Modules\Links\Infrastructure\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
 use Modules\Links\DTOs\Output\CreatedLinkDto;
-use Modules\Links\Infrastructure\Http\Resources\LinkDetailResource;
-use Symfony\Component\HttpFoundation\Response;
+use Modules\Links\DTOs\Output\IdempotencyResponseSnapshot;
 
+/**
+ * Single HTTP adapter for create-link 201 responses — fresh or replayed.
+ *
+ * Semantic headers and body bytes come from {@see LinkCreationSnapshotFactory}.
+ * X-Request-ID is applied per request and never stored in the snapshot.
+ */
 final class LinkResponseFactory
 {
-    public function created(CreatedLinkDto $link, string $etag, ?string $requestId = null): JsonResponse
+    public function __construct(
+        private readonly LinkCreationSnapshotFactory $snapshots,
+    ) {}
+
+    public function created(CreatedLinkDto $link, ?string $requestId = null): JsonResponse
+    {
+        return $this->fromSnapshot($this->snapshots->fromCreated($link), $requestId);
+    }
+
+    public function fromSnapshot(IdempotencyResponseSnapshot $snapshot, ?string $requestId = null): JsonResponse
     {
         $resolvedRequestId = $requestId ?? 'stub-request-id';
 
-        return response()->json([
-            'data' => LinkDetailResource::toArray($link),
-        ], Response::HTTP_CREATED)->withHeaders([
-            'Location' => '/api/v1/links/'.$link->id,
-            'ETag' => $etag,
-            'Cache-Control' => 'private, no-store',
-            'X-Request-ID' => $resolvedRequestId,
-        ]);
+        return JsonResponse::fromJsonString(
+            $snapshot->body,
+            $snapshot->status,
+            [
+                'Location' => $snapshot->headers['Location'],
+                'ETag' => $snapshot->headers['ETag'],
+                'Cache-Control' => $snapshot->headers['Cache-Control'],
+                'X-Request-ID' => $resolvedRequestId,
+            ],
+        );
     }
 }

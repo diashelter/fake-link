@@ -28,12 +28,15 @@
 
 ## Handoff
 
-- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T17) · Validate ✅ **PASS**
-- **Completed**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
-- **Gates**: `make lint-backend` ✅ · `make test-backend` ✅ 987 passed · `make lint-openapi` ✅ (0 errors). Sensor: 6/6 mutants killed. Spec-anchored: 48/48 ACs.
-- **Next step**: abrir PR / merge quando pronto; próxima fatia Links (idempotency ou conforme roadmap).
-- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`; não é FAIL desta fatia.
-- **Branch**: `feature/link-creation` (de `main`)
+- **Feature atual**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T9) · Validate ✅ **PASS** (re-verify after Fix iteration 1/3)
+- **Próximo passo**: Abrir PR / seguir fatia Links seguinte conforme roadmap; feature Verified.
+- **Verifier (re-verify 1/3)**: 2026-09-18 — report `.specs/features/links/idempotency/validation.md`. Diff `bc6b4755..e1d90171`. Spec-anchored: **20/20 ACs**; sensor 6/6 killed; gate `make test-backend` **1058 passed** + `lint-openapi` + `lint-backend` OK. Fix 1–5 (absent-header, TTL 24h, alter-then-replay, `cleanup_failed`, suspended+key) evidentes com `file:line`.
+- **Decisões da fatia**: replay preserva `201`, corpo e `Location`/`ETag`/`Cache-Control`, mas gera `X-Request-ID` novo; mesma chave concorrente aguarda autora; somente `201` confirmado retém snapshot; TTL exato de 24 h; bytea via `decode(?, 'hex')` + `bin2hex()`.
+- **Feature anterior**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T17) · Validate ✅ **PASS**
+- **Completed (prévia)**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
+- **In-progress**: none (idempotency Verified PASS).
+- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
+- **Branch**: `feature/idempotency` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26
 - **AD-021**: `errorCodes()` opcional em `ApiFormRequest` (default `'INVALID'`)
 
@@ -48,4 +51,4 @@ Todas as 9 fatias do pacote BFF Auth entregues e verificadas. Critérios de saí
 
 ### Fase 2: Links + Redirect — INICIADA
 
-Estrutura de specs em `.specs/features/links/` (índice + 13 fatias, catálogo `LNK-01`…`LNK-124`). Fatias 1–4 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (branch `feature/link-creation`, aguardando PR). Superfície HTTP de Links: somente `POST /api/v1/links`. Fatias 5–13 seguem em status **Seed**. O pacote frontend correspondente (`bff-links/`) será aberto depois. Docs de contrato vs runtime: `docs/api.md` §1.1.
+Estrutura de specs em `.specs/features/links/` (índice + 13 fatias, catálogo `LNK-01`…`LNK-124`). Fatias 1–5 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (PR #27), `idempotency` (branch `feature/idempotency`). Fatias 6–13 seguem em status **Seed**. Superfície HTTP de Links: somente `POST /api/v1/links`. O pacote frontend correspondente (`bff-links/`) será aberto depois. Docs de contrato vs runtime: `docs/api.md` §1.1.

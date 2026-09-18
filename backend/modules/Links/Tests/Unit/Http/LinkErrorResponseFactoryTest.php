@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Modules\Links\Exceptions\IdempotencyKeyReused;
 use Modules\Links\Exceptions\SlugGenerationExhausted;
 use Modules\Links\Exceptions\SlugUnavailable;
 use Modules\Links\Infrastructure\Http\Responses\LinkErrorResponseFactory;
@@ -55,6 +56,21 @@ describe('LinkErrorResponseFactory', function () {
             ->and($response->headers->get('X-Request-ID'))->toBe('req-d');
     });
 
+    it('builds 409 IDEMPOTENCY_KEY_REUSED without leaking key or destination details', function () {
+        $response = (new LinkErrorResponseFactory)->idempotencyKeyReused(null, 'req-idem');
+        $body = $response->getData(true);
+        $json = json_encode($body);
+
+        expect($response->getStatusCode())->toBe(409)
+            ->and($body['code'])->toBe(IdempotencyKeyReused::ERROR_CODE)
+            ->and($body['request_id'])->toBe('req-idem')
+            ->and($response->headers->get('Cache-Control'))->toContain('private')
+            ->and($response->headers->get('Cache-Control'))->toContain('no-store')
+            ->and($json)->not->toContain('https://')
+            ->and($json)->not->toContain('Idempotency-Key')
+            ->and($json)->not->toContain('snapshot');
+    });
+
     it('maps SlugUnavailable to aliasUnavailable', function () {
         $response = (new LinkErrorResponseFactory)->fromSlugUnavailable(SlugUnavailable::reserved());
 
@@ -80,6 +96,7 @@ describe('LinkErrorResponseFactory', function () {
             $factory->slugGenerationFailed(1),
             $factory->rateLimitExceeded(1),
             $factory->serviceUnavailable(),
+            $factory->idempotencyKeyReused(),
         ];
 
         foreach ($responses as $response) {

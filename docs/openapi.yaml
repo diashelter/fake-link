@@ -23,10 +23,9 @@ info:
     por IP+slug na aplicação, além da proteção do Nginx.
 
     Superfície Laravel entregue em 2026-09-18: todos os endpoints Auth e
-    `POST /api/v1/links`. Listagem, detalhe, PATCH, histórico, analytics e
-    redirect público permanecem neste contrato e ainda não estão registrados
-    na aplicação. O header `Idempotency-Key` está especificado e ainda não é
-    processado.
+    `POST /api/v1/links` (incluindo `Idempotency-Key`). Listagem, detalhe,
+    PATCH, histórico, analytics e redirect público permanecem neste contrato
+    e ainda não estão registrados na aplicação.
   license:
     name: MIT
     identifier: MIT

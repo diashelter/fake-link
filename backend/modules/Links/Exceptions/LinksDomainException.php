@@ -15,6 +15,8 @@ final class LinksDomainException extends DomainException
 
     public const INVALID_LINK_DESTINATION_VERSION_ID = 'INVALID_LINK_DESTINATION_VERSION_ID';
 
+    public const INVALID_IDEMPOTENCY_KEY = 'INVALID_IDEMPOTENCY_KEY';
+
     private function __construct(
         private readonly string $errorCode,
         string $message,
@@ -45,6 +47,14 @@ final class LinksDomainException extends DomainException
         return new self(
             errorCode: self::INVALID_LINK_DESTINATION_VERSION_ID,
             message: 'The provided link destination version identifier is invalid.',
+        );
+    }
+
+    public static function invalidIdempotencyKey(): self
+    {
+        return new self(
+            errorCode: self::INVALID_IDEMPOTENCY_KEY,
+            message: 'The Idempotency-Key header is invalid.',
         );
     }
 

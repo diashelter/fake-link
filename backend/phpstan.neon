@@ -32,4 +32,7 @@ parameters:
             path: modules/Links/Tests/*
         -
             message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+            path: modules/Links/Tests/*
+        -
+            message: '#Call to an undefined method Pest\\PendingCalls\\TestCall::#'
             path: modules/Redirects/Tests/*

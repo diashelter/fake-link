@@ -19,6 +19,10 @@ final class LinksOpenApiCatalog
 
     public const SLUG_GENERATION_FAILED = 'SLUG_GENERATION_FAILED';
 
+    public const IDEMPOTENCY_KEY_REUSED = 'IDEMPOTENCY_KEY_REUSED';
+
+    public const INVALID_IDEMPOTENCY_KEY = 'INVALID_IDEMPOTENCY_KEY';
+
     /**
      * @return array<string, string>
      */
@@ -29,6 +33,7 @@ final class LinksOpenApiCatalog
             self::VALIDATION_FAILED => 'The given data was invalid.',
             self::RATE_LIMIT_EXCEEDED => 'Too many requests.',
             self::SLUG_GENERATION_FAILED => 'Automatic slug generation failed. Please try again.',
+            self::IDEMPOTENCY_KEY_REUSED => 'The idempotency key was used with a different request.',
         ];
     }
 

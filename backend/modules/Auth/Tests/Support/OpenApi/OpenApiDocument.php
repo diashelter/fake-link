@@ -78,6 +78,28 @@ final class OpenApiDocument
     }
 
     /**
+     * Returns a resolved components.parameters entry (inline schema supported).
+     *
+     * @return array<string, mixed>
+     */
+    public function parameter(string $name): array
+    {
+        $parameters = $this->document['components']['parameters'] ?? null;
+
+        if (! is_array($parameters) || ! array_key_exists($name, $parameters)) {
+            throw new InvalidArgumentException(sprintf(
+                'OpenAPI parameter "%s" was not found in components.parameters.',
+                $name,
+            ));
+        }
+
+        /** @var array<string, mixed> $parameter */
+        $parameter = $this->resolveNode($parameters[$name]);
+
+        return $parameter;
+    }
+
+    /**
      * Returns the JSON schema for a response component's application/json content.
      *
      * @return array<string, mixed>

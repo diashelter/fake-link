@@ -1,6 +1,6 @@
 # Links + Redirect Backend API — Índice de specs
 
-**Status do módulo:** Em progresso — 2026-09-18 (13 fatias; 1–4 implementadas e verificadas; 5–13 em seed)
+**Status do módulo:** Em progresso — 2026-09-18 (13 fatias; 1–5 implementadas e verificadas; 6–13 em seed)
 
 **Escopo do módulo:** backend Laravel em `backend/modules/Links/` e `backend/modules/Redirects/` — endpoints `/api/v1/links*` do host da aplicação e a superfície pública do host curto.
 
@@ -15,7 +15,7 @@
 ## Como usar
 
 1. Aprofundar **uma fatia por vez**, na ordem sugerida abaixo (`specify feature` / deepen).
-2. Cada pasta hoje começa com `spec.md`. Fatias 1–4 já têm spec fechada, design/tasks quando aplicável, Execute e `validation.md`. Fatias 5–13 permanecem em seed até serem aprofundadas.
+2. Cada pasta começa com `spec.md`. Fatias 1–5 já têm spec fechada, design/tasks quando aplicável, Execute e `validation.md`. Fatias 6–13 permanecem em seed.
 3. Só abrir a próxima fatia depois que a anterior tiver critérios de aceite atendidos e testes do escopo passando.
 4. IDs `LNK-XX` são estáveis neste índice; specs filhas referenciam esses IDs e definem seus IDs locais no Specify.
 
@@ -31,7 +31,7 @@
 | 2 | Política de slug | [slug-policy](./slug-policy/spec.md) | ✅ Implementada e verificada (`main`, PR [#25](https://github.com/diashelter/fake-link/pull/25)) | foundation | Base36 automático, alias personalizado, reserva permanente |
 | 3 | Política de destino | [destination-policy](./destination-policy/spec.md) | ✅ Implementada e verificada (`main`, PR [#26](https://github.com/diashelter/fake-link/pull/26)) | foundation | Validação, normalização e cifra AES-256-GCM da URL |
 | 4 | Criação de link | [link-creation](./link-creation/spec.md) | ✅ Implementada e verificada (`feature/link-creation`, 2026-09-18) | slug-policy, destination-policy | `POST /api/v1/links` |
-| 5 | Idempotência | [idempotency](./idempotency/spec.md) | Seed | link-creation | `Idempotency-Key`, replay cifrado, `409` |
+| 5 | Idempotência | [idempotency](./idempotency/spec.md) | ✅ Implementada e verificada (`feature/idempotency`, 2026-09-18) | link-creation | `Idempotency-Key`, replay cifrado, `409` |
 | 6 | Consultas de link | [link-queries](./link-queries/spec.md) | Seed | link-creation | `GET /api/v1/links`, `GET /api/v1/links/{link}` |
 | 7 | Atualização de link | [link-update](./link-update/spec.md) | Seed | link-queries | `PATCH /api/v1/links/{link}` com `If-Match` |
 | 8 | Histórico de destinos | [destination-history](./destination-history/spec.md) | Seed | link-update | `GET /api/v1/links/{link}/history` |

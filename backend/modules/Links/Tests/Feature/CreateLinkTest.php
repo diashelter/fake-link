@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
 use Modules\Auth\Domain\Enums\TokenKind;
@@ -20,6 +21,7 @@ use Modules\Links\Contracts\Services\RandomSlugSource;
 use Modules\Links\Exceptions\SlugGenerationExhausted;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\ShortLinkModel;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Models\SlugReservationModel;
+use Modules\Links\Infrastructure\RateLimit\LinkRateLimitKeyFactory;
 use Modules\Links\UseCases\CreateLink;
 use Tests\TestCase;
 
@@ -123,7 +125,7 @@ describe('POST /api/v1/links happy path', function () {
             'reservations' => 1,
             'links' => 1,
             'versions' => 1,
-        ]);
+        ])->and(DB::table('idempotency_keys')->count())->toBe(0);
     });
 
     it('builds short_url from configured base, not the request host', function () {
@@ -618,5 +620,240 @@ describe('POST /api/v1/links ownership and route registration', function () {
             ->and($route->gatherMiddleware())->toContain('auth.bearer')
             ->and($route->gatherMiddleware())->toContain('token.kind:session')
             ->and($route->gatherMiddleware())->toContain('throttle.links.create');
+    });
+});
+
+describe('POST /api/v1/links idempotency', function () {
+    it('returns 401 UNAUTHENTICATED with Idempotency-Key and without a bearer', function () {
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-401'],
+            ['Idempotency-Key' => 'idem-key-401-abcdefgh'],
+        )->assertUnauthorized()
+            ->assertJsonPath('code', AuthTokenException::UNAUTHENTICATED);
+
+        expect(createLinkTableCounts()['links'])->toBe(0)
+            ->and(DB::table('idempotency_keys')->count())->toBe(0);
+    });
+
+    it('returns 403 TOKEN_RESTRICTED with Idempotency-Key for a verification bearer', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkVerificationBearer($user);
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-403'],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'idem-key-403-abcdefgh',
+            ],
+        )->assertForbidden()
+            ->assertJsonPath('code', AuthTokenException::TOKEN_RESTRICTED);
+
+        expect(createLinkTableCounts()['links'])->toBe(0)
+            ->and(DB::table('idempotency_keys')->count())->toBe(0);
+    });
+
+    it('returns 403 ACCOUNT_SUSPENDED with Idempotency-Key and without reserving the key', function () {
+        $user = UserModel::factory()->create(['status' => UserStatus::Suspended->value]);
+        $bearer = createLinkSessionBearer($user);
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-suspended'],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'idem-key-suspended-abcd',
+            ],
+        )->assertForbidden()
+            ->assertJsonPath('code', AuthTokenException::ACCOUNT_SUSPENDED);
+
+        expect(createLinkTableCounts()['links'])->toBe(0)
+            ->and(DB::table('idempotency_keys')->count())->toBe(0);
+    });
+
+    it('returns 422 INVALID_IDEMPOTENCY_KEY without writing rows', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-422'],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'too-short',
+            ],
+        )->assertStatus(422)
+            ->assertJsonPath('errors.Idempotency-Key.0.code', 'INVALID_IDEMPOTENCY_KEY');
+
+        expect(createLinkTableCounts())->toBe([
+            'reservations' => 0,
+            'links' => 0,
+            'versions' => 0,
+        ])->and(DB::table('idempotency_keys')->count())->toBe(0);
+    });
+
+    it('returns 429 RATE_LIMIT_EXCEEDED with Idempotency-Key when the create budget is exhausted', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $userId = UserId::fromString($user->id);
+        $key = (new LinkRateLimitKeyFactory)->forLinkCreation($userId);
+        $maxAttempts = (int) config('links.rate_limits.create.max_attempts', 60);
+        $decaySeconds = (int) config('links.rate_limits.create.decay_seconds', 60);
+
+        RateLimiter::clear($key);
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            RateLimiter::hit($key, $decaySeconds);
+        }
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-429'],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'idem-key-429-abcdefgh',
+            ],
+        )->assertStatus(429)
+            ->assertJsonPath('code', 'RATE_LIMIT_EXCEEDED');
+
+        expect(createLinkTableCounts()['links'])->toBe(0)
+            ->and(DB::table('idempotency_keys')->count())->toBe(0);
+
+        RateLimiter::clear($key);
+    });
+
+    it('creates once and replays the exact 201 body and semantic headers', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'idem-key-replay-abcdef',
+        ];
+        $payload = ['destination_url' => 'https://example.com/idem-replay'];
+
+        $first = postCreateLink($payload, $headers);
+        $first->assertCreated();
+
+        $second = postCreateLink($payload, $headers);
+        $second->assertCreated();
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $firstBody = $first->getContent();
+        // @phpstan-ignore staticMethod.dynamicCall
+        $secondBody = $second->getContent();
+
+        expect($secondBody)->toBe($firstBody)
+            ->and($second->headers->get('Location'))->toBe($first->headers->get('Location'))
+            ->and($second->headers->get('ETag'))->toBe($first->headers->get('ETag'))
+            ->and($second->headers->get('Cache-Control'))->toBe($first->headers->get('Cache-Control'))
+            ->and(createLinkTableCounts()['links'])->toBe(1)
+            ->and(DB::table('idempotency_keys')->count())->toBe(1);
+    });
+
+    it('replays the original 201 snapshot after the live link is mutated', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'idem-key-alter-replay-ab',
+        ];
+        $payload = [
+            'destination_url' => 'https://example.com/idem-alter',
+            'title' => 'Original Title',
+        ];
+
+        $first = postCreateLink($payload, $headers);
+        $first->assertCreated()
+            ->assertJsonPath('data.title', 'Original Title');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $firstBody = $first->getContent();
+        $firstETag = $first->headers->get('ETag');
+        $firstLocation = $first->headers->get('Location');
+        $firstCacheControl = $first->headers->get('Cache-Control');
+        $linkId = $first->json('data.id');
+
+        DB::table('short_links')->where('id', $linkId)->update([
+            'title' => 'Mutated Live Title',
+            'updated_at' => now()->utc()->addHour(),
+        ]);
+        DB::table('link_destination_versions')
+            ->where('short_link_id', $linkId)
+            ->whereNull('valid_to')
+            ->update([
+                'destination_url' => bin2hex(random_bytes(48)),
+            ]);
+
+        $second = postCreateLink($payload, $headers);
+        $second->assertCreated();
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $secondBody = $second->getContent();
+
+        expect($secondBody)->toBe($firstBody)
+            ->and($secondBody)->toContain('Original Title')
+            ->and($secondBody)->not->toContain('Mutated Live Title')
+            ->and($second->headers->get('Location'))->toBe($firstLocation)
+            ->and($second->headers->get('ETag'))->toBe($firstETag)
+            ->and($second->headers->get('Cache-Control'))->toBe($firstCacheControl)
+            ->and($second->json('data.title'))->toBe('Original Title')
+            ->and(createLinkTableCounts()['links'])->toBe(1)
+            ->and(DB::table('idempotency_keys')->count())->toBe(1)
+            ->and(DB::table('short_links')->where('id', $linkId)->value('title'))->toBe('Mutated Live Title');
+    });
+
+    it('returns 409 IDEMPOTENCY_KEY_REUSED for the same key with a different command', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'idem-key-conflict-abcdef',
+        ];
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-a'],
+            $headers,
+        )->assertCreated();
+
+        $conflict = postCreateLink(
+            ['destination_url' => 'https://example.com/idem-b'],
+            $headers,
+        );
+
+        $conflict->assertStatus(409)
+            ->assertJsonPath('code', 'IDEMPOTENCY_KEY_REUSED');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $json = $conflict->getContent();
+        expect($json)->not->toContain('https://example.com/idem-a')
+            ->and($json)->not->toContain('https://example.com/idem-b')
+            ->and($json)->not->toContain('idem-key-conflict')
+            ->and(createLinkTableCounts()['links'])->toBe(1)
+            ->and(DB::table('idempotency_keys')->count())->toBe(1);
+    });
+
+    it('returns 503 SERVICE_UNAVAILABLE when a stored snapshot cannot be decrypted', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'idem-key-decrypt-abcdef',
+        ];
+        $payload = ['destination_url' => 'https://example.com/idem-decrypt'];
+
+        postCreateLink($payload, $headers)->assertCreated();
+
+        DB::update(
+            "UPDATE idempotency_keys SET response_snapshot = decode(?, 'hex')",
+            [bin2hex(random_bytes(64))],
+        );
+
+        $failed = postCreateLink($payload, $headers);
+
+        $failed->assertStatus(503)
+            ->assertJsonPath('code', 'SERVICE_UNAVAILABLE');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $failedBody = $failed->getContent();
+
+        expect($failed->headers->get('Location'))->toBeNull()
+            ->and($failed->headers->get('ETag'))->toBeNull()
+            ->and($failedBody)->not->toContain('https://example.com/idem-decrypt')
+            ->and(createLinkTableCounts()['links'])->toBe(1);
     });
 });
