@@ -59,6 +59,7 @@ use Modules\Links\Infrastructure\Telemetry\LinkQueryMetrics;
 use Modules\Links\Infrastructure\Time\SystemClock;
 use Modules\Links\UseCases\CreateIdempotentLink;
 use Modules\Links\UseCases\CreateLink;
+use Modules\Links\UseCases\GetLink;
 use Modules\Links\UseCases\ListLinks;
 use Modules\Links\UseCases\ReserveSlug;
 use Modules\Links\UseCases\SealDestinationUrl;
@@ -151,6 +152,14 @@ final class LinksServiceProvider extends ServiceProvider
         $this->app->bind(ListLinks::class, fn (Application $app): ListLinks => new ListLinks(
             $app->make(LinkQueryRepository::class),
             $app->make(CursorCodec::class),
+            $app->make(Clock::class),
+        ));
+
+        $this->app->bind(GetLink::class, fn (Application $app): GetLink => new GetLink(
+            $app->make(LinkQueryRepository::class),
+            $app->make(DestinationCipher::class),
+            $app->make(EffectiveStatus::class),
+            $app->make(LinkETag::class),
             $app->make(Clock::class),
         ));
 

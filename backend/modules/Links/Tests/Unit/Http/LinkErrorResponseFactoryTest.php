@@ -95,6 +95,7 @@ describe('LinkErrorResponseFactory', function () {
             $factory->aliasUnavailable(),
             $factory->slugGenerationFailed(1),
             $factory->rateLimitExceeded(1),
+            $factory->notFound(),
             $factory->serviceUnavailable(),
             $factory->idempotencyKeyReused(),
         ];

@@ -197,11 +197,11 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Endpoint devolve todos e somente os campos/headers OpenAPI.
-- [ ] Link ausente e alheio produzem a mesma resposta 404.
-- [ ] Falha de decriptação mapeia para 503 sem `data`, `ETag` ou destino.
-- [ ] Feature/contract/E2E tests cobrem sucesso, auth, ownership, headers e envelope corrompido.
-- [ ] Gate full passa.
+- [x] Endpoint devolve todos e somente os campos/headers OpenAPI.
+- [x] Link ausente e alheio produzem a mesma resposta 404.
+- [x] Falha de decriptação mapeia para 503 sem `data`, `ETag` ou destino.
+- [x] Feature/contract/E2E tests cobrem sucesso, auth, ownership, headers e envelope corrompido.
+- [x] Gate full passa.
 
 **Tests**: feature + contract + e2e  
 **Gate**: full + e2e  

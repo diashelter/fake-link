@@ -6,9 +6,11 @@ namespace Modules\Links\Infrastructure\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
 use Modules\Links\DTOs\Output\CreatedLinkDto;
+use Modules\Links\DTOs\Output\GetLinkResult;
 use Modules\Links\DTOs\Output\IdempotencyResponseSnapshot;
 use Modules\Links\DTOs\Output\LinkPage;
 use Modules\Links\DTOs\Output\LinkSummaryRecord;
+use Modules\Links\Infrastructure\Http\Resources\LinkDetailResource;
 use Modules\Links\Infrastructure\Http\Resources\LinkSummaryResource;
 
 /**
@@ -26,6 +28,17 @@ final class LinkResponseFactory
     public function created(CreatedLinkDto $link, ?string $requestId = null): JsonResponse
     {
         return $this->fromSnapshot($this->snapshots->fromCreated($link), $requestId);
+    }
+
+    public function detail(GetLinkResult $result, ?string $requestId = null): JsonResponse
+    {
+        return response()->json([
+            'data' => LinkDetailResource::toArray($result->link),
+        ])->withHeaders([
+            'Cache-Control' => 'private, no-store',
+            'ETag' => $result->etag,
+            'X-Request-ID' => $requestId ?? 'stub-request-id',
+        ]);
     }
 
     public function collection(LinkPage $page, ?string $requestId = null): JsonResponse

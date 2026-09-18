@@ -23,6 +23,10 @@ final class LinksOpenApiCatalog
 
     public const INVALID_IDEMPOTENCY_KEY = 'INVALID_IDEMPOTENCY_KEY';
 
+    public const RESOURCE_NOT_FOUND = 'RESOURCE_NOT_FOUND';
+
+    public const SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE';
+
     /**
      * @return array<string, string>
      */
@@ -34,6 +38,8 @@ final class LinksOpenApiCatalog
             self::RATE_LIMIT_EXCEEDED => 'Too many requests.',
             self::SLUG_GENERATION_FAILED => 'Automatic slug generation failed. Please try again.',
             self::IDEMPOTENCY_KEY_REUSED => 'The idempotency key was used with a different request.',
+            self::RESOURCE_NOT_FOUND => 'The requested resource was not found.',
+            self::SERVICE_UNAVAILABLE => 'The service is temporarily unavailable.',
         ];
     }
 
