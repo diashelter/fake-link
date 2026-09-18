@@ -234,11 +234,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `create()` insere com UUID v7 gerado na aplicação e participa da transação aberta pelo chamador
-- [ ] Não existe método de update de `slug` nem de `user_id` (verificado por teste + Pest Arch)
-- [ ] Violação de FK de `slug` mapeia para falha tipada
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam
+- [x] `create()` insere com UUID v7 gerado na aplicação e participa da transação aberta pelo chamador
+- [x] Não existe método de update de `slug` nem de `user_id` (verificado por teste + Pest Arch)
+- [x] Violação de FK de `slug` mapeia para falha tipada
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): add short link repository with immutable slug and owner`
