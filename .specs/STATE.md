@@ -24,19 +24,19 @@
 | AD-018 | 2026-08-29 | Profile `e2e` + `docker-compose.e2e.yml` + `make test-e2e-auth` + `frontend-e2e.yml`; Playwright roda no container `frontend` (stage `e2e`); Mailpit para captura de e-mail; TTLs de sessão BFF configuráveis por env com defaults inalterados |
 | AD-019 | 2026-08-30 | Parsing de URL não confiável usa **`league/uri`** (promovido a dependência direta em `backend/composer.json`, `^7.8`); `parse_url()` e regex sobre a autoridade são proibidos para entrada de usuário — vale para `Links`, `Redirects` e qualquer fatia futura que leia URL. Checagens que o parser reescreveria em silêncio (bytes não-ASCII, caracteres de controle, percent-encoding malformado) rodam **antes** dele |
 | AD-020 | 2026-09-01 | Código de erro estável **`SLUG_GENERATION_FAILED`** (`503`, com `Retry-After`) para exaustão das tentativas de gerar um slug automático livre (esgotou o teto de 5 colisões ou o teto de 5 descartes por denylist). Registrado em `docs/api.md` §7. O domínio (`Modules\Links`) expõe a falha tipada `SlugGenerationExhausted`; o mapeamento HTTP e a entrada na OpenAPI pertencem à fatia `link-creation` que expõe o endpoint (escopo diferido). Nenhuma decisão anterior é superseded |
+| AD-021 | 2026-09-17 | `ApiFormRequest` aceita `errorCodes(): array` opcional (`campo.regra` → código estável); ausência do mapa preserva `'INVALID'`. Convenção válida para todos os módulos (Auth permanece no default). Nenhuma decisão anterior é superseded |
 
 ## Handoff
 
-- **Feature**: `links/destination-policy` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T12 + 1 fix task commitados) · Validate ✅ **PASS** 2026-09-17 (fix→re-verify: 1 iteração, de um teto de 3)
-- **Completed**: `links/foundation` e `links/slug-policy` já em `main` (slug-policy mesclada via PR #25, `7cd7ddc`). `links/destination-policy` T1–T12 + fix em `feature/destination-policy` (`adf1482`…`48f5bf4`) — Verified PASS pelo Verifier independente (`.specs/features/links/destination-policy/validation.md`): 38/38 critérios de aceitação batem o resultado definido pela spec, sensor de discriminação 5/5 mutantes mortos, run próprio limpo 822/822. A primeira passada do Verifier (FAIL, narrow) encontrou uma lacuna real — porta sintaticamente inválida (`:-1`, `:abc`) classificada `MalformedUrl` em vez de `InvalidPort` (AC11/LDST-14) — corrigida no commit `c5a2a53` discriminando o prefixo fixo da mensagem do `SyntaxError` do `league/uri` (nomeia só a porta, nunca a URL completa). Também fechou dois gaps menores de cobertura (determinismo AC14 na cadeia completa para entrada rejeitada; regressão permanente do caso CRLF percent-encoded). Branch **não mesclada** em `main` — aguardando decisão do usuário sobre merge/PR.
-- **Gates**: full-suite 822/822 (0 falhas, corrida limpa do Verifier); Links **91.24% linhas / 91.20% métodos** (passa 90/85); `make lint-backend` + `make test-architecture` (19/19) limpos.
-- **Achado à parte (fora do escopo desta fatia, backlog, herdado de slug-policy)**: `make lint` falha em `lint-frontend` — `frontend/e2e/{guards,journey}.spec.ts` não compilam (`tsc` `TS2353: 'launchOptions'` não existe em `BrowserContextOptions`). Reproduzido em `main` limpo — pré-existente, ainda não corrigido.
-- **Lições candidatas registradas**: `L-072`…`L-073` (parser de terceiros valida sintaxe antes de checagem de range própria — verificar empiricamente; critério de determinismo precisa de teste na camada e classe de entrada exata que a spec reivindica) — ver `.specs/lessons.json`. Lições `L-001`…`L-025`/`L-027`…`L-041` podadas automaticamente por `lessons.py` (candidatas >45 dias sem corroboração); `L-026`, `L-042`…`L-071` permanecem.
-- **Next step**: decidir merge/PR de `feature/destination-policy` → `main`; depois iniciar a fatia 4 (`link-creation`, consome `SealDestinationUrl` desta fatia) ou a próxima da fila.
-- **Blockers**: none.
-- **Branch**: `feature/destination-policy` (de `main`, não mesclada)
-- **Prior feature**: `links/slug-policy` — Verified PASS 2026-09-01, mesclada em `main` via PR #25
-- **Gap de baixo risco herdado**: rollback sequence (`migrate:rollback` ordem inversa) sem teste dedicado; RESTRICT constraints garantem corretude
+- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute 🔄 (Batch 1/3 em andamento: fases 1+2, T1–T6)
+- **Completed**: `links/foundation`, `links/slug-policy` (PR #25) e `links/destination-policy` (PR #26) em `main`. Fatia 4 (`link-creation`) em execução com 3 batch workers sequenciais (~7 tasks).
+- **In progress**: Batch Worker 1 — T1–T6 (config, contrato SLUG_GENERATION_FAILED, ApiFormRequest errorCodes, EffectiveStatus, LinkETag, DTOs). T1–T2 done; T3+ in progress.
+- **Next step**: ao concluir Batch 1 → despachar Batch 2 (T7–T14); depois Batch 3 (T15–T17); Verifier automático após T17.
+- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
+- **Branch**: `feature/link-creation` (de `main`)
+- **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26
+- **Gap de baixo risco herdado**: rollback sequence sem teste dedicado; RESTRICT constraints garantem corretude
+- **AD-021**: `errorCodes()` opcional em `ApiFormRequest` (default `'INVALID'`)
 
 ### Fase 1: Auth + BFF — CONCLUÍDA ✅
 
