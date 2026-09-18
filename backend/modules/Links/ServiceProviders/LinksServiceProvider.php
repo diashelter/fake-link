@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
+use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
 use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Repositories\SlugReservationRepository;
 use Modules\Links\Contracts\Services\DestinationCipher;
@@ -26,9 +27,11 @@ use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
 use Modules\Links\Infrastructure\Crypto\DestinationKeyring;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\LinkDestinationVersionMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\ShortLinkMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentDestinationVersionRepository;
+use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentIdempotencyKeyRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentShortLinkRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
@@ -52,6 +55,7 @@ final class LinksServiceProvider extends ServiceProvider
         SlugReservationRepository::class => EloquentSlugReservationRepository::class,
         ShortLinkRepository::class => EloquentShortLinkRepository::class,
         DestinationVersionRepository::class => EloquentDestinationVersionRepository::class,
+        IdempotencyKeyRepository::class => EloquentIdempotencyKeyRepository::class,
     ];
 
     public function register(): void
@@ -106,6 +110,7 @@ final class LinksServiceProvider extends ServiceProvider
 
         $this->app->bind(ShortLinkMapper::class);
         $this->app->bind(LinkDestinationVersionMapper::class);
+        $this->app->bind(IdempotencyKeyMapper::class);
     }
 
     public function boot(): void
