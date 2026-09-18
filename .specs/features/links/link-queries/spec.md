@@ -164,14 +164,14 @@ Um `User` precisa localizar e consultar os próprios `Short Links` sem revelar r
 
 | Requirement ID | Story | Descrição | Phase | Status |
 | --- | --- | --- | --- | --- |
-| LNK-50 | P1: Listar | Cursor assinado e ordem fixa | Design | Pending |
-| LNK-51 | P1: Listar | Página e meta mínima | Design | Pending |
-| LNK-52 | P1: Pesquisar | Busca por título e slug | Design | Pending |
-| LNK-53 | P1: Pesquisar | Filtro e estado efetivo | Design | Pending |
-| LNK-54 | P1: Detalhe | `LinkDetail` e `ETag` | Design | Pending |
-| LNK-55 | P1: Detalhe/Proteção | Ownership por `404` | Design | Pending |
-| LNK-56 | P1: Proteção | Cursor inválido | Design | Pending |
-| LNQ-01–LNQ-12 | Todas | Critérios locais acima | Design | Pending |
+| LNK-50 | P1: Listar | Cursor assinado e ordem fixa | Design | ✅ Verified |
+| LNK-51 | P1: Listar | Página e meta mínima | Design | ✅ Verified |
+| LNK-52 | P1: Pesquisar | Busca por título e slug | Design | ✅ Verified |
+| LNK-53 | P1: Pesquisar | Filtro e estado efetivo | Design | ✅ Verified |
+| LNK-54 | P1: Detalhe | `LinkDetail` e `ETag` | Design | ✅ Verified |
+| LNK-55 | P1: Detalhe/Proteção | Ownership por `404` | Design | ✅ Verified |
+| LNK-56 | P1: Proteção | Cursor inválido | Design | ✅ Verified |
+| LNQ-01–LNQ-12 | Todas | Critérios locais acima | Design | ✅ Verified |
 
 **Coverage:** 19 total, 0 mapped to tasks ⚠️
 

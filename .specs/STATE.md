@@ -28,14 +28,13 @@
 
 ## Handoff
 
-- **Feature atual**: `links/link-queries` — Specify ✅ · Design ✅ · Tasks ✅ · Execute pendente (T1–T8)
-- **Próximo passo**: Execute das tasks em `.specs/features/links/link-queries/tasks.md`, a partir de T1.
-- **Artefatos trazidos de**: `feature/link-queries` (`spec.md`, `design.md`, `tasks.md`, migration de índices, `LinkQueryIndexesTest.php`) para `feature/query` (base em `main` pós-PR #28).
+- **Feature atual**: `links/link-queries` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T8) · Validate ✅ **PASS**
+- **Próximo passo**: Abrir PR / seguir fatia Links seguinte (`link-update`); feature Verified.
+- **Verifier**: 2026-09-18 — report `.specs/features/links/link-queries/validation.md`. Diff `6421992b..ee27065e`. Spec-anchored: **21/21 ACs**; sensor 7/7 killed; gate `make test-backend` **1222 passed** + `lint-openapi` + Pint/PHPStan/PHPMD OK. E2E T8: 3 passed (Verifier não reexecutou `make test-e2e-links`).
 - **Feature anterior**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T9) · Validate ✅ **PASS** (re-verify after Fix iteration 1/3)
-- **Verifier (idempotency)**: 2026-09-18 — report `.specs/features/links/idempotency/validation.md`. Diff `bc6b4755..e1d90171`. Spec-anchored: **20/20 ACs**; sensor 6/6 killed; gate `make test-backend` **1058 passed** + `lint-openapi` + `lint-backend` OK.
 - **Completed (prévia)**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
-- **In-progress**: none — artefatos de Specify/Design/Tasks presentes; Execute ainda não iniciado nesta branch.
-- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
+- **In-progress**: none (link-queries Verified PASS).
+- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`. `make lint-backend` via `composer quality` pode estourar timeout de 300s do PHPStan.
 - **Branch**: `feature/query` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26
 - **AD-021**: `errorCodes()` opcional em `ApiFormRequest` (default `'INVALID'`)
@@ -51,4 +50,4 @@ Todas as 9 fatias do pacote BFF Auth entregues e verificadas. Critérios de saí
 
 ### Fase 2: Links + Redirect — INICIADA
 
-Estrutura de specs em `.specs/features/links/` (índice + 13 fatias, catálogo `LNK-01`…`LNK-124`). Fatias 1–5 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (PR #27), `idempotency` (PR #28). Fatia 6 (`link-queries`) tem spec/design/tasks nesta branch; fatias 7–13 seguem em status **Seed**. Superfície HTTP de Links: somente `POST /api/v1/links` até o Execute desta fatia. O pacote frontend correspondente (`bff-links/`) será aberto depois. Docs de contrato vs runtime: `docs/api.md` §1.1.
+Estrutura de specs em `.specs/features/links/` (índice + 13 fatias, catálogo `LNK-01`…`LNK-124`). Fatias 1–6 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (PR #27), `idempotency` (PR #28), `link-queries` (branch `feature/query`). Fatias 7–13 seguem em status **Seed**. Superfície HTTP de Links: `POST` e `GET /api/v1/links`, `GET /api/v1/links/{link}`. O pacote frontend correspondente (`bff-links/`) será aberto depois. Docs de contrato vs runtime: `docs/api.md` §1.1.
