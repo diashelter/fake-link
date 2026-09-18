@@ -306,13 +306,13 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `destination_url` ausente → `REQUIRED`; inválida → `INVALID_DESTINATION_URL` sem ecoar a URL
-- [ ] `custom_alias` inválido ou `null` → `INVALID_ALIAS`, sem revelar a regra violada
-- [ ] `title` com trim, `""` → `null`, 160 aceito, 161 → `TITLE_TOO_LONG` (contagem por caractere)
-- [ ] `expires_at` `<= now()` → `EXPIRES_AT_NOT_IN_FUTURE`; formato fora de ISO `Z` → `INVALID_DATETIME`
-- [ ] Campo extra → `UNKNOWN_FIELD` por campo
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥20 testes passam
+- [x] `destination_url` ausente → `REQUIRED`; inválida → `INVALID_DESTINATION_URL` sem ecoar a URL
+- [x] `custom_alias` inválido ou `null` → `INVALID_ALIAS`, sem revelar a regra violada
+- [x] `title` com trim, `""` → `null`, 160 aceito, 161 → `TITLE_TOO_LONG` (contagem por caractere)
+- [x] `expires_at` `<= now()` → `EXPIRES_AT_NOT_IN_FUTURE`; formato fora de ISO `Z` → `INVALID_DATETIME`
+- [x] Campo extra → `UNKNOWN_FIELD` por campo
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥20 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): validate the closed create link payload`
