@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Links\Infrastructure\Http\Responses;
 
 use Illuminate\Http\JsonResponse;
+use Modules\Links\Exceptions\IdempotencyKeyReused;
 use Modules\Links\Exceptions\SlugGenerationExhausted;
 use Modules\Links\Exceptions\SlugUnavailable;
 
@@ -48,6 +49,18 @@ final class LinkErrorResponseFactory
             status: 503,
             code: 'SERVICE_UNAVAILABLE',
             message: 'The service is temporarily unavailable.',
+            requestId: $requestId,
+        );
+    }
+
+    public function idempotencyKeyReused(
+        ?IdempotencyKeyReused $exception = null,
+        ?string $requestId = null,
+    ): JsonResponse {
+        return $this->errorResponse(
+            status: 409,
+            code: IdempotencyKeyReused::ERROR_CODE,
+            message: 'This idempotency key was already used with a different request.',
             requestId: $requestId,
         );
     }

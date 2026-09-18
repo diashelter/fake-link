@@ -144,7 +144,6 @@ final class LinksServiceProvider extends ServiceProvider
             $app->make(LinkCreationSnapshotFactory::class),
         ));
 
-
         $this->app->bind(CreateIdempotentLink::class, fn (Application $app): CreateIdempotentLink => new CreateIdempotentLink(
             $app->make(TransactionManager::class),
             $app->make(CreateLink::class),

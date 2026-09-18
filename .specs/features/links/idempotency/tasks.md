@@ -181,11 +181,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: NONE · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Header inválido retorna `422 INVALID_IDEMPOTENCY_KEY` sem escrita.
-- [ ] Header ausente mantém a criação atual; chave válida faz criação/replay/conflito corretos.
-- [ ] `409 IDEMPOTENCY_KEY_REUSED` e `503 SERVICE_UNAVAILABLE` não expõem entrada ou snapshot.
-- [ ] Feature tests cobrem `401`, `403`, `422`, `429`, `201`, replay, `409` e `503`.
-- [ ] Gate: `make test-backend`.
+- [x] Header inválido retorna `422 INVALID_IDEMPOTENCY_KEY` sem escrita.
+- [x] Header ausente mantém a criação atual; chave válida faz criação/replay/conflito corretos.
+- [x] `409 IDEMPOTENCY_KEY_REUSED` e `503 SERVICE_UNAVAILABLE` não expõem entrada ou snapshot.
+- [x] Feature tests cobrem `401`, `403`, `422`, `429`, `201`, replay, `409` e `503`.
+- [x] Gate: `make test-backend`.
 
 **Tests:** Feature · **Gate:** full  
 **Commit:** `feat(links): expose idempotent link creation over HTTP`

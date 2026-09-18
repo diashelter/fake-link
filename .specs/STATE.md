@@ -28,12 +28,12 @@
 
 ## Handoff
 
-- **Feature atual**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute em andamento (T1 restaurado nesta branch)
-- **Próximo passo**: validar gate de T1 se necessário e continuar Execute a partir de T2 (Batch 1: T1–T6).
-- **Decisões da fatia**: replay preserva `201`, corpo e `Location`/`ETag`/`Cache-Control`, mas gera `X-Request-ID` novo; mesma chave concorrente aguarda autora; somente `201` confirmado retém snapshot; TTL exato de 24 h.
+- **Feature atual**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute em andamento (Batch 1: T1–T6 ✅)
+- **Próximo passo**: continuar Execute a partir de T7 (Batch 2: T7–T9 — prune, concorrência/privacidade, contrato/cobertura).
+- **Decisões da fatia**: replay preserva `201`, corpo e `Location`/`ETag`/`Cache-Control`, mas gera `X-Request-ID` novo; mesma chave concorrente aguarda autora; somente `201` confirmado retém snapshot; TTL exato de 24 h; bytea via `decode(?, 'hex')` + `bin2hex()`.
 - **Feature anterior**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T17) · Validate ✅ **PASS**
 - **Completed (prévia)**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
-- **In-progress**: T1 (persistência `idempotency_keys`) movido de `feature/link-queries` para esta branch; T2–T9 pendentes.
+- **In-progress**: Batch 1 concluído (T1–T6). T7–T9 pendentes.
 - **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
 - **Branch**: `feature/idempotency` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26

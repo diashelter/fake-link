@@ -16,7 +16,7 @@ final class IdempotencyKeyReused extends DomainException
 
     private function __construct()
     {
-        parent::__construct('The Idempotency-Key was already used with a different request.');
+        parent::__construct('This idempotency key was already used with a different request.');
     }
 
     public static function reused(): self

@@ -11,8 +11,10 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Validator as IlluminateValidator;
 use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\ValueObjects\DestinationUrl;
+use Modules\Links\Domain\ValueObjects\IdempotencyKey;
 use Modules\Links\Domain\ValueObjects\Slug;
 use Modules\Links\DTOs\Input\CreateLinkInput;
+use Modules\Links\Exceptions\LinksDomainException;
 use Modules\Links\Exceptions\SlugPolicyException;
 use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
 use Throwable;
@@ -85,6 +87,7 @@ final class CreateLinkRequest extends ApiFormRequest
             'title.titletoolong' => 'TITLE_TOO_LONG',
             'expires_at.invaliddatetime' => 'INVALID_DATETIME',
             'expires_at.expiresatnotinfuture' => 'EXPIRES_AT_NOT_IN_FUTURE',
+            'Idempotency-Key.invalididempotencykey' => 'INVALID_IDEMPOTENCY_KEY',
         ];
 
         foreach ($this->submittedKeys as $key) {
@@ -161,7 +164,28 @@ final class CreateLinkRequest extends ApiFormRequest
                     }
                 }
             }
+
+            $idempotencyHeader = $this->headers->get('Idempotency-Key');
+
+            if ($idempotencyHeader !== null && $idempotencyHeader !== '') {
+                try {
+                    IdempotencyKey::fromString($idempotencyHeader);
+                } catch (LinksDomainException) {
+                    $validator->addFailure('Idempotency-Key', 'InvalidIdempotencyKey');
+                }
+            }
         });
+    }
+
+    public function idempotencyKey(): ?IdempotencyKey
+    {
+        $raw = $this->headers->get('Idempotency-Key');
+
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        return IdempotencyKey::fromString($raw);
     }
 
     public function toDto(): CreateLinkInput
