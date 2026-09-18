@@ -14,6 +14,7 @@ use Modules\Links\Domain\ValueObjects\DestinationUrl;
 use Modules\Links\Domain\ValueObjects\Slug;
 use Modules\Links\DTOs\Input\CreateLinkInput;
 use Modules\Links\Exceptions\SlugPolicyException;
+use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
 use Throwable;
 
 final class CreateLinkRequest extends ApiFormRequest
@@ -35,6 +36,14 @@ final class CreateLinkRequest extends ApiFormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function failedValidation(Validator $validator): never
+    {
+        $this->container->make(LinkCreationMetrics::class)
+            ->recordFailure(LinkCreationMetrics::REASON_VALIDATION_FAILED);
+
+        parent::failedValidation($validator);
     }
 
     protected function prepareForValidation(): void

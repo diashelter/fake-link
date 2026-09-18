@@ -478,11 +478,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Contadores de sucesso e de cada falha (`alias_unavailable`, `slug_exhausted`, `validation_failed`, `rate_limited`, `infrastructure`)
-- [ ] Nenhum rótulo contém slug, alias, `destination_url`, query, fragmento ou título
-- [ ] Sentinela injeta valores marcadores e varre log, métrica e trace provando ausência
-- [ ] Gate: `make lint` e `make test-backend-coverage` (≥90% linhas / ≥85% métodos em `modules/Links`)
-- [ ] Test count: ≥8 testes passam
+- [x] Contadores de sucesso e de cada falha (`alias_unavailable`, `slug_exhausted`, `validation_failed`, `rate_limited`, `infrastructure`)
+- [x] Nenhum rótulo contém slug, alias, `destination_url`, query, fragmento ou título
+- [x] Sentinela injeta valores marcadores e varre log, métrica e trace provando ausência
+- [x] Gate: `make lint` e `make test-backend-coverage` (≥90% linhas / ≥85% métodos em `modules/Links`)
+- [x] Test count: ≥8 testes passam
 
 **Tests**: e2e · **Gate**: build + coverage  
 **Commit**: `feat(links): record redacted creation telemetry`

@@ -33,6 +33,7 @@ use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentShort
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
 use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
+use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
 use Modules\Links\UseCases\CreateLink;
 use Modules\Links\UseCases\ReserveSlug;
 use Modules\Links\UseCases\SealDestinationUrl;
@@ -55,6 +56,8 @@ final class LinksServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->app->singleton(LinkCreationMetrics::class);
+
         $this->app->singleton(DestinationKeyring::class, fn (): DestinationKeyring => DestinationKeyring::fromConfig(
             config('links.destination'),
         ));
