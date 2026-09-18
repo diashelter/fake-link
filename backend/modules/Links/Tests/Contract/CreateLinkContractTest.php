@@ -249,3 +249,145 @@ describe('Contract: POST /api/v1/links', function () {
         expect((int) $response->headers->get('Retry-After'))->toBeGreaterThanOrEqual(1);
     });
 });
+
+describe('Contract: POST /api/v1/links idempotency', function () {
+    it('declares the IdempotencyKey parameter with OpenAPI constraints', function () {
+        $parameter = OpenApiDocument::load()->parameter('IdempotencyKey');
+        $schema = $parameter['schema'] ?? null;
+
+        expect($parameter['name'] ?? null)->toBe('Idempotency-Key')
+            ->and($parameter['in'] ?? null)->toBe('header')
+            ->and($parameter['required'] ?? null)->toBeFalse()
+            ->and($schema)->toBeArray()
+            ->and($schema['type'] ?? null)->toBe('string')
+            ->and($schema['minLength'] ?? null)->toBe(16)
+            ->and($schema['maxLength'] ?? null)->toBe(128)
+            ->and($schema['pattern'] ?? null)->toBe('^[A-Za-z0-9._:-]+$');
+    });
+
+    it('returns 201 LinkCreated matching OpenAPI for the original idempotent create', function () {
+        $user = createLinkContractOwner();
+        $bearer = createLinkContractBearer($user);
+        $payload = [
+            'destination_url' => 'https://example.com/contract-idem-original',
+            'custom_alias' => 'idem-orig',
+            'title' => 'Idem Original',
+            'expires_at' => null,
+        ];
+
+        $response = postCreateLinkContract($payload, [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'contract-idem-key-01',
+        ]);
+
+        $response->assertCreated();
+
+        OpenApiSchemaAssert::assertMatchesSchema(
+            $response->json(),
+            OpenApiDocument::load()->responseSchema('LinkCreated'),
+        );
+        OpenApiSchemaAssert::assertPrivateCacheAndRequestId($response);
+
+        expect($response->headers->get('Location'))->toMatch('#^/api/v1/links/[0-9a-f-]{36}$#i')
+            ->and($response->headers->get('ETag'))->toMatch('/^"[0-9a-f]{64}"$/');
+    });
+
+    it('returns 201 LinkCreated matching OpenAPI for an idempotent replay', function () {
+        $user = createLinkContractOwner();
+        $bearer = createLinkContractBearer($user);
+        $payload = [
+            'destination_url' => 'https://example.com/contract-idem-replay',
+            'custom_alias' => 'idem-replay',
+            'title' => null,
+            'expires_at' => null,
+        ];
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'contract-idem-key-02',
+        ];
+
+        $first = postCreateLinkContract($payload, $headers);
+        $first->assertCreated();
+
+        $replay = postCreateLinkContract($payload, $headers);
+        $replay->assertCreated();
+
+        OpenApiSchemaAssert::assertMatchesSchema(
+            $replay->json(),
+            OpenApiDocument::load()->responseSchema('LinkCreated'),
+        );
+        OpenApiSchemaAssert::assertPrivateCacheAndRequestId($replay);
+
+        expect($replay->json())->toBe($first->json())
+            ->and($replay->headers->get('Location'))->toBe($first->headers->get('Location'))
+            ->and($replay->headers->get('ETag'))->toBe($first->headers->get('ETag'))
+            ->and((string) $replay->headers->get('Cache-Control'))->toContain('private')
+            ->and((string) $replay->headers->get('Cache-Control'))->toContain('no-store');
+    });
+
+    it('returns 409 LinkConflict matching OpenAPI for IDEMPOTENCY_KEY_REUSED', function () {
+        $user = createLinkContractOwner();
+        $bearer = createLinkContractBearer($user);
+        $key = 'contract-idem-key-03';
+
+        postCreateLinkContract(
+            [
+                'destination_url' => 'https://example.com/contract-idem-a',
+            ],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => $key,
+            ],
+        )->assertCreated();
+
+        $response = postCreateLinkContract(
+            [
+                'destination_url' => 'https://example.com/contract-idem-b',
+            ],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => $key,
+            ],
+        );
+
+        OpenApiSchemaAssert::assertErrorEnvelope(
+            $response,
+            409,
+            LinksOpenApiCatalog::IDEMPOTENCY_KEY_REUSED,
+            LinksOpenApiCatalog::message(LinksOpenApiCatalog::IDEMPOTENCY_KEY_REUSED),
+        );
+        OpenApiSchemaAssert::assertMatchesSchema(
+            $response->json(),
+            OpenApiDocument::load()->responseSchema('LinkConflict'),
+        );
+        OpenApiSchemaAssert::assertPrivateCacheAndRequestId($response);
+    });
+
+    it('returns 422 ValidationError matching OpenAPI for an invalid Idempotency-Key', function () {
+        $user = createLinkContractOwner();
+        $bearer = createLinkContractBearer($user);
+
+        $response = postCreateLinkContract(
+            [
+                'destination_url' => 'https://example.com/contract-idem-invalid-key',
+            ],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'short',
+            ],
+        );
+
+        $response->assertStatus(422);
+
+        OpenApiSchemaAssert::assertMatchesSchema(
+            $response->json(),
+            OpenApiDocument::load()->responseSchema('ValidationError'),
+        );
+
+        expect($response->json('code'))->toBe(LinksOpenApiCatalog::VALIDATION_FAILED)
+            ->and($response->json('message'))->toBe(LinksOpenApiCatalog::message(LinksOpenApiCatalog::VALIDATION_FAILED))
+            ->and($response->json('errors.Idempotency-Key.0.code'))->toBe(LinksOpenApiCatalog::INVALID_IDEMPOTENCY_KEY)
+            ->and((string) $response->headers->get('Cache-Control'))->toContain('private')
+            ->and((string) $response->headers->get('Cache-Control'))->toContain('no-store');
+    });
+});

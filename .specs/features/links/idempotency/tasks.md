@@ -244,10 +244,10 @@ T7 → T8 → T9
 
 **Tools:** MCP: NONE · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] Contract tests validam parâmetro, `201` original/replay, `409`, `422` e headers declarados.
-- [ ] Architecture tests provam Domain livre de Laravel e Controller sem persistência/transação.
-- [ ] `make lint-openapi`, `make lint`, `make test-backend` e `make test-backend-coverage` passam, com Links em ≥90% linhas e ≥85% métodos.
-- [ ] Nenhum teste é removido ou enfraquecido para aprovar os gates.
+- [x] Contract tests validam parâmetro, `201` original/replay, `409`, `422` e headers declarados.
+- [x] Architecture tests provam Domain livre de Laravel e Controller sem persistência/transação.
+- [x] `make lint-openapi`, `make lint`, `make test-backend` e `make test-backend-coverage` passam, com Links em ≥90% linhas e ≥85% métodos.
+- [x] Nenhum teste é removido ou enfraquecido para aprovar os gates.
 
 **Tests:** Contract + architecture · **Gate:** contract + build + coverage  
 **Commit:** `test(links): verify idempotency contract and coverage`

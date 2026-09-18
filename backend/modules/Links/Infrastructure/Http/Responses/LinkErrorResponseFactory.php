@@ -60,7 +60,7 @@ final class LinkErrorResponseFactory
         return $this->errorResponse(
             status: 409,
             code: IdempotencyKeyReused::ERROR_CODE,
-            message: 'This idempotency key was already used with a different request.',
+            message: 'The idempotency key was used with a different request.',
             requestId: $requestId,
         );
     }

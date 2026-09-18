@@ -26,6 +26,7 @@
         </testsuite>
         <testsuite name="Architecture">
             <directory>tests/Architecture</directory>
+            <directory>modules/Links/Tests/Architecture</directory>
         </testsuite>
     </testsuites>
     <source>
