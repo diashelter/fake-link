@@ -29,8 +29,7 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
         string $keyHash,
         DateTimeImmutable $now,
     ): ?IdempotencyRecord {
-        /** @var IdempotencyKeyModel|null $model */
-        $model = IdempotencyKeyModel::query()
+        $row = DB::table('idempotency_keys')
             ->where('user_id', $userId->value())
             ->where('key_hash', $keyHash)
             ->where('expires_at', '>', Carbon::instance($now))
@@ -38,9 +37,13 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
             ->whereNotNull('key_id')
             ->first();
 
-        if ($model === null) {
+        if ($row === null) {
             return null;
         }
+
+        $model = new IdempotencyKeyModel;
+        $model->forceFill((array) $row);
+        $model->exists = true;
 
         return $this->mapper->toRecord($model);
     }
@@ -52,7 +55,7 @@ final class EloquentIdempotencyKeyRepository implements IdempotencyKeyRepository
         DateTimeImmutable $createdAt,
         DateTimeImmutable $expiresAt,
     ): void {
-        IdempotencyKeyModel::query()->insert(
+        DB::table('idempotency_keys')->insert(
             $this->mapper->toReservePersistence(
                 $userId,
                 $keyHash,

@@ -72,5 +72,9 @@
         <env name="SHORT_URL_BASE" value="https://go.localhost"/>
         <env name="LINKS_ETAG_HMAC_KEY" value="testing-links-etag-hmac-key"/>
         <env name="LINKS_RATE_LIMIT_HMAC_KEY" value="testing-links-rate-limit-hmac-key"/>
+        <env name="LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY" value="testing-links-idempotency-key-hash-hmac"/>
+        <env name="LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY" value="testing-links-idempotency-fingerprint-hmac"/>
+        <env name="LINKS_IDEMPOTENCY_KEYRING" value="{&quot;testing-idem-1&quot;:&quot;AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=&quot;}"/>
+        <env name="LINKS_IDEMPOTENCY_ACTIVE_KEY_ID" value="testing-idem-1"/>
     </php>
 </phpunit>

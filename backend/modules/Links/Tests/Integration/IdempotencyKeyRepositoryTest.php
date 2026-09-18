@@ -10,7 +10,6 @@ use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
 use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
-use Modules\Links\Infrastructure\Persistence\Eloquent\Models\IdempotencyKeyModel;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentIdempotencyKeyRepository;
 use Tests\TestCase;
 
@@ -170,7 +169,7 @@ describe('EloquentIdempotencyKeyRepository', function () {
 
         expect($this->repo->findActive($userA, $keyHash, $createdAt))->not->toBeNull()
             ->and($this->repo->findActive($userB, $keyHash, $createdAt))->not->toBeNull()
-            ->and(IdempotencyKeyModel::query()->count())->toBe(2);
+            ->and(DB::table('idempotency_keys')->count())->toBe(2);
     });
 
     it('rejects duplicate (user_id, key_hash) via unique constraint', function () {
@@ -226,7 +225,7 @@ describe('EloquentIdempotencyKeyRepository', function () {
             // expected
         }
 
-        expect(IdempotencyKeyModel::query()->where('key_hash', $keyHash)->exists())->toBeFalse()
+        expect(DB::table('idempotency_keys')->where('key_hash', $keyHash)->exists())->toBeFalse()
             ->and($this->repo->findActive($owner, $keyHash, $createdAt))->toBeNull();
     });
 
@@ -245,12 +244,12 @@ describe('EloquentIdempotencyKeyRepository', function () {
         $deleted = $this->repo->deleteExpired($now, 1);
 
         expect($deleted)->toBe(1)
-            ->and(IdempotencyKeyModel::query()->count())->toBe(2);
+            ->and(DB::table('idempotency_keys')->count())->toBe(2);
 
         $deletedAgain = $this->repo->deleteExpired($now, 10);
 
         expect($deletedAgain)->toBe(1)
-            ->and(IdempotencyKeyModel::query()->count())->toBe(1)
+            ->and(DB::table('idempotency_keys')->count())->toBe(1)
             ->and($this->repo->findActive($owner, hex64('alive'), $now))->not->toBeNull();
     });
 

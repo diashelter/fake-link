@@ -96,4 +96,22 @@ return [
 
     'etag_hmac_key' => env('LINKS_ETAG_HMAC_KEY'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Idempotency
+    |--------------------------------------------------------------------------
+    |
+    | Exclusive crypto material for create-link idempotency. HMAC secrets are
+    | purpose-distinct (key hash vs command fingerprint). The snapshot keyring
+    | must never share keys with links.destination.
+    |
+    */
+
+    'idempotency' => [
+        'key_hash_hmac_key' => env('LINKS_IDEMPOTENCY_KEY_HASH_HMAC_KEY'),
+        'fingerprint_hmac_key' => env('LINKS_IDEMPOTENCY_FINGERPRINT_HMAC_KEY'),
+        'keyring' => env('LINKS_IDEMPOTENCY_KEYRING', '{}'),
+        'active_key_id' => env('LINKS_IDEMPOTENCY_ACTIVE_KEY_ID', ''),
+    ],
+
 ];

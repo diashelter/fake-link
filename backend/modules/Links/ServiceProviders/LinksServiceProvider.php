@@ -13,18 +13,24 @@ use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Repositories\SlugReservationRepository;
 use Modules\Links\Contracts\Services\DestinationCipher;
 use Modules\Links\Contracts\Services\ETagSigningKey;
+use Modules\Links\Contracts\Services\IdempotencyHmacSecrets;
+use Modules\Links\Contracts\Services\IdempotencySnapshotCipher;
 use Modules\Links\Contracts\Services\LinkDestinationVersionIdGenerator;
 use Modules\Links\Contracts\Services\RandomSlugSource;
 use Modules\Links\Contracts\Services\ReservedSlugs;
 use Modules\Links\Contracts\Services\ShortLinkIdGenerator;
+use Modules\Links\Domain\Services\CanonicalCreateLinkCommand;
 use Modules\Links\Domain\Services\EffectiveStatus;
 use Modules\Links\Domain\Services\LinkETag;
 use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\Services\SlugGenerator;
 use Modules\Links\Domain\Services\SlugPolicy;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
+use Modules\Links\Infrastructure\Crypto\Aes256GcmIdempotencySnapshotCipher;
 use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
+use Modules\Links\Infrastructure\Crypto\ConfigIdempotencyHmacSecrets;
 use Modules\Links\Infrastructure\Crypto\DestinationKeyring;
+use Modules\Links\Infrastructure\Crypto\IdempotencyKeyring;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
@@ -50,6 +56,7 @@ final class LinksServiceProvider extends ServiceProvider
         ShortLinkIdGenerator::class => Uuid7ShortLinkIdGenerator::class,
         LinkDestinationVersionIdGenerator::class => Uuid7LinkDestinationVersionIdGenerator::class,
         DestinationCipher::class => Aes256GcmDestinationCipher::class,
+        IdempotencySnapshotCipher::class => Aes256GcmIdempotencySnapshotCipher::class,
         ReservedSlugs::class => ConfigReservedSlugs::class,
         RandomSlugSource::class => CsprngSlugSource::class,
         SlugReservationRepository::class => EloquentSlugReservationRepository::class,
@@ -64,6 +71,20 @@ final class LinksServiceProvider extends ServiceProvider
 
         $this->app->singleton(DestinationKeyring::class, fn (): DestinationKeyring => DestinationKeyring::fromConfig(
             config('links.destination'),
+        ));
+
+        $this->app->singleton(IdempotencyKeyring::class, fn (): IdempotencyKeyring => IdempotencyKeyring::fromConfig([
+            'keyring' => (string) config('links.idempotency.keyring'),
+            'active_key_id' => (string) config('links.idempotency.active_key_id'),
+        ]));
+
+        $this->app->singleton(IdempotencyHmacSecrets::class, fn (): IdempotencyHmacSecrets => new ConfigIdempotencyHmacSecrets(
+            (string) config('links.idempotency.key_hash_hmac_key'),
+            (string) config('links.idempotency.fingerprint_hmac_key'),
+        ));
+
+        $this->app->singleton(CanonicalCreateLinkCommand::class, fn (Application $app): CanonicalCreateLinkCommand => new CanonicalCreateLinkCommand(
+            $app->make(IdempotencyHmacSecrets::class),
         ));
 
         $this->app->singleton(PublicHostClassifier::class, fn (): PublicHostClassifier => new PublicHostClassifier(

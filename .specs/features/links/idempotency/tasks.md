@@ -96,11 +96,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: Context7 · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] `IdempotencyKey` aceita somente 16–128 caracteres `[A-Za-z0-9._:-]+`.
-- [ ] JSON em ordem diferente, alias em caixa diferente, título com espaços e ausente/`null` canônico geram fingerprint igual.
-- [ ] Mudança normalizada de qualquer campo do payload gera fingerprint diferente.
-- [ ] Snapshot criptografado não contém corpo/headers/destino em texto claro e envelope adulterado falha fechado.
-- [ ] Testes unitários e de criptografia passam com `make test-backend`.
+- [x] `IdempotencyKey` aceita somente 16–128 caracteres `[A-Za-z0-9._:-]+`.
+- [x] JSON em ordem diferente, alias em caixa diferente, título com espaços e ausente/`null` canônico geram fingerprint igual.
+- [x] Mudança normalizada de qualquer campo do payload gera fingerprint diferente.
+- [x] Snapshot criptografado não contém corpo/headers/destino em texto claro e envelope adulterado falha fechado.
+- [x] Testes unitários e de criptografia passam com `make test-backend`.
 
 **Tests:** unit + integration · **Gate:** full  
 **Commit:** `feat(links): canonicalize and protect idempotency commands`
