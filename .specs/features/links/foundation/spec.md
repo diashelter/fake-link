@@ -335,33 +335,33 @@ Sem proprietário, sem referência ao link; reserva nunca é removida.
 
 | Requirement ID | Story | Descrição | Phase | Status |
 | --- | --- | --- | --- | --- |
-| LNK-01 | P1: Scaffold | Scaffold hexagonal do módulo `Links` | Design | Pending |
-| LNK-02 | P1: Scaffold | Scaffold hexagonal do módulo `Redirects` | Design | Pending |
-| LFND-01 | P1: Scaffold | Providers registrados em `bootstrap/providers.php` | Design | Pending |
-| LFND-02 | P1: Scaffold | Ports resolvíveis do container | Design | Pending |
-| LFND-03 | P1: Scaffold | Nenhuma rota de negócio registrada | Design | Pending |
-| LFND-04 | P1: Scaffold | PHPStan + Pest Arch cobrem os módulos e seam Redirects↛Links | Design | Pending |
-| LNK-03 | P1: Schema | Três migrations base aplicadas | Design | Pending |
-| LFND-05 | P1: Schema | Tipos e colunas por `information_schema` | Design | Pending |
-| LFND-06 | P1: Schema | FKs `RESTRICT` e unicidade de slug | Design | Pending |
-| LFND-07 | P1: Schema | `CHECK` de `slug_source` e de vigência | Design | Pending |
-| LFND-08 | P1: Schema | Índice parcial único de versão atual | Design | Pending |
-| LFND-09 | P1: Domínio | `Slug` com invariantes estruturais | Design | Pending |
-| LFND-10 | P1: Domínio | `DestinationUrl` com esquema e limite | Design | Pending |
-| LFND-11 | P1: Domínio | Enum `LinkStatus` | Design | Pending |
-| LFND-12 | P1: Domínio | Derivação de precedência do estado efetivo | Design | Pending |
-| LNK-04 | P1: Keyring | Keyring de destinos com chave externa à persistência | Design | Pending |
-| LFND-13 | P1: Keyring | Round-trip AES-256-GCM com nonce único | Design | Pending |
-| LFND-14 | P1: Keyring | Falha autenticada (tag, `key_id`, formato) | Design | Pending |
-| LFND-15 | P1: Keyring | Rotação por `key_id` com chave antiga | Design | Pending |
-| LFND-16 | P1: Keyring | Ausência de plaintext e chave em logs/telemetria | Design | Pending |
-| LNK-05 | P1: Gates | Suítes registradas e cobertura dos módulos | Design | Pending |
-| LFND-17 | P1: Gates | `phpunit.xml` descobre as suítes novas | Design | Pending |
-| LFND-18 | P1: Gates | `<source><include>` cobre os módulos | Design | Pending |
-| LFND-19 | P1: Gates | Gate 90%/85% para Links e Redirects, 80/80 preservado para Auth | Design | Pending |
-| LFND-20 | P1: Gates | `docs/testing.md` atualizado | Design | Pending |
+| LNK-01 | P1: Scaffold | Scaffold hexagonal do módulo `Links` | Execute | Verified |
+| LNK-02 | P1: Scaffold | Scaffold hexagonal do módulo `Redirects` | Execute | Verified |
+| LFND-01 | P1: Scaffold | Providers registrados em `bootstrap/providers.php` | Execute | Verified |
+| LFND-02 | P1: Scaffold | Ports resolvíveis do container | Execute | Verified |
+| LFND-03 | P1: Scaffold | Nenhuma rota de negócio registrada | Execute | Verified |
+| LFND-04 | P1: Scaffold | PHPStan + Pest Arch cobrem os módulos e seam Redirects↛Links | Execute | Verified |
+| LNK-03 | P1: Schema | Três migrations base aplicadas | Execute | Verified |
+| LFND-05 | P1: Schema | Tipos e colunas por `information_schema` | Execute | Verified |
+| LFND-06 | P1: Schema | FKs `RESTRICT` e unicidade de slug | Execute | Verified |
+| LFND-07 | P1: Schema | `CHECK` de `slug_source` e de vigência | Execute | Verified |
+| LFND-08 | P1: Schema | Índice parcial único de versão atual | Execute | Verified |
+| LFND-09 | P1: Domínio | `Slug` com invariantes estruturais | Execute | Verified |
+| LFND-10 | P1: Domínio | `DestinationUrl` com esquema e limite | Execute | Verified |
+| LFND-11 | P1: Domínio | Enum `LinkStatus` | Execute | Verified |
+| LFND-12 | P1: Domínio | Derivação de precedência do estado efetivo | Execute | Verified |
+| LNK-04 | P1: Keyring | Keyring de destinos com chave externa à persistência | Execute | Verified |
+| LFND-13 | P1: Keyring | Round-trip AES-256-GCM com nonce único | Execute | Verified |
+| LFND-14 | P1: Keyring | Falha autenticada (tag, `key_id`, formato) | Execute | Verified |
+| LFND-15 | P1: Keyring | Rotação por `key_id` com chave antiga | Execute | Verified |
+| LFND-16 | P1: Keyring | Ausência de plaintext e chave em logs/telemetria | Execute | Verified |
+| LNK-05 | P1: Gates | Suítes registradas e cobertura dos módulos | Execute | Verified |
+| LFND-17 | P1: Gates | `phpunit.xml` descobre as suítes novas | Execute | Verified |
+| LFND-18 | P1: Gates | `<source><include>` cobre os módulos | Execute | Verified |
+| LFND-19 | P1: Gates | Gate 90%/85% para Links e Redirects, 80/80 preservado para Auth | Execute | Verified |
+| LFND-20 | P1: Gates | `docs/testing.md` atualizado | Execute | Verified |
 
-**Coverage:** 25 total, 0 mapeados para tasks (Tasks pendente)
+**Coverage:** 25 total, 25 mapeados para tasks (T1–T15, `main`); Execute ✅ · Verifier ✅ **PASS** 2026-08-30 (`.specs/features/links/foundation/validation.md`) — 3/3 discrimination mutants killed, 0 surviving; 554 testes, 0 falhas
 
 ---
 
