@@ -11,7 +11,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **ative-a pelo nome e si
 **Spec**: [spec.md](./spec.md)  
 **Context**: [context.md](./context.md)  
 **Design**: [design.md](./design.md)  
-**Status**: Draft — aguardando aprovação (e confirmação da abordagem A em design.md)
+**Status**: Verified PASS — Execute T1–T17 concluído; validation 2026-09-18
 
 **Pré-requisito de execução:** as fatias [foundation](../foundation/spec.md) e [destination-policy](../destination-policy/spec.md) precisam estar entregues; [slug-policy](../slug-policy/spec.md) tem spec fechada mas ainda não implementada. Não iniciar Execute antes disso.
 
@@ -98,10 +98,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `links.short_url.base_url` lê `SHORT_URL_BASE` com fallback `https://{SHORT_HOST}`
-- [ ] `links.rate_limits.create` = `{max_attempts: 60, decay_seconds: 60}`
-- [ ] `SHORT_URL_BASE` presente em `.env.example` e na lista de `validate-env.sh`
-- [ ] Gate: `make lint`
+- [x] `links.short_url.base_url` lê `SHORT_URL_BASE` com fallback `https://{SHORT_HOST}`
+- [x] `links.rate_limits.create` = `{max_attempts: 60, decay_seconds: 60}`
+- [x] `SHORT_URL_BASE` presente em `.env.example` e na lista de `validate-env.sh`
+- [x] Gate: `make lint`
 
 **Tests**: none · **Gate**: build  
 **Commit**: `feat(links): add module configuration for short url and creation limits`
@@ -120,9 +120,9 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `SLUG_GENERATION_FAILED` listado em `docs/api.md` §7
-- [ ] Exemplo na resposta `503` de `createLink`, com `Retry-After` documentado
-- [ ] Gate: `make lint-openapi` passa sem novos warnings
+- [x] `SLUG_GENERATION_FAILED` listado em `docs/api.md` §7
+- [x] Exemplo na resposta `503` de `createLink`, com `Retry-After` documentado
+- [x] Gate: `make lint-openapi` passa sem novos warnings
 
 **Tests**: none · **Gate**: build  
 **Commit**: `docs(api): document SLUG_GENERATION_FAILED for link creation`
@@ -141,10 +141,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `errorCodes()` mapeia campo+regra para código estável; ausência do mapa mantém `'INVALID'`
-- [ ] Teste de regressão prova que os `FormRequest` do Auth continuam emitindo `'INVALID'`
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam (sem deleções silenciosas)
+- [x] `errorCodes()` mapeia campo+regra para código estável; ausência do mapa mantém `'INVALID'`
+- [x] Teste de regressão prova que os `FormRequest` do Auth continuam emitindo `'INVALID'`
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam (sem deleções silenciosas)
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(api): allow form requests to declare stable per-field error codes`
@@ -165,11 +165,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Precedência de `docs/data-model.md` §4 coberta nas quatro combinações e nos empates
-- [ ] `expires_at == now()` resolve como `expired` (limite exclusivo)
-- [ ] `Domain` sem `config()` nem Eloquent (Pest Arch)
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] Precedência de `docs/data-model.md` §4 coberta nas quatro combinações e nos empates
+- [x] `expires_at == now()` resolve como `expired` (limite exclusivo)
+- [x] `Domain` sem `config()` nem Eloquent (Pest Arch)
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): derive effective link status in the domain`
@@ -188,12 +188,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Formato forte casa `^"[^"]+"$` e não usa prefixo `W/`
-- [ ] Determinismo: mesmo estado → mesmo valor; teste de sensibilidade para **cada** campo da tupla
-- [ ] Estado efetivo entra no cálculo (bloqueio e expiração alteram o valor)
-- [ ] Teste prova que `version`, `user_id` e a URL de destino não são recuperáveis do valor
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥12 testes passam
+- [x] Formato forte casa `^"[^"]+"$` e não usa prefixo `W/`
+- [x] Determinismo: mesmo estado → mesmo valor; teste de sensibilidade para **cada** campo da tupla
+- [x] Estado efetivo entra no cálculo (bloqueio e expiração alteram o valor)
+- [x] Teste prova que `version`, `user_id` e a URL de destino não são recuperáveis do valor
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥12 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): compute opaque strong etag from effective link state`
@@ -212,10 +212,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] DTOs `final readonly`, com tipos estritos e sem lógica
-- [ ] Teste prova que `CreatedLinkDto` carrega estado suficiente para ETag e para o Resource
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥3 testes passam
+- [x] DTOs `final readonly`, com tipos estritos e sem lógica
+- [x] Teste prova que `CreatedLinkDto` carrega estado suficiente para ETag e para o Resource
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥3 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): add create link input and output dtos`
@@ -234,11 +234,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `create()` insere com UUID v7 gerado na aplicação e participa da transação aberta pelo chamador
-- [ ] Não existe método de update de `slug` nem de `user_id` (verificado por teste + Pest Arch)
-- [ ] Violação de FK de `slug` mapeia para falha tipada
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam
+- [x] `create()` insere com UUID v7 gerado na aplicação e participa da transação aberta pelo chamador
+- [x] Não existe método de update de `slug` nem de `user_id` (verificado por teste + Pest Arch)
+- [x] Violação de FK de `slug` mapeia para falha tipada
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): add short link repository with immutable slug and owner`
@@ -257,12 +257,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Linha gravada com `valid_to = null`, `valid_from` = instante da criação e `key_id` preenchido
-- [ ] Teste inspeciona a coluna e prova que a URL **não** está em texto claro
-- [ ] Segunda versão vigente para o mesmo link viola o índice parcial único e falha
-- [ ] Participa da transação corrente
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam
+- [x] Linha gravada com `valid_to = null`, `valid_from` = instante da criação e `key_id` preenchido
+- [x] Teste inspeciona a coluna e prova que a URL **não** está em texto claro
+- [x] Segunda versão vigente para o mesmo link viola o índice parcial único e falha
+- [x] Participa da transação corrente
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): persist first encrypted destination version`
@@ -281,13 +281,13 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Caminho feliz cria exatamente uma linha em cada uma das três tabelas
-- [ ] Falha no insert da versão de destino reverte link e reserva; falha no insert do link reverte a reserva
-- [ ] Validação e cifra do destino ocorrem antes de abrir a transação
-- [ ] `SlugUnavailable` e `SlugGenerationExhausted` propagam tipadas, sem estado parcial
-- [ ] Estado inicial: `is_enabled=true`, `blocked_at=null`, `version=1`, `slug_source` correto
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥10 testes passam
+- [x] Caminho feliz cria exatamente uma linha em cada uma das três tabelas
+- [x] Falha no insert da versão de destino reverte link e reserva; falha no insert do link reverte a reserva
+- [x] Validação e cifra do destino ocorrem antes de abrir a transação
+- [x] `SlugUnavailable` e `SlugGenerationExhausted` propagam tipadas, sem estado parcial
+- [x] Estado inicial: `is_enabled=true`, `blocked_at=null`, `version=1`, `slug_source` correto
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥10 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `feat(links): create link, reservation and first destination in one transaction`
@@ -306,13 +306,13 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `destination_url` ausente → `REQUIRED`; inválida → `INVALID_DESTINATION_URL` sem ecoar a URL
-- [ ] `custom_alias` inválido ou `null` → `INVALID_ALIAS`, sem revelar a regra violada
-- [ ] `title` com trim, `""` → `null`, 160 aceito, 161 → `TITLE_TOO_LONG` (contagem por caractere)
-- [ ] `expires_at` `<= now()` → `EXPIRES_AT_NOT_IN_FUTURE`; formato fora de ISO `Z` → `INVALID_DATETIME`
-- [ ] Campo extra → `UNKNOWN_FIELD` por campo
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥20 testes passam
+- [x] `destination_url` ausente → `REQUIRED`; inválida → `INVALID_DESTINATION_URL` sem ecoar a URL
+- [x] `custom_alias` inválido ou `null` → `INVALID_ALIAS`, sem revelar a regra violada
+- [x] `title` com trim, `""` → `null`, 160 aceito, 161 → `TITLE_TOO_LONG` (contagem por caractere)
+- [x] `expires_at` `<= now()` → `EXPIRES_AT_NOT_IN_FUTURE`; formato fora de ISO `Z` → `INVALID_DATETIME`
+- [x] Campo extra → `UNKNOWN_FIELD` por campo
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥20 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): validate the closed create link payload`
@@ -331,12 +331,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Corpo contém exatamente os campos de `LinkDetail`; sem `version`, `blocked_at`, `user_id` ou analytics
-- [ ] `short_url` = `{links.short_url.base_url}/{slug}`; teste prova independência do host do request
-- [ ] Datas em ISO 8601 UTC com sufixo `Z`
-- [ ] `Location: /api/v1/links/{id}`, `ETag` forte, `Cache-Control: private, no-store`, `X-Request-ID` presentes
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥10 testes passam
+- [x] Corpo contém exatamente os campos de `LinkDetail`; sem `version`, `blocked_at`, `user_id` ou analytics
+- [x] `short_url` = `{links.short_url.base_url}/{slug}`; teste prova independência do host do request
+- [x] Datas em ISO 8601 UTC com sufixo `Z`
+- [x] `Location: /api/v1/links/{id}`, `ETag` forte, `Cache-Control: private, no-store`, `X-Request-ID` presentes
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥10 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): serialize link detail and creation response headers`
@@ -355,11 +355,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Cada resposta tem `code`, `message`, `request_id`, `Cache-Control: private, no-store` e `X-Request-ID`
-- [ ] `Retry-After` inteiro ≥ 1 nas respostas que o exigem
-- [ ] Teste prova que nenhuma resposta contém alias, destino, título ou dados do ocupante
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] Cada resposta tem `code`, `message`, `request_id`, `Cache-Control: private, no-store` e `X-Request-ID`
+- [x] `Retry-After` inteiro ≥ 1 nas respostas que o exigem
+- [x] Teste prova que nenhuma resposta contém alias, destino, título ou dados do ocupante
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): add stable error responses for link creation`
@@ -378,17 +378,17 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `POST /api/v1/links` com `auth.bearer` + `token.kind:session` responde `201` com headers e corpo corretos
-- [ ] Alias em caixa mista normaliza; `slug_source` correto nos dois caminhos
-- [ ] Alias ocupado → `409` idêntico para reserva com link e órfã; alias inválido **e** ocupado → `422`
-- [ ] Exaustão de geração → `503 SLUG_GENERATION_FAILED` com `Retry-After`
-- [ ] `401 UNAUTHENTICATED`, `403 TOKEN_RESTRICTED`, `403 ACCOUNT_SUSPENDED`, `403 ACCOUNT_PENDING_DELETION` cobertos
-- [ ] Todo `422` não deixa linha em nenhuma das três tabelas
-- [ ] Suítes de `modules/Links` registradas em `phpunit.xml` (Unit/Feature/Integration/Contract) e `<source>` inclui `modules/Links`
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥25 testes passam
+- [x] `POST /api/v1/links` com `auth.bearer` + `token.kind:session` responde `201` com headers e corpo corretos
+- [x] Alias em caixa mista normaliza; `slug_source` correto nos dois caminhos
+- [x] Alias ocupado → `409` idêntico para reserva com link e órfã; alias inválido **e** ocupado → `422`
+- [x] Exaustão de geração → `503 SLUG_GENERATION_FAILED` com `Retry-After`
+- [x] `401 UNAUTHENTICATED`, `403 TOKEN_RESTRICTED`, `403 ACCOUNT_SUSPENDED`, `403 ACCOUNT_PENDING_DELETION` cobertos
+- [x] Todo `422` não deixa linha em nenhuma das três tabelas
+- [x] Suítes de `modules/Links` registradas em `phpunit.xml` (Unit/Feature/Integration/Contract) e `<source>` inclui `modules/Links`
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥25 testes passam
 
-**Tests**: e2e · **Gate**: full  
+**Tests**: e2e · **Gate**: full
 **Commit**: `feat(links): expose POST /api/v1/links`
 
 ---
@@ -405,16 +405,16 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] 60 requisições passam e a 61ª retorna `429 RATE_LIMIT_EXCEEDED` com `Retry-After` ≥ 1
-- [ ] Requisições que terminam em `422`/`409`/`503` consomem tentativa
-- [ ] Requisição sem Bearer válido não consome cota de conta alguma
-- [ ] Contas distintas têm contadores independentes
-- [ ] Chave é HMAC; teste prova ausência de `user_id` em texto claro na chave
-- [ ] Driver de rate limit indisponível → requisição segue (fail-open) e métrica é emitida
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] 60 requisições passam e a 61ª retorna `429 RATE_LIMIT_EXCEEDED` com `Retry-After` ≥ 1
+- [x] Requisições que terminam em `422`/`409`/`503` consomem tentativa
+- [x] Requisição sem Bearer válido não consome cota de conta alguma
+- [x] Contas distintas têm contadores independentes
+- [x] Chave é HMAC; teste prova ausência de `user_id` em texto claro na chave
+- [x] Driver de rate limit indisponível → requisição segue (fail-open) e métrica é emitida
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
-**Tests**: e2e · **Gate**: full  
+**Tests**: e2e · **Gate**: full
 **Commit**: `feat(links): throttle link creation at 60 per minute per account`
 
 ---
@@ -431,12 +431,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Exatamente um `201` e um `409` entre as duas transações concorrentes
-- [ ] Uma única linha em `slug_reservations` e um único `short_link` para o slug
-- [ ] A perdedora não altera nem remove a reserva vencedora
-- [ ] A falha não revela o proprietário do slug vencedor
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥4 testes passam
+- [x] Exatamente um `201` e um `409` entre as duas transações concorrentes
+- [x] Uma única linha em `slug_reservations` e um único `short_link` para o slug
+- [x] A perdedora não altera nem remove a reserva vencedora
+- [x] A falha não revela o proprietário do slug vencedor
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥4 testes passam
 
 **Tests**: integration · **Gate**: full  
 **Commit**: `test(links): cover concurrent creation of equivalent aliases`
@@ -455,11 +455,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Request valida contra `CreateLinkRequest`; `201` contra `LinkResponse` com os headers de `LinkCreated`
-- [ ] `409`, `422` e `429` validam contra `LinkConflict`, `ValidationError` e `TooManyRequests`
-- [ ] Corpo do `201` não contém propriedade fora de `LinkDetail` (`additionalProperties: false`)
-- [ ] Gate: `make test-backend` e `make lint-openapi`
-- [ ] Test count: ≥6 testes passam
+- [x] Request valida contra `CreateLinkRequest`; `201` contra `LinkResponse` com os headers de `LinkCreated`
+- [x] `409`, `422` e `429` validam contra `LinkConflict`, `ValidationError` e `TooManyRequests`
+- [x] Corpo do `201` não contém propriedade fora de `LinkDetail` (`additionalProperties: false`)
+- [x] Gate: `make test-backend` e `make lint-openapi`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: e2e (contract) · **Gate**: full  
 **Commit**: `test(links): assert create link endpoint against the openapi contract`
@@ -478,11 +478,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Contadores de sucesso e de cada falha (`alias_unavailable`, `slug_exhausted`, `validation_failed`, `rate_limited`, `infrastructure`)
-- [ ] Nenhum rótulo contém slug, alias, `destination_url`, query, fragmento ou título
-- [ ] Sentinela injeta valores marcadores e varre log, métrica e trace provando ausência
-- [ ] Gate: `make lint` e `make test-backend-coverage` (≥90% linhas / ≥85% métodos em `modules/Links`)
-- [ ] Test count: ≥8 testes passam
+- [x] Contadores de sucesso e de cada falha (`alias_unavailable`, `slug_exhausted`, `validation_failed`, `rate_limited`, `infrastructure`)
+- [x] Nenhum rótulo contém slug, alias, `destination_url`, query, fragmento ou título
+- [x] Sentinela injeta valores marcadores e varre log, métrica e trace provando ausência
+- [x] Gate: `make lint` e `make test-backend-coverage` (≥90% linhas / ≥85% métodos em `modules/Links`)
+- [x] Test count: ≥8 testes passam
 
 **Tests**: e2e · **Gate**: build + coverage  
 **Commit**: `feat(links): record redacted creation telemetry`

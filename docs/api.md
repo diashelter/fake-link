@@ -260,7 +260,7 @@ Códigos estáveis específicos por fatia (fora da lista geral acima):
 | --- | --- | --- |
 | `SLUG_GENERATION_FAILED` | `503` | A criação de link esgotou as tentativas de gerar um slug automático livre; falha transitória e reprocessável, a resposta inclui `Retry-After`. |
 
-O domínio (`Modules\Links`) lança a falha tipada `SlugGenerationExhausted`; o mapeamento HTTP e a entrada correspondente na OpenAPI pertencem à fatia `link-creation` que expõe o endpoint e **não** são alterados aqui.
+O domínio (`Modules\Links`) lança a falha tipada `SlugGenerationExhausted`; o endpoint `POST /api/v1/links` mapeia para `503` com o código estável acima (veja o exemplo `SlugGenerationFailed` em `docs/openapi.yaml`).
 
 ## 8. Rate limiting inicial
 

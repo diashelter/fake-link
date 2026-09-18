@@ -109,13 +109,9 @@ test('session session accessing /verify-email redirects to /', async ({
 // ---------------------------------------------------------------------------
 test('logout-all in one browser context invalidates the other', async ({ browser }) => {
   // Context A: login
+  // Host resolver rules come from playwright.config project launchOptions.
   const ctxA = await browser.newContext({
     ignoreHTTPSErrors: true,
-    launchOptions: {
-      args: [
-        '--host-resolver-rules=MAP app.localhost:443 nginx:443, MAP go.localhost:443 nginx:443',
-      ],
-    },
   });
   const pageA = await ctxA.newPage();
   await loginViaUi(pageA, { email: TEST_EMAIL, password: TEST_PASSWORD });
@@ -124,11 +120,6 @@ test('logout-all in one browser context invalidates the other', async ({ browser
   // Context B: login independently (creates a separate session for the same user)
   const ctxB = await browser.newContext({
     ignoreHTTPSErrors: true,
-    launchOptions: {
-      args: [
-        '--host-resolver-rules=MAP app.localhost:443 nginx:443, MAP go.localhost:443 nginx:443',
-      ],
-    },
   });
   const pageB = await ctxB.newPage();
   await loginViaUi(pageB, { email: TEST_EMAIL, password: TEST_PASSWORD });

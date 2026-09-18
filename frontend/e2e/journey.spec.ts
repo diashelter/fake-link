@@ -178,13 +178,9 @@ test('password reset invalidates previous session and authenticates with new pas
 
   // ---- Step 5: verify previous session is rejected ----
   // Use a fresh context with only the old cookie to probe the session
+  // Host resolver rules come from playwright.config project launchOptions.
   const oldCtx = await browser.newContext({
     ignoreHTTPSErrors: true,
-    launchOptions: {
-      args: [
-        '--host-resolver-rules=MAP app.localhost:443 nginx:443, MAP go.localhost:443 nginx:443',
-      ],
-    },
   });
   const oldPage = await oldCtx.newPage();
 

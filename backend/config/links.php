@@ -65,4 +65,35 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Short URL base
+    |--------------------------------------------------------------------------
+    |
+    | Absolute origin used to build public short_url values ({base}/{slug}).
+    | Never derive this from the inbound request host — app host ≠ short host.
+    |
+    */
+
+    'short_url' => [
+        'base_url' => env('SHORT_URL_BASE') ?: ('https://'.env('SHORT_HOST', '')),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate limits
+    |--------------------------------------------------------------------------
+    */
+
+    'rate_limits' => [
+        'create' => [
+            'max_attempts' => 60,
+            'decay_seconds' => 60,
+        ],
+    ],
+
+    'rate_limit_hmac_key' => env('LINKS_RATE_LIMIT_HMAC_KEY'),
+
+    'etag_hmac_key' => env('LINKS_ETAG_HMAC_KEY'),
+
 ];
