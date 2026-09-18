@@ -1,14 +1,14 @@
 # BFF + UI Auth — Índice de specs
 
+**Status do módulo:** Concluído (fatias 1–9 Verified) — 2026-08-29
+
 **Escopo do módulo:** frontend Next.js (`frontend/`) — sessão BFF (Route Handlers, cookie, Redis), CSRF/proxy e UI server-first dos fluxos de conta.
 
 **Fora do escopo:** API Laravel Auth (já entregue em `.specs/features/auth/`), Links, Analytics, Operations, tokens de integração.
 
 **Fase alvo:** Fase 1 (Auth + BFF) — complemento da API Auth.
 
-**Progresso (2026-08-29):** 9 de 9 fatias com Execute em andamento ou concluído (foundation → e2e-security-gate). Fatia 9 aguarda Verifier.
-
-**Maturidade:** fatias 1–8 concluíram Specify → Design → Tasks → Execute → Validate. Fatia 9 concluiu Specify → Design → Tasks → Execute; aguarda Validate.
+**Progresso (2026-09-18):** pacote concluído. 9 de 9 fatias Specify → Design → Tasks → Execute → Validate, inclusive o gate E2E Playwright.
 
 ---
 
@@ -35,7 +35,7 @@
 | 6 | Verificação de e-mail | [email-verification](./email-verification/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | register | BFF verify/resend + UI |
 | 7 | Senha | [password](./password/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Forgot / reset / change |
 | 8 | Sessão e shell | [session-shell](./session-shell/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | login | Logout, me, perfil, guards |
-| 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ⏳ | 4–8 | Playwright + ausência de Bearer |
+| 9 | Gate E2E de segurança | [e2e-security-gate](./e2e-security-gate/spec.md) | Spec ✅ · Design ✅ · Tasks ✅ · Execute ✅ · Validate ✅ | 4–8 | Playwright + ausência de Bearer |
 
 ```mermaid
 flowchart LR
@@ -103,7 +103,7 @@ flowchart LR
 
 ## Inventário da implementação (`frontend/`)
 
-Resumo do que já existe no módulo Auth — atualizado em 2026-08-19.
+Resumo do que já existe no módulo Auth — atualizado em 2026-09-18.
 
 ### Route Handlers BFF (`app/api/bff/auth/`)
 
@@ -147,11 +147,9 @@ Allowlist central: `modules/auth/bff/allowlist.ts` (11 entradas produto).
 | Schemas Zod | `schemas/login-schema.ts`, `register-schema.ts`, `verify-email-schema.ts`, `forgot-password-schema.ts`, `reset-password-schema.ts`, `change-password-schema.ts`, `password-schema.ts`, `update-profile-schema.ts`, `logout-all-schema.ts` | várias |
 | Mensagens pt-BR | `lib/auth-messages.ts`, `lib/validation-errors.ts` | várias |
 
-### Ainda não implementado
+### Pacote concluído
 
-| Item | Fatia alvo | IDs |
-| --- | --- | --- |
-| Validate Playwright E2E (Verifier pendente) | e2e-security-gate | BFFUI-80…83 |
+O Verifier da fatia `e2e-security-gate` passou em 2026-08-29 (`.specs/features/bff-auth/e2e-security-gate/validation.md`). Não há item Auth pendente neste índice.
 
 ---
 

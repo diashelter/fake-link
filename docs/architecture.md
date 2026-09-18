@@ -97,6 +97,8 @@ Um módulo **não** deve importar Models Eloquent, Entities de domínio ou detal
 
 Possui convite, registro, verificação de e-mail, login, recuperação de senha, Users, tokens Bearer e revogação. Expõe identidade autenticada e policies necessárias aos outros módulos. O modelo inicial distingue somente token de sessão e token de verificação; abilities de integração ficam adiadas.
 
+**Estado (2026-09-18):** módulo concluído. Todos os endpoints `/api/v1/auth/*` e `/api/v1/me` estão registrados.
+
 ### 4.2 Links
 
 Possui criação de Short Link, reserva de slug, destino atual, histórico de destinos, expiração e consultas privadas. Também possui a resolução efetiva de slug. Seu contrato de leitura retorna exatamente um destes resultados:
@@ -107,15 +109,21 @@ Possui criação de Short Link, reserva de slug, destino atual, histórico de de
 
 O contrato não conhece HTTP, Redis, headers ou templates de erro. Essa fronteira garante que todas as regras que tornam um link utilizável permaneçam em `Links`.
 
+**Estado (2026-09-18):** domínio de slug, política de destino e cifra AES-256-GCM entregues. Superfície HTTP registrada: somente `POST /api/v1/links` (transação de reserva, link e primeira versão, `ETag` e `LinkDetail`). Consultas, `PATCH`, histórico, porta de resolução e idempotência ainda não.
+
 ### 4.3 Redirects
 
 Possui a superfície HTTP do Short host, semântica de `GET` e `HEAD`, cache de resolução, headers, status e orçamento de tempo. Em cache miss, chama a interface de resolução de `Links`. Após decidir uma resposta válida, entrega o contexto efêmero ao contrato profundo de analytics em modo best-effort.
+
+**Estado (2026-09-18):** scaffold hexagonal e provider registrados; rotas de resolução ainda são placeholder.
 
 ### 4.4 Analytics
 
 Possui `recordClick`, sanitização e classificação do contexto bruto, publicação na fila, consumo idempotente, eventos detalhados, unicidade e agregados. `recordClick` é uma interface profunda: recebe contexto efêmero suficiente para a classificação, executa localmente depois da resposta e não devolve conceitos internos ao módulo chamador.
 
 O módulo descarta IP, user-agent e referenciador bruto antes da fila. Classificação de cliente usa Matomo DeviceDetector localmente, sem serviço de terceiros.
+
+**Estado (2026-09-18):** ainda não há código em `backend/modules/Analytics/`.
 
 ### 4.5 Operations
 
@@ -127,6 +135,8 @@ Possui comandos operacionais explícitos e auditáveis:
 - reconstruir analytics a partir dos eventos detalhados.
 
 Esses workflows coordenam módulos sem assumir seus modelos. O scheduler reconcilia o estado desejado persistido no PostgreSQL para recuperar falhas parciais. Toda ação operacional relevante gera auditoria append-only com retenção de 366 dias. Bloqueio e suspensão não enviam notificação ao User.
+
+**Estado (2026-09-18):** ainda não há código em `backend/modules/Operations/`.
 
 ### 4.6 Shared
 
@@ -166,6 +176,8 @@ Não são eventos de integração distribuídos e não exigem outbox. Workflows 
 
 Exclusão não libera slug. A reserva mínima sobrevive sem owner nem destino.
 
+**Runtime (2026-09-18):** os passos 1–3 e a resposta `201` de criação estão implementados. Troca de destino, invalidação de cache e consultas privadas ainda não.
+
 ### 6.2 Redirect
 
 1. Nginx aceita somente uma requisição permitida do Short host, substitui o request ID e encaminha ao Laravel.
@@ -177,6 +189,8 @@ Exclusão não libera slug. A reserva mínima sobrevive sem owner nem destino.
 
 O orçamento total da aplicação para redirect é 1 segundo. Se PostgreSQL estiver indisponível, hits existentes e decifráveis continuam funcionando até o TTL; misses retornam `503 Service Unavailable`. Falha de Redis apenas força PostgreSQL. Payload de cache corrompido é descartado e força banco. Falha persistente ao decifrar o destino vindo da fonte de verdade retorna `503`, nunca uma URL incerta.
 
+**Runtime (2026-09-18):** fluxo ainda não implementado. O módulo `Redirects` só tem scaffold.
+
 ### 6.3 Analytics
 
 1. `recordClick` recebe timestamp UTC e contexto bruto somente em memória após a resposta.
@@ -186,6 +200,8 @@ O orçamento total da aplicação para redirect é 1 segundo. Se PostgreSQL esti
 5. O worker grava cada evento, sua unicidade e os agregados afetados em uma única transação PostgreSQL por evento.
 
 Bots, previews e tráfego desconhecido podem ser contados por categoria, mas nunca entram em human uniques. Não são persistidas categorias de browser ou sistema operacional. O payload de fila não contém dados brutos. A perda de publicação após a resposta é aceita, medida e alertada; Redis counters foram rejeitados por criarem outra fonte de verdade e uma janela adicional de perda.
+
+**Runtime (2026-09-18):** ainda não há módulo `Analytics`.
 
 ## 7. Cache de redirect
 
@@ -233,32 +249,31 @@ O frontend modulariza Auth em `frontend/modules/auth/`, com suporte compartilhad
 
 Cookie de sessão: `__Host-fl_session` (configurável via `BFF_SESSION_COOKIE_NAME`). CSRF: cookies `__Host-fl_csrf` (legível pelo browser) e `__Host-fl_csrf_sid` (pre-auth). Chaves separadas: `BFF_SESSION_AES_KEY`, `BFF_SESSION_HMAC_KEY`, `BFF_CSRF_HMAC_KEY`.
 
-**Implementado (infraestrutura BFF + login + cadastro):**
+**Implementado (Fase 1 completa — 2026-08-29, gate E2E verificado):**
 
 - Fundação frontend: módulos `auth`/`shared`, Tailwind v4, RHF+Zod, TanStack Query sem persistência, primitivos UI, gates Vitest/ESLint/Prettier, Husky/lint-staged, MSW harness, landing `pt-BR` tema claro.
 - Núcleo de sessão: cifra GCM do Bearer, ID opaco 256-bit, cookie `__Host-`, lookup Redis `HMAC(session_id)`, TTL absoluto/idle (`session`: 7d/24h; `verification`: 24h/1h), throttle de touch (900s), rotação/destruição, falha Redis → logout seguro, métrica de decrypt fail.
 - CSRF e proxy: validação de `Origin` exata, double-submit CSRF (modo sessão e pre-auth), allowlist estática, `sanitizeReturnUrl`, `Cache-Control: private, no-store`, guard de mutations, proxy upstream com timeout 10s.
-- **Login (fatia 4):** `POST /api/bff/auth/login`, UI `/login`, `performBffLogin`, sessão BFF sem Bearer no browser — verificado (`.specs/features/bff-auth/login/validation.md`).
-- **Cadastro (fatia 5):** `POST /api/bff/auth/register`, UI `/register`, `/terms`, `performBffRegister`, sessão `verification` sem Bearer — verificado (`.specs/features/bff-auth/register/validation.md`).
+- Fluxos de produto: login, cadastro, verificação de e-mail, recuperação/reset/alteração de senha, perfil, logout e logout-all — Route Handlers BFF, UIs e guards verificados.
 
 **Rotas de produto existentes:**
 
-- `POST /api/bff/auth/login` — autenticação via BFF.
-- `POST /api/bff/auth/register` — cadastro via BFF.
-- `GET /login` — UI server-first de login.
-- `GET /register` — UI server-first de cadastro.
-- `GET /terms` — Terms versionados (placeholder pt-BR).
+- `POST /api/bff/auth/login`
+- `POST /api/bff/auth/register`
+- `POST /api/bff/auth/email/verify`
+- `POST /api/bff/auth/email/resend`
+- `POST /api/bff/auth/password/reset-request`
+- `POST /api/bff/auth/password/reset`
+- `POST /api/bff/auth/password/change`
+- `POST /api/bff/auth/logout`
+- `POST /api/bff/auth/logout-all`
+- `GET` / `PATCH /api/bff/auth/me`
+- UI: `/login`, `/register`, `/verify-email`, `/forgot-password`, `/reset-password`, `/settings`, `/settings/password`, `/terms`
 
 **Rotas existentes (não-produto / probe):**
 
 - `GET/POST /api/_test/session` — probe de sessão (404 em produção salvo `BFF_SESSION_PROBE_ENABLED=true`).
 - `GET/POST /api/bff/_probe/mutate` — probe de mutation guard + CSRF (404 em produção).
-
-**Pendente (Fase 1 — fatias email-verification → e2e-security-gate):**
-
-- Route Handlers de produto restantes (verify, password, logout, me) populando `AUTH_BFF_ALLOWLIST`.
-- UI server-first: verificação, recuperação/reset/change de senha, perfil, guards de rota.
-- Integração end-to-end com API Laravel Auth e gate Playwright de ausência de Bearer no browser.
 
 Detalhes de specs, ACs e validação: `.specs/features/bff-auth/README.md`.
 

@@ -41,7 +41,7 @@
 
 ## Fase 1: Auth + BFF
 
-**Progresso (2026-08-29):** API Laravel Auth entregue (fatias 1–7). No frontend, todas as 9 fatias BFF Auth estão em Execute ou verificadas (foundation → e2e-security-gate). Gate E2E Playwright (`make test-e2e-auth`) entregue na fatia 9; aguarda Verifier. Índice: `.specs/features/bff-auth/README.md`.
+**Progresso (2026-09-18):** concluída. API Laravel Auth (fatias 1–8) e BFF + UI Auth (9 fatias, inclusive o gate E2E Playwright `make test-e2e-auth`) estão entregues e verificadas. Índices: `.specs/features/auth/README.md`, `.specs/features/bff-auth/README.md`.
 
 ### Entregáveis
 
@@ -53,11 +53,11 @@
 - Sessão completa com 7 dias absolutos e 24 horas de inatividade; Restricted Session com 24 horas absolutas e 1 hora de inatividade.
 - Perfil limitado à alteração de nome e revogação de todas as sessões após mudança ou reset de senha.
 - Token Bearer de acesso direto com expiração absoluta e por inatividade conforme o tipo e write throttle de `last_used_at` de 15 minutos.
-- BFF em Next.js Route Handlers com token criptografado no servidor, sessão opaca validada por HMAC e chave externa ao Redis. *(infra + login + cadastro implementados)*
-- Cookie `__Host-` quando aplicável, `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` e sem `Domain`. *(implementado)*
-- Proteção de mutations por allowlist de `Origin` e double-submit CSRF. *(implementado)*
-- Allowlist de rotas do BFF, `returnUrl` interno seguro e garantia de que o token não chega ao browser. *(login + register na allowlist; demais rotas de produto pendentes)*
-- Logout seguro quando Redis ou API falham e invalidação da sessão após perda do Redis. *(destroy/clear cookie implementados; Route Handler de logout pendente)*
+- BFF em Next.js Route Handlers com token criptografado no servidor, sessão opaca validada por HMAC e chave externa ao Redis.
+- Cookie `__Host-` quando aplicável, `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` e sem `Domain`.
+- Proteção de mutations por allowlist de `Origin` e double-submit CSRF.
+- Allowlist de rotas do BFF, `returnUrl` interno seguro e garantia de que o token não chega ao browser.
+- Logout seguro quando Redis ou API falham e invalidação da sessão após perda do Redis.
 - UI server-first de convite, cadastro, verificação, login, recuperação, termos e sessão.
 - React Hook Form com Zod e TanStack Query sem persistência, com defaults documentados e testados.
 - OpenAPI, contratos, testes Pest/Vitest/RTL/MSW/Playwright, acessibilidade e telemetria do fluxo.
@@ -72,7 +72,7 @@
 
 ## Fase 2: Links + Redirect
 
-**Progresso (2026-08-29):** estrutura de specs da API backend criada — 13 fatias seed cobrindo os módulos Laravel `Links` e `Redirects`, ainda sem implementação. O pacote frontend (dashboard de links) será aberto depois. Índice: `.specs/features/links/README.md`.
+**Progresso (2026-09-18):** API backend em andamento. Fatias 1–4 verificadas: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26) e `link-creation` (`POST /api/v1/links`). Fatias 5–13 (`idempotency` → `module-closure`, inclusive redirect público) seguem em seed. O pacote frontend (`bff-links/`) ainda não foi aberto. Índice: `.specs/features/links/README.md`. Superfície HTTP: `docs/api.md` §1.1.
 
 ### Entregáveis
 

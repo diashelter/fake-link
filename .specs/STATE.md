@@ -48,4 +48,4 @@ Todas as 9 fatias do pacote BFF Auth entregues e verificadas. Critérios de saí
 
 ### Fase 2: Links + Redirect — INICIADA
 
-Estrutura de specs da API backend criada em `.specs/features/links/` (índice + 13 fatias seed, catálogo `LNK-01`…`LNK-124`). Fatias 1–4 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (branch `feature/link-creation`, aguardando PR). Fatias 5–13 seguem em status **Seed**. O pacote frontend correspondente (`bff-links/`) será aberto depois.
+Estrutura de specs em `.specs/features/links/` (índice + 13 fatias, catálogo `LNK-01`…`LNK-124`). Fatias 1–4 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (branch `feature/link-creation`, aguardando PR). Superfície HTTP de Links: somente `POST /api/v1/links`. Fatias 5–13 seguem em status **Seed**. O pacote frontend correspondente (`bff-links/`) será aberto depois. Docs de contrato vs runtime: `docs/api.md` §1.1.

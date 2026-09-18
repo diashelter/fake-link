@@ -12,6 +12,8 @@
 - Chaves estrangeiras usam `RESTRICT` por padrão. Exclusões são explícitas e ordenadas; somente tabelas pequenas e inseparáveis de tokens podem usar `CASCADE`.
 - Dados sensíveis em destinos, cache e snapshots de idempotência usam criptografia de aplicação AES-256-GCM, com keyrings separados e rotação de chaves.
 
+Tabelas já migradas em `backend/database/migrations/` (2026-09-18): `users`, `auth_tokens`, `email_action_tokens`, `slug_reservations`, `short_links` e `link_destination_versions`. As tabelas de idempotência, cliques, agregados e auditoria operacional ainda não têm migration.
+
 ## 2. Relacionamentos
 
 ```mermaid

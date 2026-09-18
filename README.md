@@ -4,17 +4,11 @@ Fake Link é um encurtador de URLs com criação e gestão de `Short Links`, red
 
 ## Estado atual
 
-A **Fase 1 Auth Backend API** (`backend/modules/Auth/`) está entregue nas fatias 1–7 (register → verify → login → password → session/profile), com OpenAPI lint (Spectral), contract tests e fechamento documental em andamento na fatia 8 (`auth/module-closure`). Declaração oficial de módulo concluído depende do Verifier dessa fatia.
+A **Fase 1 Auth + BFF** está concluída: API Laravel em `backend/modules/Auth/` (register, verificação, login, senha, sessão e perfil) e frontend BFF/UI em `frontend/modules/auth/`, com OpenAPI, contract tests e gate Playwright `make test-e2e-auth`.
 
-No **frontend Auth + BFF** (`frontend/modules/auth/`), todas as 9 fatias estão em Execute ou verificadas:
+A **Fase 2 Links + Redirect** está em andamento. Quatro fatias da API backend estão verificadas (`foundation`, `slug-policy`, `destination-policy`, `link-creation`). O único endpoint de Links registrado é `POST /api/v1/links`. Listagem, edição, histórico, idempotência e o host curto de redirect ainda não estão na superfície HTTP. Índice: [`.specs/features/links/README.md`](.specs/features/links/README.md). Contrato vs runtime: [`docs/api.md` §1.1](docs/api.md).
 
-- **foundation** — módulos `auth`/`shared`, stack de forms (RHF+Zod), TanStack Query, primitivos UI, gates de qualidade.
-- **session-core** — sessão opaca (cookie `__Host-fl_session`), Bearer cifrado AES-256-GCM no Redis, TTL absoluto/idle, rotação e destroy.
-- **csrf-proxy** — validação de `Origin`, CSRF double-submit, allowlist/proxy upstream, `returnUrl` seguro.
-- **login**, **register**, **email-verification**, **password**, **session-shell** — Route Handlers BFF, UIs e guards verificados.
-- **e2e-security-gate** — suíte Playwright (`make test-e2e-auth`): Bearer ausente no browser, CSRF, Redis flush, TTL e axe WCAG 2.2 AA; Execute concluído, aguarda Verifier.
-
-Detalhes: [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
+Detalhes de Auth: [`.specs/features/auth/README.md`](.specs/features/auth/README.md), [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
 
 Em caso de divergência, [decisions.md](docs/decisions.md) e `.specs/STATE.md` (Decisions AD-NNN) registram a política confirmada; [product.md](docs/product.md) define o comportamento esperado.
 
@@ -120,12 +114,12 @@ CI=true pnpm --dir frontend install
 
 Rode o primeiro comando na **raiz do monorepo**. O segundo instala as ferramentas de lint/format usadas pelo hook no host. Os gates Docker (`make lint`, `make lint-frontend`, `make test-frontend`, `make test-frontend-coverage`) continuam obrigatórios independentemente dos hooks.
 
-Checklist BFF Auth (estado atual — fatias 1–9 em Execute ou verificadas):
+Checklist BFF Auth (Fase 1 concluída):
 
 - Todos os Route Handlers Auth de produto implementados (`/api/bff/auth/login`, register, email/verify, email/resend, password/*, logout, logout-all, me)
 - Sem Radix UI (adiado além da fundação)
 - Bearer token nunca exposto ao browser (facade server-only + testes Vitest + suíte Playwright `make test-e2e-auth`)
-- Gate E2E Playwright entregue: Bearer ausente, CSRF, Redis flush, TTL, axe WCAG 2.2 AA (fatia `e2e-security-gate`)
+- Gate E2E Playwright entregue e verificado: Bearer ausente, CSRF, Redis flush, TTL, axe WCAG 2.2 AA (fatia `e2e-security-gate`)
 
 Perfis Compose: `test` (CI isolado), `docs`, `benchmark`, `observability`. Produção usa `docker-compose.prod.yml`. Build multiarch: `docker/scripts/build-multiarch.sh`.
 

@@ -97,10 +97,9 @@ Os nomes exatos dos domínios serão definidos antes do lançamento.
 ## 8. Interface
 
 - Landing page estática e concisa. *(implementada)*
-- Fluxos de login e cadastro. *(implementados — BFF + UI `/login`, `/register`, `/terms`)*
-- Fluxos de verificação, forgot password e reset password. *(pendentes — demais fatias BFF Auth na Fase 1)*
-- Lista e criação de links.
-- Detalhe do link com abas Overview, Analytics e History.
+- Fluxos de login, cadastro, verificação, recuperação de senha, perfil e sessão. *(implementados — BFF + UI)*
+- Lista e criação de links. *(criação via API `POST /api/v1/links`; UI e demais endpoints de Links pendentes na Fase 2)*
+- Detalhe do link com abas Overview, Analytics e History. *(pendente — Fase 2/3)*
 - Interface somente em pt-BR e tema somente claro.
 - Layout funcional a partir de 360 px e compatível com as duas versões mais recentes dos browsers suportados.
 - Conformidade com WCAG 2.2 AA.

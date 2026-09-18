@@ -10,6 +10,22 @@
 - Não há CORS entre origens: clientes acessam a API no próprio host e integrações server-to-server não dependem de CORS.
 - A licença da especificação é MIT.
 
+O restante deste documento descreve o contrato design-first do MVP. A superfície Laravel realmente registrada em 2026-09-18 é menor: Auth completo e somente `POST /api/v1/links`. Detalhe em [Superfície entregue](#11-superfície-entregue).
+
+### 1.1. Superfície entregue
+
+| Área | Runtime Laravel | Observação |
+| --- | --- | --- |
+| Auth e `GET`/`PATCH /api/v1/me` | Entregue | Todos os endpoints da [§3](#3-autenticação-e-conta) |
+| `POST /api/v1/links` | Entregue | Token `session`; política de slug e destino; cifra AES-256-GCM; transação reserva + link + primeira versão; `201` com `Location`, `ETag` e `LinkDetail`; `409 ALIAS_UNAVAILABLE`; `503 SLUG_GENERATION_FAILED`; 60 criações/min por conta |
+| `Idempotency-Key` em `POST /links` | Contrato apenas | Header documentado; a fatia de idempotência ainda não processa o valor |
+| `GET`/`PATCH /api/v1/links`, `GET …/history` | Contrato apenas | Rotas ainda não registradas |
+| Host curto (`GET`/`HEAD /{slug}`, `/`, `/robots.txt`) | Scaffold | Módulo `Redirects` existe sem resolução efetiva |
+| Analytics privados | Contrato apenas | Módulo `Analytics` ainda não existe |
+| Operations | Fora desta OpenAPI | Módulo ainda não existe |
+
+O Swagger em `/docs` continua mostrando o contrato completo. Caminhos ainda não registrados não fazem parte da superfície de runtime.
+
 ## 2. Convenções gerais
 
 - JSON em UTF-8 é usado na API. Redirects públicos retornam `302` ou HTML mínimo nos erros.
@@ -68,6 +84,8 @@ Exemplo de validação:
 
 ## 3. Autenticação e conta
 
+Todos os endpoints desta seção estão implementados em `backend/modules/Auth/`.
+
 ### 3.1. Tokens
 
 A API aceita `Authorization: Bearer <token>`. Existem somente dois tipos de token:
@@ -104,6 +122,8 @@ Senhas possuem de 12 a 128 caracteres e devem conter pelo menos uma letra ASCII 
 O usuário retornado contém `id`, `name`, `email`, `status`, `email_verified_at`, `terms_version`, `terms_accepted_at`, `created_at` e `updated_at`. Os estados públicos são `pending_verification`, `active`, `suspended` e `deletion_pending`.
 
 ## 4. Links
+
+Runtime atual: somente `POST /api/v1/links`. Listagem, detalhe, atualização, histórico e replay idempotente permanecem no contrato.
 
 ### 4.1. Endpoints
 
@@ -182,6 +202,8 @@ Aliases personalizados têm de 3 a 48 caracteres, usam letras ASCII, números e 
 
 ## 5. Redirect público
 
+A superfície abaixo é contrato do host curto. O módulo `Redirects` está no scaffold da Fase 2; as rotas efetivas de resolução ainda não estão registradas.
+
 O host curto não usa `/api/v1`:
 
 | Método | Caminho | Comportamento |
@@ -203,6 +225,8 @@ Respostas de erro são HTML mínimo, sem destino ou dados do proprietário, mas 
 Outros métodos retornam `405 METHOD_NOT_ALLOWED`. HSTS permanece ausente permanentemente. Todas as páginas do host da aplicação devem usar `noindex`; isso é uma responsabilidade do frontend e não uma rota da API.
 
 ## 6. Analytics privados
+
+Contrato da Fase 3. Nenhum endpoint desta seção está registrado.
 
 Somente o proprietário pode consultar:
 
