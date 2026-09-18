@@ -20,7 +20,7 @@ O restante deste documento descreve o contrato design-first do MVP. A superfíci
 | `POST /api/v1/links` | Entregue | Token `session`; política de slug e destino; cifra AES-256-GCM; transação reserva + link + primeira versão; `201` com `Location`, `ETag` e `LinkDetail`; `409 ALIAS_UNAVAILABLE`; `503 SLUG_GENERATION_FAILED`; 60 criações/min por conta |
 | `GET /api/v1/links` | Entregue | Token `session`; cursor assinado; busca e filtro de estado efetivo; `LinkSummary` sem destino; 300 leituras/min por token |
 | `GET /api/v1/links/{link}` | Entregue | Token `session`; `LinkDetail` com destino e `ETag` forte; `404` uniforme; `503` se o envelope não decifrar; compartilha o limite de leitura |
-| `Idempotency-Key` em `POST /links` | Contrato apenas | Header documentado; a fatia de idempotência ainda não processa o valor |
+| `Idempotency-Key` em `POST /links` | Entregue | Replay cifrado por 24 h; `409 IDEMPOTENCY_KEY_REUSED` se o fingerprint divergir |
 | `PATCH /api/v1/links/{link}`, `GET …/history` | Contrato apenas | Rotas ainda não registradas |
 | Host curto (`GET`/`HEAD /{slug}`, `/`, `/robots.txt`) | Scaffold | Módulo `Redirects` existe sem resolução efetiva |
 | Analytics privados | Contrato apenas | Módulo `Analytics` ainda não existe |
@@ -125,7 +125,7 @@ O usuário retornado contém `id`, `name`, `email`, `status`, `email_verified_at
 
 ## 4. Links
 
-Runtime atual: `POST /api/v1/links`, `GET /api/v1/links` e `GET /api/v1/links/{link}`. Atualização, histórico e replay idempotente permanecem no contrato.
+Runtime atual: `POST /api/v1/links` (com `Idempotency-Key`), `GET /api/v1/links` e `GET /api/v1/links/{link}`. Atualização e histórico permanecem no contrato.
 
 ### 4.1. Endpoints
 

@@ -6,7 +6,7 @@ Fake Link é um encurtador de URLs com criação e gestão de `Short Links`, red
 
 A **Fase 1 Auth + BFF** está concluída: API Laravel em `backend/modules/Auth/` (register, verificação, login, senha, sessão e perfil) e frontend BFF/UI em `frontend/modules/auth/`, com OpenAPI, contract tests e gate Playwright `make test-e2e-auth`.
 
-A **Fase 2 Links + Redirect** está em andamento. Quatro fatias da API backend estão verificadas (`foundation`, `slug-policy`, `destination-policy`, `link-creation`). O único endpoint de Links registrado é `POST /api/v1/links`. Listagem, edição, histórico, idempotência e o host curto de redirect ainda não estão na superfície HTTP. Índice: [`.specs/features/links/README.md`](.specs/features/links/README.md). Contrato vs runtime: [`docs/api.md` §1.1](docs/api.md).
+A **Fase 2 Links + Redirect** está em andamento. Seis fatias da API backend estão verificadas (`foundation`, `slug-policy`, `destination-policy`, `link-creation`, `idempotency`, `link-queries`). Superfície HTTP de Links: `POST /api/v1/links` (com `Idempotency-Key`), `GET /api/v1/links` e `GET /api/v1/links/{link}`. Edição, histórico, BFF/UI de links e o host curto de redirect ainda não estão registrados. Índice: [`.specs/features/links/README.md`](.specs/features/links/README.md). Contrato vs runtime: [`docs/api.md` §1.1](docs/api.md).
 
 Detalhes de Auth: [`.specs/features/auth/README.md`](.specs/features/auth/README.md), [`.specs/features/bff-auth/README.md`](.specs/features/bff-auth/README.md) e [`docs/architecture.md` §8.1](docs/architecture.md).
 
@@ -97,6 +97,8 @@ O script gera os certificados em `docker/nginx/certs/` e imprime o comando de im
 | `make test-backend-coverage` | Pest com cobertura PCOV no container backend |
 | `make test` | Pest, Vitest, compose gates e smoke |
 | `make test-backend` / `make test-frontend` | Suites isoladas |
+| `make test-e2e-auth` | Playwright Auth (perfil `e2e`) |
+| `make test-e2e-links` | Playwright listagem e detalhe de links (perfil `e2e`) |
 | `make logs` / `make ps` | Observabilidade operacional |
 
 CI backend: workflow [`.github/workflows/backend-quality.yml`](.github/workflows/backend-quality.yml) (PR e push em `main`) executa os mesmos targets via Docker Compose — sem PHP/Composer no host do runner.

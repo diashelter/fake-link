@@ -157,6 +157,7 @@ Migrations em `backend/database/migrations/` — introduzidas progressivamente:
 | `short_links` | foundation |
 | `link_destination_versions` | foundation (esquema); destination-policy (cifra e normalização) |
 | `idempotency_keys` | idempotency |
+| Índices de consulta em `short_links` (`pg_trgm`, GIN de título, keyset, prefixo de slug) | link-queries |
 
 Detalhes de campos: `docs/data-model.md` §4 e §7.
 

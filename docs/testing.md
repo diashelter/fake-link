@@ -57,6 +57,7 @@ Os testes de arquitetura devem falhar quando:
 
 - Playwright cobre login, recuperação, criação e gestão de links, redirect, conflito de edição e dashboard de analytics.
 - **`make test-e2e-auth`** é o gate de saída da Fase 1 (Auth + BFF): executa a suíte Playwright do perfil `e2e` (`docker-compose.e2e.yml`) cobrindo Bearer ausente no browser/HTML/storage, CSRF, Origin, cookie, returnUrl, flush Redis, TTL absoluto/idle, guards de sessão e axe WCAG 2.2 AA nos fluxos críticos. O workflow `.github/workflows/frontend-e2e.yml` executa esse target em cada PR e push em `main`.
+- **`make test-e2e-links`** cobre listagem paginada e detalhe autorizados no mesmo perfil `e2e`, incluindo isolamento entre contas e varredura de vazamento de Bearer/cookie nos artefatos. Ainda não há workflow de CI dedicado; o target roda na composição efêmera Docker.
 - Snapshots visuais Playwright são restritos a estados críticos e estáveis, em viewport de 360 px e em desktop. Dados, relógio, fontes, animações e rede devem estar estabilizados.
 - Antes de release, BrowserStack executa as versões atual e anterior de Chrome, Edge, Firefox e Safari em desktop e iOS nas combinações aplicáveis.
 - Estados dinâmicos, animações e dashboards com dados não determinísticos não entram em snapshots visuais.
@@ -162,6 +163,12 @@ Warnings novos não são aceitos como forma de aprovação do pipeline.
 - Criação, primeira versão, reserva e idempotência são confirmadas na mesma transação.
 - `Idempotency-Key` é escopada por usuário. O fingerprint é HMAC do método, rota e payload normalizado; material de replay é criptografado.
 - Repetição exata dentro da validade retorna exatamente status, headers e body originais, sem novo link. Payload normalizado diferente com a mesma chave retorna `409`.
+- `GET /api/v1/links` pagina por cursor assinado na ordem `created_at DESC, id DESC`, com `per_page` 1–100 (padrão 20) e `meta` somente `next_cursor` e `per_page`.
+- `search` casa substring de título ou prefixo de slug sem diferenciar caixa e diferenciando acentos; `status` filtra o estado efetivo derivado no mesmo `now()` UTC.
+- Cursor inválido, adulterado ou de outro filtro retorna `422` com `errors.cursor[0].code = INVALID_CURSOR` e não consulta dados.
+- `LinkSummary` nunca inclui destino, `ETag` ou versão; a listagem não decifra `Destination`.
+- `GET /api/v1/links/{link}` devolve `LinkDetail` e o mesmo `ETag` da criação; recurso ausente ou alheio produz o mesmo `404`; envelope ilegível produz `503` sem corpo parcial.
+- Leituras privadas compartilham o limite de 300/min por token.
 - Atualizações de título, destino, habilitação e expiração exigem `If-Match`; ausência retorna `428` e versão obsoleta retorna `412`.
 - Alteração efetiva incrementa a versão e produz novo `ETag`. No-op não incrementa versão, não cria histórico e não invalida cache sem necessidade.
 - Duas atualizações concorrentes não perdem dados; somente uma confirma com o mesmo `ETag`.

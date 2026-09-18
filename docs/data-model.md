@@ -12,7 +12,7 @@
 - Chaves estrangeiras usam `RESTRICT` por padrão. Exclusões são explícitas e ordenadas; somente tabelas pequenas e inseparáveis de tokens podem usar `CASCADE`.
 - Dados sensíveis em destinos, cache e snapshots de idempotência usam criptografia de aplicação AES-256-GCM, com keyrings separados e rotação de chaves.
 
-Tabelas já migradas em `backend/database/migrations/` (2026-09-18): `users`, `auth_tokens`, `email_action_tokens`, `slug_reservations`, `short_links` e `link_destination_versions`. As tabelas de idempotência, cliques, agregados e auditoria operacional ainda não têm migration.
+Tabelas já migradas em `backend/database/migrations/` (2026-09-18): `users`, `auth_tokens`, `email_action_tokens`, `slug_reservations`, `short_links`, `link_destination_versions` e `idempotency_keys`. As tabelas de cliques, agregados e auditoria operacional ainda não têm migration.
 
 ## 2. Relacionamentos
 
@@ -207,6 +207,8 @@ Não existe endpoint para excluir um link. O estado efetivo não é persistido e
 2. `expired`, quando não bloqueado e `expires_at <= now()`.
 3. `inactive`, quando não bloqueado, não expirado e `is_enabled = false`.
 4. `active`, nos demais casos.
+
+Índices de consulta (fatia `link-queries`): extensão `pg_trgm`; GIN em `lower(title)` com `gin_trgm_ops`; B-tree `(user_id, created_at DESC, id DESC)` para keyset; `(user_id, slug varchar_pattern_ops)` para prefixo de slug.
 
 O motivo de um bloqueio administrativo fica somente em `audit_events`, não no recurso. O proprietário pode editar título, destino, expiração e habilitação de um link bloqueado, mas essas alterações não limpam `blocked_at` nem tornam o redirect disponível.
 
