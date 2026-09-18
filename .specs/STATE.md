@@ -28,10 +28,10 @@
 
 ## Handoff
 
-- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute 🔄 (Batch 1/3 em andamento: fases 1+2, T1–T6)
-- **Completed**: `links/foundation`, `links/slug-policy` (PR #25) e `links/destination-policy` (PR #26) em `main`. Fatia 4 (`link-creation`) em execução com 3 batch workers sequenciais (~7 tasks).
-- **In progress**: Batch Worker 1 — T1–T6 (config, contrato SLUG_GENERATION_FAILED, ApiFormRequest errorCodes, EffectiveStatus, LinkETag, DTOs). T1–T2 done; T3+ in progress.
-- **Next step**: ao concluir Batch 1 → despachar Batch 2 (T7–T14); depois Batch 3 (T15–T17); Verifier automático após T17.
+- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute 🔄 (Batch 2/3 em andamento: fases 3+4, T7–T14)
+- **Completed**: Batch 1 T1–T6 (`46e081a9`…`bab6897c`, 857 testes). Pré-requisitos: foundation, slug-policy (PR #25), destination-policy (PR #26).
+- **In progress**: Batch Worker 2 — T7–T14 (repos, CreateLink UseCase, HTTP surface, rate limit).
+- **Next step**: ao concluir Batch 2 → despachar Batch 3 (T15–T17); Verifier automático após T17.
 - **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
 - **Branch**: `feature/link-creation` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26

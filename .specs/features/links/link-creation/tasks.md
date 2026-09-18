@@ -98,10 +98,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `links.short_url.base_url` lê `SHORT_URL_BASE` com fallback `https://{SHORT_HOST}`
-- [ ] `links.rate_limits.create` = `{max_attempts: 60, decay_seconds: 60}`
-- [ ] `SHORT_URL_BASE` presente em `.env.example` e na lista de `validate-env.sh`
-- [ ] Gate: `make lint`
+- [x] `links.short_url.base_url` lê `SHORT_URL_BASE` com fallback `https://{SHORT_HOST}`
+- [x] `links.rate_limits.create` = `{max_attempts: 60, decay_seconds: 60}`
+- [x] `SHORT_URL_BASE` presente em `.env.example` e na lista de `validate-env.sh`
+- [x] Gate: `make lint`
 
 **Tests**: none · **Gate**: build  
 **Commit**: `feat(links): add module configuration for short url and creation limits`
@@ -120,9 +120,9 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `SLUG_GENERATION_FAILED` listado em `docs/api.md` §7
-- [ ] Exemplo na resposta `503` de `createLink`, com `Retry-After` documentado
-- [ ] Gate: `make lint-openapi` passa sem novos warnings
+- [x] `SLUG_GENERATION_FAILED` listado em `docs/api.md` §7
+- [x] Exemplo na resposta `503` de `createLink`, com `Retry-After` documentado
+- [x] Gate: `make lint-openapi` passa sem novos warnings
 
 **Tests**: none · **Gate**: build  
 **Commit**: `docs(api): document SLUG_GENERATION_FAILED for link creation`
@@ -141,10 +141,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] `errorCodes()` mapeia campo+regra para código estável; ausência do mapa mantém `'INVALID'`
-- [ ] Teste de regressão prova que os `FormRequest` do Auth continuam emitindo `'INVALID'`
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥6 testes passam (sem deleções silenciosas)
+- [x] `errorCodes()` mapeia campo+regra para código estável; ausência do mapa mantém `'INVALID'`
+- [x] Teste de regressão prova que os `FormRequest` do Auth continuam emitindo `'INVALID'`
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥6 testes passam (sem deleções silenciosas)
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(api): allow form requests to declare stable per-field error codes`
@@ -165,11 +165,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Precedência de `docs/data-model.md` §4 coberta nas quatro combinações e nos empates
-- [ ] `expires_at == now()` resolve como `expired` (limite exclusivo)
-- [ ] `Domain` sem `config()` nem Eloquent (Pest Arch)
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] Precedência de `docs/data-model.md` §4 coberta nas quatro combinações e nos empates
+- [x] `expires_at == now()` resolve como `expired` (limite exclusivo)
+- [x] `Domain` sem `config()` nem Eloquent (Pest Arch)
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): derive effective link status in the domain`
@@ -188,12 +188,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Formato forte casa `^"[^"]+"$` e não usa prefixo `W/`
-- [ ] Determinismo: mesmo estado → mesmo valor; teste de sensibilidade para **cada** campo da tupla
-- [ ] Estado efetivo entra no cálculo (bloqueio e expiração alteram o valor)
-- [ ] Teste prova que `version`, `user_id` e a URL de destino não são recuperáveis do valor
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥12 testes passam
+- [x] Formato forte casa `^"[^"]+"$` e não usa prefixo `W/`
+- [x] Determinismo: mesmo estado → mesmo valor; teste de sensibilidade para **cada** campo da tupla
+- [x] Estado efetivo entra no cálculo (bloqueio e expiração alteram o valor)
+- [x] Teste prova que `version`, `user_id` e a URL de destino não são recuperáveis do valor
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥12 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): compute opaque strong etag from effective link state`
@@ -212,10 +212,10 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] DTOs `final readonly`, com tipos estritos e sem lógica
-- [ ] Teste prova que `CreatedLinkDto` carrega estado suficiente para ETag e para o Resource
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥3 testes passam
+- [x] DTOs `final readonly`, com tipos estritos e sem lógica
+- [x] Teste prova que `CreatedLinkDto` carrega estado suficiente para ETag e para o Resource
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥3 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): add create link input and output dtos`
