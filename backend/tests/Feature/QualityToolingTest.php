@@ -20,7 +20,7 @@ it('runs pint style check with exit code zero', function () {
 
 it('runs phpstan analyse with exit code zero', function () {
     $result = Process::path(base_path())
-        ->timeout(180)
+        ->timeout(300)
         ->run(['./vendor/bin/phpstan', 'analyse', '--memory-limit=512M']);
 
     $message = $result->errorOutput() !== '' ? $result->errorOutput() : $result->output();

@@ -117,11 +117,11 @@ T7 → T8 → T9
 
 **Tools:** MCP: Context7 · Skill: `tlc-spec-driven`  
 **Done when:**
-- [ ] UseCase não importa facade Laravel nem inicia transação.
-- [ ] Adaptador `TransactionManager` faz rollback em exceção e o provider registra o binding.
-- [ ] A criação atual ainda confirma reserva, link e versão numa única transação.
-- [ ] Testes de rollback existentes permanecem verdes e novos testes provam que a transação externa inclui todas as três linhas.
-- [ ] Gate: `make test-backend`.
+- [x] UseCase não importa facade Laravel nem inicia transação.
+- [x] Adaptador `TransactionManager` faz rollback em exceção e o provider registra o binding.
+- [x] A criação atual ainda confirma reserva, link e versão numa única transação.
+- [x] Testes de rollback existentes permanecem verdes e novos testes provam que a transação externa inclui todas as três linhas.
+- [x] Gate: `make test-backend`.
 
 **Tests:** integration · **Gate:** full  
 **Commit:** `refactor(links): expose link creation transaction boundary`

@@ -6,10 +6,10 @@ namespace Modules\Links\UseCases;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Illuminate\Support\Facades\DB;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
 use Modules\Links\Contracts\Repositories\ShortLinkRepository;
+use Modules\Links\Contracts\Services\TransactionManager;
 use Modules\Links\Domain\Services\EffectiveStatus;
 use Modules\Links\Domain\Services\PublicHostClassifier;
 use Modules\Links\Domain\ValueObjects\DestinationUrl;
@@ -21,7 +21,7 @@ use Modules\Links\Exceptions\SlugUnavailable;
 /**
  * Creates a short link: seals the destination outside the transaction, then
  * reserves the slug, inserts the link, and opens the first destination version
- * in a single transaction.
+ * in a single transaction (owned here or joined from an outer TransactionManager).
  */
 final readonly class CreateLink
 {
@@ -32,6 +32,7 @@ final readonly class CreateLink
         private ShortLinkRepository $shortLinks,
         private DestinationVersionRepository $destinationVersions,
         private EffectiveStatus $effectiveStatus,
+        private TransactionManager $transactions,
     ) {}
 
     /**
@@ -44,7 +45,7 @@ final readonly class CreateLink
         $encrypted = ($this->sealDestinationUrl)($input->destinationUrl);
         $normalizedDestination = DestinationUrl::fromString($input->destinationUrl, $this->hosts)->value();
 
-        return DB::transaction(function () use ($ownerId, $input, $encrypted, $normalizedDestination): CreatedLinkDto {
+        return $this->transactions->run(function () use ($ownerId, $input, $encrypted, $normalizedDestination): CreatedLinkDto {
             $slug = $input->customAlias !== null
                 ? $this->reserveSlug->forAlias($input->customAlias)
                 : $this->reserveSlug->automatic();

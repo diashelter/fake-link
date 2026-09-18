@@ -11,6 +11,7 @@ use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
 use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Services\DestinationCipher;
 use Modules\Links\Contracts\Services\RandomSlugSource;
+use Modules\Links\Contracts\Services\TransactionManager;
 use Modules\Links\Domain\Enums\LinkStatus;
 use Modules\Links\Domain\Enums\SlugSource;
 use Modules\Links\Domain\Services\EffectiveStatus;
@@ -124,6 +125,7 @@ function makeCreateLink(
             new LinkDestinationVersionMapper,
         ),
         effectiveStatus: new EffectiveStatus,
+        transactions: app(TransactionManager::class),
     );
 }
 
@@ -242,6 +244,7 @@ describe('CreateLink transactional integrity', function () {
             $shortLinks,
             $versions,
             new EffectiveStatus,
+            app(TransactionManager::class),
         );
 
         $threw = null;
@@ -293,6 +296,7 @@ describe('CreateLink transactional integrity', function () {
                 new LinkDestinationVersionMapper,
             ),
             new EffectiveStatus,
+            app(TransactionManager::class),
         );
 
         $threw = null;
@@ -354,6 +358,59 @@ describe('CreateLink transactional integrity', function () {
             title: null,
             expiresAt: null,
         )))->toThrow(LinksDomainException::class);
+
+        expect(tableCounts())->toBe(['reservations' => 0, 'links' => 0, 'versions' => 0]);
+    });
+
+    it('participates in an outer transaction so all three rows share one unit of work', function () {
+        $owner = createLinkOwner();
+        $useCase = makeCreateLink(new CreateLinkSequencedSlugSource(['outer001']));
+
+        $levelBefore = DB::transactionLevel();
+        DB::beginTransaction();
+        $levelOpened = DB::transactionLevel();
+
+        try {
+            $result = $useCase->execute($owner, new CreateLinkInput(
+                destinationUrl: 'https://example.com/outer',
+                customAlias: null,
+                title: null,
+                expiresAt: null,
+            ));
+
+            // CreateLink's boundary completes (SAVEPOINT released) without leaving an extra open level.
+            expect($result->slug)->toBe('outer001')
+                ->and(tableCounts())->toBe(['reservations' => 1, 'links' => 1, 'versions' => 1])
+                ->and(DB::transactionLevel())->toBe($levelOpened);
+
+            DB::rollBack();
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        expect(DB::transactionLevel())->toBe($levelBefore)
+            ->and(tableCounts())->toBe(['reservations' => 0, 'links' => 0, 'versions' => 0]);
+    });
+
+    it('rolls back reservation, link, and version together when the outer transaction aborts', function () {
+        $owner = createLinkOwner();
+        $useCase = makeCreateLink(new CreateLinkSequencedSlugSource(['outer002']));
+
+        DB::beginTransaction();
+
+        try {
+            $useCase->execute($owner, new CreateLinkInput(
+                destinationUrl: 'https://example.com/outer-abort',
+                customAlias: null,
+                title: null,
+                expiresAt: null,
+            ));
+
+            expect(tableCounts())->toBe(['reservations' => 1, 'links' => 1, 'versions' => 1]);
+        } finally {
+            DB::rollBack();
+        }
 
         expect(tableCounts())->toBe(['reservations' => 0, 'links' => 0, 'versions' => 0]);
     });

@@ -19,6 +19,7 @@ use Modules\Links\Contracts\Services\LinkDestinationVersionIdGenerator;
 use Modules\Links\Contracts\Services\RandomSlugSource;
 use Modules\Links\Contracts\Services\ReservedSlugs;
 use Modules\Links\Contracts\Services\ShortLinkIdGenerator;
+use Modules\Links\Contracts\Services\TransactionManager;
 use Modules\Links\Domain\Services\CanonicalCreateLinkCommand;
 use Modules\Links\Domain\Services\EffectiveStatus;
 use Modules\Links\Domain\Services\LinkETag;
@@ -40,6 +41,7 @@ use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentDesti
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentIdempotencyKeyRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentShortLinkRepository;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Repositories\EloquentSlugReservationRepository;
+use Modules\Links\Infrastructure\Persistence\LaravelTransactionManager;
 use Modules\Links\Infrastructure\Slug\ConfigReservedSlugs;
 use Modules\Links\Infrastructure\Slug\CsprngSlugSource;
 use Modules\Links\Infrastructure\Telemetry\LinkCreationMetrics;
@@ -57,6 +59,7 @@ final class LinksServiceProvider extends ServiceProvider
         LinkDestinationVersionIdGenerator::class => Uuid7LinkDestinationVersionIdGenerator::class,
         DestinationCipher::class => Aes256GcmDestinationCipher::class,
         IdempotencySnapshotCipher::class => Aes256GcmIdempotencySnapshotCipher::class,
+        TransactionManager::class => LaravelTransactionManager::class,
         ReservedSlugs::class => ConfigReservedSlugs::class,
         RandomSlugSource::class => CsprngSlugSource::class,
         SlugReservationRepository::class => EloquentSlugReservationRepository::class,
@@ -127,6 +130,7 @@ final class LinksServiceProvider extends ServiceProvider
             $app->make(ShortLinkRepository::class),
             $app->make(DestinationVersionRepository::class),
             $app->make(EffectiveStatus::class),
+            $app->make(TransactionManager::class),
         ));
 
         $this->app->bind(ShortLinkMapper::class);
