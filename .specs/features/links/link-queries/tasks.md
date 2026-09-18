@@ -148,11 +148,11 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Lista emite cursor somente quando houver página seguinte.
-- [ ] Detalhe calcula o `ETag` com a mesma tupla da criação.
-- [ ] Decriptação ocorre apenas no detalhe já scoped ao owner; falha não produz DTO parcial.
-- [ ] Unit/integration tests cobrem estado temporal e corrupção de envelope.
-- [ ] Gate full passa.
+- [x] Lista emite cursor somente quando houver página seguinte.
+- [x] Detalhe calcula o `ETag` com a mesma tupla da criação.
+- [x] Decriptação ocorre apenas no detalhe já scoped ao owner; falha não produz DTO parcial.
+- [x] Unit/integration tests cobrem estado temporal e corrupção de envelope.
+- [x] Gate full passa.
 
 **Tests**: unit + integration  
 **Gate**: full  

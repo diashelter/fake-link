@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Modules\Links\Domain\Enums\LinkStatus;
 use Modules\Links\Domain\Enums\SlugSource;
 use Modules\Links\DTOs\Output\CreatedLinkDto;
+use Modules\Links\DTOs\Output\LinkDetailDto;
 use Modules\Links\Infrastructure\Http\Resources\LinkDetailResource;
 use Modules\Links\Infrastructure\Http\Responses\LinkResponseFactory;
 use Tests\TestCase;
@@ -93,6 +94,42 @@ describe('LinkDetailResource', function () {
 
         expect($array['slug_source'])->toBe('custom')
             ->and($array['status'])->toBe('active');
+    });
+
+    it('serializes a read LinkDetailDto with destination_url and without version, blocked_at or user_id', function () {
+        $dto = new LinkDetailDto(
+            id: '01900000-0000-7000-8000-000000000001',
+            slug: 'abc12def',
+            slugSource: SlugSource::Automatic,
+            destinationUrl: 'https://example.com/path',
+            title: 'Hello',
+            isEnabled: true,
+            status: LinkStatus::Active,
+            expiresAt: new DateTimeImmutable('2030-01-01T00:00:00Z'),
+            createdAt: new DateTimeImmutable('2026-06-15T10:30:00Z'),
+            updatedAt: new DateTimeImmutable('2026-06-15T10:30:00Z'),
+        );
+
+        $array = LinkDetailResource::toArray($dto);
+
+        expect(array_keys($array))->toBe([
+            'id',
+            'slug',
+            'short_url',
+            'destination_url',
+            'title',
+            'slug_source',
+            'is_enabled',
+            'status',
+            'expires_at',
+            'created_at',
+            'updated_at',
+        ])
+            ->and($array['destination_url'])->toBe('https://example.com/path')
+            ->and($array['created_at'])->toBe('2026-06-15T10:30:00Z')
+            ->and($array)->not->toHaveKey('version')
+            ->and($array)->not->toHaveKey('blocked_at')
+            ->and($array)->not->toHaveKey('user_id');
     });
 });
 
