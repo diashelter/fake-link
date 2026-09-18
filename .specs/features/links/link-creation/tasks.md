@@ -331,12 +331,12 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Corpo contém exatamente os campos de `LinkDetail`; sem `version`, `blocked_at`, `user_id` ou analytics
-- [ ] `short_url` = `{links.short_url.base_url}/{slug}`; teste prova independência do host do request
-- [ ] Datas em ISO 8601 UTC com sufixo `Z`
-- [ ] `Location: /api/v1/links/{id}`, `ETag` forte, `Cache-Control: private, no-store`, `X-Request-ID` presentes
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥10 testes passam
+- [x] Corpo contém exatamente os campos de `LinkDetail`; sem `version`, `blocked_at`, `user_id` ou analytics
+- [x] `short_url` = `{links.short_url.base_url}/{slug}`; teste prova independência do host do request
+- [x] Datas em ISO 8601 UTC com sufixo `Z`
+- [x] `Location: /api/v1/links/{id}`, `ETag` forte, `Cache-Control: private, no-store`, `X-Request-ID` presentes
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥10 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): serialize link detail and creation response headers`
