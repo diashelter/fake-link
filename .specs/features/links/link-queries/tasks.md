@@ -74,10 +74,10 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Migration é criada pelo Artisan dentro do container e é reversível.
-- [ ] PostgreSQL de teste tem extensão e índices necessários.
-- [ ] Teste de integração prova a estrutura e `EXPLAIN` da busca/ordenação usa índice compatível.
-- [ ] Gate full passa sem remover testes existentes.
+- [x] Migration é criada pelo Artisan dentro do container e é reversível.
+- [x] PostgreSQL de teste tem extensão e índices necessários.
+- [x] Teste de integração prova a estrutura e `EXPLAIN` da busca/ordenação usa índice compatível.
+- [x] Gate full passa sem remover testes existentes.
 
 **Tests**: integration  
 **Gate**: full  
