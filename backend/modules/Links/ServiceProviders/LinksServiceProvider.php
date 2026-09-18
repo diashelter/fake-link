@@ -11,6 +11,8 @@ use Modules\Links\Contracts\Repositories\DestinationVersionRepository;
 use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
 use Modules\Links\Contracts\Repositories\ShortLinkRepository;
 use Modules\Links\Contracts\Repositories\SlugReservationRepository;
+use Modules\Links\Contracts\Services\CursorCodec;
+use Modules\Links\Contracts\Services\CursorSigningKey;
 use Modules\Links\Contracts\Services\DestinationCipher;
 use Modules\Links\Contracts\Services\ETagSigningKey;
 use Modules\Links\Contracts\Services\IdempotencyHmacSecrets;
@@ -29,6 +31,7 @@ use Modules\Links\Domain\Services\SlugPolicy;
 use Modules\Links\Infrastructure\Console\Commands\PruneExpiredIdempotencyKeys;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmDestinationCipher;
 use Modules\Links\Infrastructure\Crypto\Aes256GcmIdempotencySnapshotCipher;
+use Modules\Links\Infrastructure\Crypto\ConfigCursorSigningKey;
 use Modules\Links\Infrastructure\Crypto\ConfigETagSigningKey;
 use Modules\Links\Infrastructure\Crypto\ConfigIdempotencyHmacSecrets;
 use Modules\Links\Infrastructure\Crypto\DestinationKeyring;
@@ -37,6 +40,7 @@ use Modules\Links\Infrastructure\Http\Responses\LinkCreationSnapshotFactory;
 use Modules\Links\Infrastructure\Http\Responses\LinkResponseFactory;
 use Modules\Links\Infrastructure\Identity\Uuid7LinkDestinationVersionIdGenerator;
 use Modules\Links\Infrastructure\Identity\Uuid7ShortLinkIdGenerator;
+use Modules\Links\Infrastructure\Pagination\HmacCursorCodec;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\IdempotencyKeyMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\LinkDestinationVersionMapper;
 use Modules\Links\Infrastructure\Persistence\Eloquent\Mappers\ShortLinkMapper;
@@ -100,6 +104,14 @@ final class LinksServiceProvider extends ServiceProvider
 
         $this->app->singleton(ETagSigningKey::class, fn (): ETagSigningKey => new ConfigETagSigningKey(
             (string) config('links.etag_hmac_key'),
+        ));
+
+        $this->app->singleton(CursorSigningKey::class, fn (): CursorSigningKey => new ConfigCursorSigningKey(
+            (string) config('links.cursor_hmac_key'),
+        ));
+
+        $this->app->singleton(CursorCodec::class, fn (Application $app): CursorCodec => new HmacCursorCodec(
+            $app->make(CursorSigningKey::class),
         ));
 
         $this->app->singleton(LinkETag::class, fn (Application $app): LinkETag => new LinkETag(

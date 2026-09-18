@@ -98,11 +98,11 @@ T5 + T6 + T7 → T8
 - Skill: `tlc-spec-driven`
 
 **Done when**:
-- [ ] Cursor contém somente versão, âncora e escopo exigidos; não contém `user_id`.
-- [ ] Assinatura, formato, tipos, versão e escopo inválidos falham com erro específico.
-- [ ] `search` e `status` normalizados são vinculados; `per_page` não é.
-- [ ] Unit tests cobrem todos os ramos e os limites da SPEC.
-- [ ] Gate quick passa.
+- [x] Cursor contém somente versão, âncora e escopo exigidos; não contém `user_id`.
+- [x] Assinatura, formato, tipos, versão e escopo inválidos falham com erro específico.
+- [x] `search` e `status` normalizados são vinculados; `per_page` não é.
+- [x] Unit tests cobrem todos os ramos e os limites da SPEC.
+- [x] Gate quick passa.
 
 **Tests**: unit  
 **Gate**: quick  

@@ -96,6 +96,8 @@ return [
 
     'etag_hmac_key' => env('LINKS_ETAG_HMAC_KEY'),
 
+    'cursor_hmac_key' => env('LINKS_CURSOR_HMAC_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Idempotency
