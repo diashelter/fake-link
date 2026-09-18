@@ -28,13 +28,15 @@
 
 ## Handoff
 
-- **Feature atual**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T9)
-- **Próximo passo**: Verifier independente da fatia `links/idempotency`.
+- **Feature atual**: `links/idempotency` — Specify ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T9) · Validate ❌ **FAIL** → Fix iteration **1/3 done**, awaiting re-verify
+- **Próximo passo**: Re-dispatch Verifier independente (iteração 1/3) sobre Fix 1–5 (ausência de header; TTL 24h via UseCase; alter-then-replay; sinal sanitizado `links.idempotency.cleanup_failed`; edge suspended+key).
+- **Fix iteration 1**: Gaps 1–5 fechados com testes (+ prune signal mínimo em produção). Gate: `make lint-backend` OK · `make test-backend` **1058 passed**. `validation.md` deixado para reescrita do Verifier.
+- **Verifier (pré-fix)**: 2026-09-18 — report `.specs/features/links/idempotency/validation.md`. Diff `bc6b4755..52887399`. Spec-anchored: 16/20 ACs; 4 gaps + 1 edge.
 - **Decisões da fatia**: replay preserva `201`, corpo e `Location`/`ETag`/`Cache-Control`, mas gera `X-Request-ID` novo; mesma chave concorrente aguarda autora; somente `201` confirmado retém snapshot; TTL exato de 24 h; bytea via `decode(?, 'hex')` + `bin2hex()`.
 - **Feature anterior**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T17) · Validate ✅ **PASS**
 - **Completed (prévia)**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
-- **In-progress**: Execute completo (T1–T9). Aguardando Verifier.
-- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
+- **In-progress**: Fix iteration 1 committed; aguardando re-verify.
+- **Blockers**: none (gaps de cobertura de teste, não de gate). Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
 - **Branch**: `feature/idempotency` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26
 - **AD-021**: `errorCodes()` opcional em `ApiFormRequest` (default `'INVALID'`)

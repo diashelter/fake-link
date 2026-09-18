@@ -125,7 +125,7 @@ describe('POST /api/v1/links happy path', function () {
             'reservations' => 1,
             'links' => 1,
             'versions' => 1,
-        ]);
+        ])->and(DB::table('idempotency_keys')->count())->toBe(0);
     });
 
     it('builds short_url from configured base, not the request host', function () {
@@ -652,6 +652,23 @@ describe('POST /api/v1/links idempotency', function () {
             ->and(DB::table('idempotency_keys')->count())->toBe(0);
     });
 
+    it('returns 403 ACCOUNT_SUSPENDED with Idempotency-Key and without reserving the key', function () {
+        $user = UserModel::factory()->create(['status' => UserStatus::Suspended->value]);
+        $bearer = createLinkSessionBearer($user);
+
+        postCreateLink(
+            ['destination_url' => 'https://example.com/idem-suspended'],
+            [
+                'Authorization' => 'Bearer '.$bearer,
+                'Idempotency-Key' => 'idem-key-suspended-abcd',
+            ],
+        )->assertForbidden()
+            ->assertJsonPath('code', AuthTokenException::ACCOUNT_SUSPENDED);
+
+        expect(createLinkTableCounts()['links'])->toBe(0)
+            ->and(DB::table('idempotency_keys')->count())->toBe(0);
+    });
+
     it('returns 422 INVALID_IDEMPOTENCY_KEY without writing rows', function () {
         $user = activeLinkOwner();
         $bearer = createLinkSessionBearer($user);
@@ -726,6 +743,58 @@ describe('POST /api/v1/links idempotency', function () {
             ->and($second->headers->get('Cache-Control'))->toBe($first->headers->get('Cache-Control'))
             ->and(createLinkTableCounts()['links'])->toBe(1)
             ->and(DB::table('idempotency_keys')->count())->toBe(1);
+    });
+
+    it('replays the original 201 snapshot after the live link is mutated', function () {
+        $user = activeLinkOwner();
+        $bearer = createLinkSessionBearer($user);
+        $headers = [
+            'Authorization' => 'Bearer '.$bearer,
+            'Idempotency-Key' => 'idem-key-alter-replay-ab',
+        ];
+        $payload = [
+            'destination_url' => 'https://example.com/idem-alter',
+            'title' => 'Original Title',
+        ];
+
+        $first = postCreateLink($payload, $headers);
+        $first->assertCreated()
+            ->assertJsonPath('data.title', 'Original Title');
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $firstBody = $first->getContent();
+        $firstETag = $first->headers->get('ETag');
+        $firstLocation = $first->headers->get('Location');
+        $firstCacheControl = $first->headers->get('Cache-Control');
+        $linkId = $first->json('data.id');
+
+        DB::table('short_links')->where('id', $linkId)->update([
+            'title' => 'Mutated Live Title',
+            'updated_at' => now()->utc()->addHour(),
+        ]);
+        DB::table('link_destination_versions')
+            ->where('short_link_id', $linkId)
+            ->whereNull('valid_to')
+            ->update([
+                'destination_url' => bin2hex(random_bytes(48)),
+            ]);
+
+        $second = postCreateLink($payload, $headers);
+        $second->assertCreated();
+
+        // @phpstan-ignore staticMethod.dynamicCall
+        $secondBody = $second->getContent();
+
+        expect($secondBody)->toBe($firstBody)
+            ->and($secondBody)->toContain('Original Title')
+            ->and($secondBody)->not->toContain('Mutated Live Title')
+            ->and($second->headers->get('Location'))->toBe($firstLocation)
+            ->and($second->headers->get('ETag'))->toBe($firstETag)
+            ->and($second->headers->get('Cache-Control'))->toBe($firstCacheControl)
+            ->and($second->json('data.title'))->toBe('Original Title')
+            ->and(createLinkTableCounts()['links'])->toBe(1)
+            ->and(DB::table('idempotency_keys')->count())->toBe(1)
+            ->and(DB::table('short_links')->where('id', $linkId)->value('title'))->toBe('Mutated Live Title');
     });
 
     it('returns 409 IDEMPOTENCY_KEY_REUSED for the same key with a different command', function () {

@@ -6,6 +6,7 @@ namespace Modules\Links\Infrastructure\Console\Commands;
 
 use DateTimeImmutable;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Modules\Links\Contracts\Repositories\IdempotencyKeyRepository;
 use Throwable;
 
@@ -35,8 +36,11 @@ final class PruneExpiredIdempotencyKeys extends Command
 
         try {
             $deleted = $idempotencyKeys->deleteExpired($now, $batchSize);
-        } catch (Throwable $e) {
-            $this->error('Prune failed: '.$e->getMessage());
+        } catch (Throwable) {
+            Log::warning('links.idempotency.cleanup_failed', [
+                'operation' => 'prune',
+            ]);
+            $this->error('Prune failed.');
 
             return self::FAILURE;
         }

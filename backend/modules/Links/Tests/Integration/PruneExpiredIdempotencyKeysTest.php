@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Modules\Auth\Domain\ValueObjects\UserId;
 use Modules\Auth\Tests\Support\DatabaseSafetyGuard;
@@ -174,15 +176,31 @@ describe('links:prune-idempotency', function () {
 
             public function deleteExpired(DateTimeImmutable $now, int $limit): int
             {
-                throw new RuntimeException('simulated prune failure');
+                throw new RuntimeException('simulated prune failure with secret=super-secret-token');
             }
         };
 
         $this->app->instance(IdempotencyKeyRepository::class, $failing);
 
+        /** @var list<MessageLogged> $logs */
+        $logs = [];
+        Log::listen(function (MessageLogged $event) use (&$logs): void {
+            $logs[] = $event;
+        });
+
         $this->artisan('links:prune-idempotency')->assertFailed();
 
-        expect(DB::table('idempotency_keys')->count())->toBe(2)
+        $cleanupSignals = array_values(array_filter(
+            $logs,
+            fn (MessageLogged $event): bool => $event->message === 'links.idempotency.cleanup_failed',
+        ));
+
+        expect($cleanupSignals)->toHaveCount(1)
+            ->and($cleanupSignals[0]->level)->toBe('warning')
+            ->and($cleanupSignals[0]->context)->toBe(['operation' => 'prune'])
+            ->and(json_encode($cleanupSignals[0]->context, JSON_THROW_ON_ERROR))->not->toContain('super-secret-token')
+            ->and(json_encode($cleanupSignals[0]->context, JSON_THROW_ON_ERROR))->not->toContain('simulated prune failure')
+            ->and(DB::table('idempotency_keys')->count())->toBe(2)
             ->and(DB::table('idempotency_keys')->where('key_hash', pruneHex64('valid'))->exists())->toBeTrue()
             ->and(DB::table('idempotency_keys')->where('key_hash', pruneHex64('expired'))->exists())->toBeTrue();
     });

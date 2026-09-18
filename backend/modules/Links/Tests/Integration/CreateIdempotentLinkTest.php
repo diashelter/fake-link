@@ -187,6 +187,14 @@ describe('CreateIdempotentLink', function () {
             ->and(DB::table('short_links')->count())->toBe(1)
             ->and(DB::table('idempotency_keys')->count())->toBe(1)
             ->and(DB::table('idempotency_keys')->whereNotNull('response_snapshot')->count())->toBe(1);
+
+        $row = DB::table('idempotency_keys')->first();
+        expect($row)->not->toBeNull();
+
+        $createdAt = new DateTimeImmutable((string) $row->created_at);
+        $expiresAt = new DateTimeImmutable((string) $row->expires_at);
+
+        expect($expiresAt->getTimestamp() - $createdAt->getTimestamp())->toBe(24 * 60 * 60);
     });
 
     it('replays the same snapshot without calling CreateLink again', function () {
