@@ -455,11 +455,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Request valida contra `CreateLinkRequest`; `201` contra `LinkResponse` com os headers de `LinkCreated`
-- [ ] `409`, `422` e `429` validam contra `LinkConflict`, `ValidationError` e `TooManyRequests`
-- [ ] Corpo do `201` não contém propriedade fora de `LinkDetail` (`additionalProperties: false`)
-- [ ] Gate: `make test-backend` e `make lint-openapi`
-- [ ] Test count: ≥6 testes passam
+- [x] Request valida contra `CreateLinkRequest`; `201` contra `LinkResponse` com os headers de `LinkCreated`
+- [x] `409`, `422` e `429` validam contra `LinkConflict`, `ValidationError` e `TooManyRequests`
+- [x] Corpo do `201` não contém propriedade fora de `LinkDetail` (`additionalProperties: false`)
+- [x] Gate: `make test-backend` e `make lint-openapi`
+- [x] Test count: ≥6 testes passam
 
 **Tests**: e2e (contract) · **Gate**: full  
 **Commit**: `test(links): assert create link endpoint against the openapi contract`
