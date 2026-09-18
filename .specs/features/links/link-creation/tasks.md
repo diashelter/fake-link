@@ -355,11 +355,11 @@ T15 → T16 → T17
 
 **Done when**:
 
-- [ ] Cada resposta tem `code`, `message`, `request_id`, `Cache-Control: private, no-store` e `X-Request-ID`
-- [ ] `Retry-After` inteiro ≥ 1 nas respostas que o exigem
-- [ ] Teste prova que nenhuma resposta contém alias, destino, título ou dados do ocupante
-- [ ] Gate: `make test-backend`
-- [ ] Test count: ≥8 testes passam
+- [x] Cada resposta tem `code`, `message`, `request_id`, `Cache-Control: private, no-store` e `X-Request-ID`
+- [x] `Retry-After` inteiro ≥ 1 nas respostas que o exigem
+- [x] Teste prova que nenhuma resposta contém alias, destino, título ou dados do ocupante
+- [x] Gate: `make test-backend`
+- [x] Test count: ≥8 testes passam
 
 **Tests**: unit · **Gate**: quick  
 **Commit**: `feat(links): add stable error responses for link creation`
