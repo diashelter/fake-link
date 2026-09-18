@@ -11,7 +11,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **ative-a pelo nome e si
 **Spec**: [spec.md](./spec.md)  
 **Context**: [context.md](./context.md)  
 **Design**: [design.md](./design.md)  
-**Status**: Draft — aguardando aprovação (e confirmação da abordagem A em design.md)
+**Status**: Verified PASS — Execute T1–T17 concluído; validation 2026-09-18
 
 **Pré-requisito de execução:** as fatias [foundation](../foundation/spec.md) e [destination-policy](../destination-policy/spec.md) precisam estar entregues; [slug-policy](../slug-policy/spec.md) tem spec fechada mas ainda não implementada. Não iniciar Execute antes disso.
 

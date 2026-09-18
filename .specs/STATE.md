@@ -28,14 +28,13 @@
 
 ## Handoff
 
-- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute 🔄 (Batch 2/3 em andamento: fases 3+4, T7–T14)
-- **Completed**: Batch 1 T1–T6 (`46e081a9`…`bab6897c`, 857 testes). Pré-requisitos: foundation, slug-policy (PR #25), destination-policy (PR #26).
-- **In progress**: Batch Worker 2 — T7–T14 (repos, CreateLink UseCase, HTTP surface, rate limit).
-- **Next step**: ao concluir Batch 2 → despachar Batch 3 (T15–T17); Verifier automático após T17.
-- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`.
+- **Feature**: `links/link-creation` — Specify ✅ · Discuss ✅ · Design ✅ · Tasks ✅ · Execute ✅ (T1–T17) · Validate ✅ **PASS**
+- **Completed**: T1–T17 on `feature/link-creation` (`46e081a9`…`7dfdec0d`). Verifier report: `.specs/features/links/link-creation/validation.md` (2026-09-18).
+- **Gates**: `make lint-backend` ✅ · `make test-backend` ✅ 987 passed · `make lint-openapi` ✅ (0 errors). Sensor: 6/6 mutants killed. Spec-anchored: 48/48 ACs.
+- **Next step**: abrir PR / merge quando pronto; próxima fatia Links (idempotency ou conforme roadmap).
+- **Blockers**: none. Known inherited: `make lint` pode falhar em `lint-frontend` (e2e Playwright `launchOptions` TS2353) — pré-existente em `main`; não é FAIL desta fatia.
 - **Branch**: `feature/link-creation` (de `main`)
 - **Prior feature**: `links/destination-policy` — Verified PASS 2026-09-17, mesclada via PR #26
-- **Gap de baixo risco herdado**: rollback sequence sem teste dedicado; RESTRICT constraints garantem corretude
 - **AD-021**: `errorCodes()` opcional em `ApiFormRequest` (default `'INVALID'`)
 
 ### Fase 1: Auth + BFF — CONCLUÍDA ✅
@@ -49,4 +48,4 @@ Todas as 9 fatias do pacote BFF Auth entregues e verificadas. Critérios de saí
 
 ### Fase 2: Links + Redirect — INICIADA
 
-Estrutura de specs da API backend criada em `.specs/features/links/` (índice + 13 fatias seed, catálogo `LNK-01`…`LNK-124`). Fatia 1 (`foundation`) e fatia 2 (`slug-policy`) Verified PASS e mescladas em `main`. Fatia 3 (`destination-policy`, LDST-01…24) Verified PASS em `feature/destination-policy` (não mesclada). Fatias 4–13 seguem em status **Seed**. O pacote frontend correspondente (`bff-links/`) será aberto depois.
+Estrutura de specs da API backend criada em `.specs/features/links/` (índice + 13 fatias seed, catálogo `LNK-01`…`LNK-124`). Fatias 1–4 Verified PASS: `foundation`, `slug-policy` (PR #25), `destination-policy` (PR #26), `link-creation` (branch `feature/link-creation`, aguardando PR). Fatias 5–13 seguem em status **Seed**. O pacote frontend correspondente (`bff-links/`) será aberto depois.
