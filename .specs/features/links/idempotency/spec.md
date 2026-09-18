@@ -168,36 +168,36 @@ Um cliente pode concluir `POST /api/v1/links` no servidor, mas perder a resposta
 
 | Requirement ID | Story | Descrição | Phase | Status |
 | --- | --- | --- | --- | --- |
-| LNK-40 | P1: Proteção | Header opcional e formato restrito | Design | Pending |
-| LNK-41 | P1: Proteção / Reuso | HMAC de chave e comando por usuário | Design | Pending |
-| LNK-42 | P1: Replay | Snapshot cifrado e keyring dedicado | Design | Pending |
-| LNK-43 | P1/P2: Replay / Expiração | Replay exato por 24 horas | Design | Pending |
-| LNK-44 | P1: Reuso | `409 IDEMPOTENCY_KEY_REUSED` | Design | Pending |
-| LNI-01 | P1: Proteção | Criação e registro transacionais | Design | Pending |
-| LNI-02 | P1: Proteção | Ausência preserva comportamento atual | Design | Pending |
-| LNI-03 | P1: Proteção | Erros prévios não reservam chave | Design | Pending |
-| LNI-04 | P1: Replay | Status, corpo e headers originais | Design | Pending |
-| LNI-05 | P1: Replay | Request ID novo no replay | Design | Pending |
-| LNI-06 | P1: Replay | Cifra e redação | Design | Pending |
-| LNI-07 | P1: Reuso | `409` sem efeito colateral | Design | Pending |
-| LNI-08 | P1: Reuso | Isolamento e concorrência | Design | Pending |
-| LNI-09 | P1: Reuso | Canonicalização determinística | Design | Pending |
-| LNI-10 | P2: Expiração | Janela exata | Design | Pending |
-| LNI-11 | P2: Expiração | Limpeza segura | Design | Pending |
-| LNI-12 | P2: Expiração | Decrypt falha seguro | Design | Pending |
+| LNK-40 | P1: Proteção | Header opcional e formato restrito | Execute | Verified |
+| LNK-41 | P1: Proteção / Reuso | HMAC de chave e comando por usuário | Execute | Verified |
+| LNK-42 | P1: Replay | Snapshot cifrado e keyring dedicado | Execute | Verified |
+| LNK-43 | P1/P2: Replay / Expiração | Replay exato por 24 horas | Execute | Verified |
+| LNK-44 | P1: Reuso | `409 IDEMPOTENCY_KEY_REUSED` | Execute | Verified |
+| LNI-01 | P1: Proteção | Criação e registro transacionais | Execute | Verified |
+| LNI-02 | P1: Proteção | Ausência preserva comportamento atual | Execute | Verified |
+| LNI-03 | P1: Proteção | Erros prévios não reservam chave | Execute | Verified |
+| LNI-04 | P1: Replay | Status, corpo e headers originais | Execute | Verified |
+| LNI-05 | P1: Replay | Request ID novo no replay | Execute | Verified |
+| LNI-06 | P1: Replay | Cifra e redação | Execute | Verified |
+| LNI-07 | P1: Reuso | `409` sem efeito colateral | Execute | Verified |
+| LNI-08 | P1: Reuso | Isolamento e concorrência | Execute | Verified |
+| LNI-09 | P1: Reuso | Canonicalização determinística | Execute | Verified |
+| LNI-10 | P2: Expiração | Janela exata | Execute | Verified |
+| LNI-11 | P2: Expiração | Limpeza segura | Execute | Verified |
+| LNI-12 | P2: Expiração | Decrypt falha seguro | Execute | Verified |
 
-**Coverage:** 17 total, 0 mapped to tasks ⚠️
+**Coverage:** 17 total, 17 verified ✅
 
 ---
 
 ## Success Criteria
 
-- [ ] Mesma chave e comando canônico criam no máximo um link por usuário em 24 horas.
-- [ ] Replay devolve `201`, corpo e headers semânticos originais, com novo `X-Request-ID`.
-- [ ] Comando normalizado diferente retorna `409 IDEMPOTENCY_KEY_REUSED` sem efeito colateral.
-- [ ] Nenhum teste encontra chave bruta, URL, título ou snapshot em texto claro em PostgreSQL, logs, métricas ou traces.
-- [ ] Concorrência PostgreSQL prova autora única, replay do concorrente e rollback sem resíduo.
-- [ ] `make lint`, `make lint-openapi`, `make test-backend` e `make test-backend-coverage` passam para a fatia.
+- [x] Mesma chave e comando canônico criam no máximo um link por usuário em 24 horas.
+- [x] Replay devolve `201`, corpo e headers semânticos originais, com novo `X-Request-ID`.
+- [x] Comando normalizado diferente retorna `409 IDEMPOTENCY_KEY_REUSED` sem efeito colateral.
+- [x] Nenhum teste encontra chave bruta, URL, título ou snapshot em texto claro em PostgreSQL, logs, métricas ou traces.
+- [x] Concorrência PostgreSQL prova autora única, replay do concorrente e rollback sem resíduo.
+- [x] `make lint`, `make lint-openapi`, `make test-backend` e `make test-backend-coverage` passam para a fatia.
 
 ---
 

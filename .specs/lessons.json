@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 74,
+  "next_id": 78,
   "lessons": [
     {
       "id": "L-026",
@@ -603,6 +603,78 @@
       ],
       "created": "2026-09-17T22:33:11Z",
       "last_seen": "2026-09-17T22:33:11Z"
+    },
+    {
+      "id": "L-074",
+      "key": "ac_gap::when an optional header is absent assert the side effect table stays empty after the happy path not only that the primary resource was created",
+      "text": "When an optional header is absent, assert the side-effect table stays empty after the happy path—not only that the primary resource was created.",
+      "signal": "ac_gap",
+      "scope": "links/idempotency",
+      "status": "candidate",
+      "features": [
+        "links/idempotency"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 Protection AC3 / validation.md — absent Idempotency-Key never asserts idempotency_keys=0 (links/idempotency)"
+      ],
+      "created": "2026-09-18T15:49:04Z",
+      "last_seen": "2026-09-18T15:49:04Z"
+    },
+    {
+      "id": "L-075",
+      "key": "ac_gap::when a ttl is a contract outcome assert the persisted expires at delta after the real write path not only that fixtures pass a hardcoded 24h into the repository",
+      "text": "When a TTL is a contract outcome, assert the persisted expires_at delta after the real write path—not only that fixtures pass a hardcoded +24h into the repository.",
+      "signal": "ac_gap",
+      "scope": "links/idempotency",
+      "status": "candidate",
+      "features": [
+        "links/idempotency"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 Protection AC2 / validation.md — expires_at=created_at+24h not asserted on UseCase path (links/idempotency)"
+      ],
+      "created": "2026-09-18T15:49:04Z",
+      "last_seen": "2026-09-18T15:49:04Z"
+    },
+    {
+      "id": "L-076",
+      "key": "ac_gap::for snapshot replay contracts mutate the live resource after the first success and assert the replay still returns the original bytes and semantic headers",
+      "text": "For snapshot/replay contracts, mutate the live resource after the first success and assert the replay still returns the original bytes and semantic headers.",
+      "signal": "ac_gap",
+      "scope": "links/idempotency",
+      "status": "candidate",
+      "features": [
+        "links/idempotency"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P1 Replay AC4 / validation.md — no alter-then-replay evidence (links/idempotency)"
+      ],
+      "created": "2026-09-18T15:49:04Z",
+      "last_seen": "2026-09-18T15:49:04Z"
+    },
+    {
+      "id": "L-077",
+      "key": "ac_gap::when failure handling must emit a sanitized signal assert the metric or log event not only that the command exits non zero and rows survive",
+      "text": "When failure handling must emit a sanitized signal, assert the metric or log event—not only that the command exits non-zero and rows survive.",
+      "signal": "ac_gap",
+      "scope": "links/idempotency",
+      "status": "candidate",
+      "features": [
+        "links/idempotency"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "P2 AC4 / validation.md — prune failure lacks sanitized signal assertion (links/idempotency)"
+      ],
+      "created": "2026-09-18T15:49:04Z",
+      "last_seen": "2026-09-18T15:49:04Z"
     }
   ]
 }

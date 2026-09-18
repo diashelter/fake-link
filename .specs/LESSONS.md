@@ -210,6 +210,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: AC14/LDST-20 (spec.md P1 Política) — evidenced only at PublicHostClassifierTest.php:161-179 (sub-component, no-I/O) and DestinationUrlPolicyTest.php:305-329 (accepted inputs only) (links)
 - last seen: 2026-09-17T22:33:11Z
 
+### L-074 — When an optional header is absent, assert the side-effect table stays empty after the happy path—not only that the primary resource was created.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `links/idempotency` · harmful: 0
+- features: links/idempotency
+- evidence: P1 Protection AC3 / validation.md — absent Idempotency-Key never asserts idempotency_keys=0 (links/idempotency)
+- last seen: 2026-09-18T15:49:04Z
+
+### L-075 — When a TTL is a contract outcome, assert the persisted expires_at delta after the real write path—not only that fixtures pass a hardcoded +24h into the repository.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `links/idempotency` · harmful: 0
+- features: links/idempotency
+- evidence: P1 Protection AC2 / validation.md — expires_at=created_at+24h not asserted on UseCase path (links/idempotency)
+- last seen: 2026-09-18T15:49:04Z
+
+### L-076 — For snapshot/replay contracts, mutate the live resource after the first success and assert the replay still returns the original bytes and semantic headers.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `links/idempotency` · harmful: 0
+- features: links/idempotency
+- evidence: P1 Replay AC4 / validation.md — no alter-then-replay evidence (links/idempotency)
+- last seen: 2026-09-18T15:49:04Z
+
+### L-077 — When failure handling must emit a sanitized signal, assert the metric or log event—not only that the command exits non-zero and rows survive.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `links/idempotency` · harmful: 0
+- features: links/idempotency
+- evidence: P2 AC4 / validation.md — prune failure lacks sanitized signal assertion (links/idempotency)
+- last seen: 2026-09-18T15:49:04Z
+
 ## Quarantined (failed when applied — ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
